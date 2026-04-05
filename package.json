@@ -3,8 +3,15 @@
   "private": true,
   "workspaces": ["packages/*"],
   "scripts": {
-    "test": "bun run build:clayterm && bun test packages/ghostty-vt packages/solid-xterm packages/test-harness",
+    "test": "bun run build:clayterm && bun test packages/ghostty-vt packages/solid-xterm packages/test-harness packages/clayterm-examples",
     "test:clayterm-blackbox": "bun test packages/test-harness/test/clayterm-blackbox.test.ts",
-    "build:clayterm": "bun run ./scripts/build-clayterm.ts"
+    "build:clayterm": "bun run ./scripts/build-clayterm.ts",
+    "examples": "bun run ./packages/clayterm-examples/src/cli.ts",
+    "examples:list": "bun run ./packages/clayterm-examples/src/cli.ts list",
+    "example:basic-button": "bun run build:clayterm && bun run ./packages/clayterm-examples/src/examples/basic-button.ts",
+    "example:carousel-track": "bun run build:clayterm && bun run ./packages/clayterm-examples/src/examples/carousel-track.ts",
+    "example:carousel-floating": "bun run build:clayterm && bun run ./packages/clayterm-examples/src/examples/carousel-floating.ts",
+    "example:carousel-transition": "bun run build:clayterm && bun run ./packages/clayterm-examples/src/examples/carousel-transition.ts",
+    "example:selection": "bun run build:clayterm && bun run ./packages/clayterm-examples/src/examples/selection.ts"
   }
 }

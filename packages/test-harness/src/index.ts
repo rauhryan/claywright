@@ -457,6 +457,10 @@ export function createSession(options?: TerminalSessionOptions): TerminalSession
   return new TerminalSession(options);
 }
 
+export function resolveExample(name: string): string {
+  return new URL(`../../clayterm-examples/src/examples/${name}.ts`, import.meta.url).pathname;
+}
+
 export { createTerminal, GhosttyTerminal } from "@tui/ghostty-vt";
 export { 
   MouseEncoder, 

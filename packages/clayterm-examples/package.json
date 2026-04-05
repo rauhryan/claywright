@@ -1,0 +1,16 @@
+{
+  "name": "@tui/clayterm-examples",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "test": "bun test",
+    "run": "bun run ./src/cli.ts",
+    "basic-button": "bun run ./src/examples/basic-button.ts",
+    "carousel-track": "bun run ./src/examples/carousel-track.ts",
+    "carousel-floating": "bun run ./src/examples/carousel-floating.ts",
+    "carousel-transition": "bun run ./src/examples/carousel-transition.ts",
+    "selection": "bun run ./src/examples/selection.ts"
+  }
+}
