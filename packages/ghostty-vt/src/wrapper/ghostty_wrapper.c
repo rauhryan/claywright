@@ -115,6 +115,11 @@ GHOSTTY_API void ghostty_wrapper_mouse_event_set_button(
     ghostty_mouse_event_set_button(event, (GhosttyMouseButton)button);
 }
 
+GHOSTTY_API void ghostty_wrapper_mouse_event_clear_button(
+    GhosttyMouseEvent event) {
+    ghostty_mouse_event_clear_button(event);
+}
+
 GHOSTTY_API void ghostty_wrapper_mouse_event_set_mods(
     GhosttyMouseEvent event,
     uint8_t mods) {

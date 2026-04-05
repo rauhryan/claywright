@@ -132,6 +132,36 @@ describe("TerminalSession", () => {
     expect(session.getMouseTrackingMode()).toBe(MouseTracking.Button);
   });
 
+  it("asserts selection on inverse cells", () => {
+    const term = session.getTerminal();
+    term.write("\x1b[7mHello\x1b[0m there");
+
+    expect(() => session.assertSelection(0, 0, 4, 0)).not.toThrow();
+    expect(() => session.assertNoSelection([{ col: 5, row: 0 }, { col: 6, row: 0 }])).not.toThrow();
+  });
+
+  it("returns selected text from a range", () => {
+    const term = session.getTerminal();
+    term.write("Hello world");
+
+    expect(session.getSelectedText(0, 0, 4, 0)).toBe("Hello");
+  });
+
+  it("captures style diffs", () => {
+    const before = session.captureStyles([
+      { col: 0, row: 0 },
+      { col: 1, row: 0 },
+      { col: 2, row: 0 },
+    ]);
+
+    const term = session.getTerminal();
+    term.write("\x1b[7mABC\x1b[0m");
+
+    const changes = session.getStyleChanges(before);
+    expect(changes.length).toBeGreaterThan(0);
+    expect(changes.some((change) => change.after.inverse)).toBe(true);
+  });
+
   it("sends mouse click", () => {
     session.startVTCapture();
     session.click(5, 3);

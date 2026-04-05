@@ -71,6 +71,10 @@ const lib = dlopen(libPath, {
     args: ["usize", "i32"],
     returns: FFIType.void,
   },
+  ghostty_wrapper_mouse_event_clear_button: {
+    args: ["usize"],
+    returns: FFIType.void,
+  },
   ghostty_wrapper_mouse_event_set_mods: {
     args: ["usize", "u8"],
     returns: FFIType.void,
@@ -486,6 +490,11 @@ export class MouseEvent {
   }
 
   setButton(button: MouseButton): void {
+    if (button === MouseButton.Unknown) {
+      lib.symbols.ghostty_wrapper_mouse_event_clear_button(this.handle);
+      return;
+    }
+
     lib.symbols.ghostty_wrapper_mouse_event_set_button(this.handle, button);
   }
 

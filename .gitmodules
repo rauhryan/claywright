@@ -1,0 +1,3 @@
+[submodule "packages/clayterm"]
+	path = packages/clayterm
+	url = git@github.com:rauhryan/clayterm.git

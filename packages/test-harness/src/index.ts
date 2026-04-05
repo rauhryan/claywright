@@ -38,6 +38,13 @@ export interface CellMatch {
   bgPalette?: number;
 }
 
+export interface StyleChange {
+  col: number;
+  row: number;
+  before: TerminalCellStyle;
+  after: TerminalCellStyle;
+}
+
 export class TerminalSession {
   private terminal: GhosttyTerminal;
   private process: Subprocess<"pipe", "pipe", "pipe"> | null = null;
@@ -115,7 +122,7 @@ export class TerminalSession {
     this.terminal.write(bytes);
     
     if (this.process?.stdin) {
-      Bun.write(this.process.stdin, bytes);
+      this.process.stdin.write(bytes);
     }
   }
 
@@ -174,6 +181,14 @@ export class TerminalSession {
 
   click(col: number, row: number, button: MouseButton = MouseButton.Left): void {
     this.sendMouse({ action: MouseAction.Press, button, col, row });
+    this.sendMouse({ action: MouseAction.Release, button, col, row });
+  }
+
+  mouseDown(col: number, row: number, button: MouseButton = MouseButton.Left): void {
+    this.sendMouse({ action: MouseAction.Press, button, col, row });
+  }
+
+  mouseUp(col: number, row: number, button: MouseButton = MouseButton.Left): void {
     this.sendMouse({ action: MouseAction.Release, button, col, row });
   }
 
@@ -284,6 +299,72 @@ export class TerminalSession {
     }
 
     return changes;
+  }
+
+  getStyleChanges(
+    before: Array<{ col: number; row: number; style: TerminalCellStyle }>,
+  ): StyleChange[] {
+    const changes: StyleChange[] = [];
+
+    for (const cell of before) {
+      const after = this.getCellStyle(cell.col, cell.row);
+      if (!this.styleEquals(cell.style, after)) {
+        changes.push({ col: cell.col, row: cell.row, before: cell.style, after });
+      }
+    }
+
+    return changes;
+  }
+
+  captureStyles(cells: Array<{ col: number; row: number }>): Array<{ col: number; row: number; style: TerminalCellStyle }> {
+    return cells.map((cell) => ({
+      ...cell,
+      style: this.getCellStyle(cell.col, cell.row),
+    }));
+  }
+
+  assertSelection(startCol: number, startRow: number, endCol: number, endRow: number): void {
+    const [leftCol, rightCol] = startCol <= endCol ? [startCol, endCol] : [endCol, startCol];
+    const [topRow, bottomRow] = startRow <= endRow ? [startRow, endRow] : [endRow, startRow];
+
+    for (let row = topRow; row <= bottomRow; row++) {
+      const rowStart = row === topRow ? leftCol : 0;
+      const rowEnd = row === bottomRow ? rightCol : this.cols - 1;
+
+      for (let col = rowStart; col <= rowEnd; col++) {
+        if (!this.matchesStyle(col, row, { inverse: true })) {
+          throw new Error(`Expected selection at (${col}, ${row})`);
+        }
+      }
+    }
+  }
+
+  assertNoSelection(cells: Array<{ col: number; row: number }>): void {
+    for (const cell of cells) {
+      if (this.matchesStyle(cell.col, cell.row, { inverse: true })) {
+        throw new Error(`Expected no selection at (${cell.col}, ${cell.row})`);
+      }
+    }
+  }
+
+  getSelectedText(startCol: number, startRow: number, endCol: number, endRow: number): string {
+    return this.getTextRange(startCol, startRow, endCol, endRow).trimEnd();
+  }
+
+  private styleEquals(a: TerminalCellStyle, b: TerminalCellStyle): boolean {
+    return a.bold === b.bold &&
+      a.italic === b.italic &&
+      a.faint === b.faint &&
+      a.blink === b.blink &&
+      a.inverse === b.inverse &&
+      a.invisible === b.invisible &&
+      a.strikethrough === b.strikethrough &&
+      a.overline === b.overline &&
+      a.underline === b.underline &&
+      a.fg.tag === b.fg.tag &&
+      a.fg.palette === b.fg.palette &&
+      a.bg.tag === b.bg.tag &&
+      a.bg.palette === b.bg.palette;
   }
 
   findText(text: string): { row: number; col: number } | null {

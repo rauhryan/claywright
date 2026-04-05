@@ -1,5 +1,10 @@
 {
   "name": "tui-monorepo",
   "private": true,
-  "workspaces": ["packages/*"]
+  "workspaces": ["packages/*"],
+  "scripts": {
+    "test": "bun run build:clayterm && bun test packages/ghostty-vt packages/solid-xterm packages/test-harness",
+    "test:clayterm-blackbox": "bun test packages/test-harness/test/clayterm-blackbox.test.ts",
+    "build:clayterm": "bash -lc 'cd packages/clayterm && bun run build:wasm'"
+  }
 }
