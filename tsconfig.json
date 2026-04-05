@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "clayterm": ["packages/clayterm/build/npm/esm/mod.js"],
+      "clayterm/input": ["packages/clayterm/build/npm/esm/input.js"],
+      "clayterm/ops": ["packages/clayterm/build/npm/esm/ops.js"],
+      "clayterm/term": ["packages/clayterm/build/npm/esm/term.js"],
+      "clayterm/wasm": ["packages/clayterm/build/npm/esm/wasm.js"]
+    }
+  }
+}

@@ -6,11 +6,8 @@ import {
   grow,
   open,
   rgba,
-  setWasmSource,
   text,
-} from "../../../clayterm/mod.ts";
-
-setWasmSource(new URL("../../../clayterm/clayterm.wasm", import.meta.url));
+} from "clayterm";
 
 let term = await createTerm({ width: 40, height: 10 });
 let input = await createInput();
