@@ -1,0 +1,23 @@
+{
+  "name": "@tui/solid-xterm",
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": "./jsx-runtime.ts",
+    "./jsx-runtime": "./jsx-runtime.ts",
+    "./jsx-dev-runtime": "./jsx-runtime.ts"
+  },
+  "scripts": {
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@babel/core": "^7.28.0",
+    "@babel/preset-typescript": "^7.27.1",
+    "@xterm/headless": "^6.0.0",
+    "babel-preset-solid": "2.0.0-beta.5",
+    "solid-js": "2.0.0-beta.5"
+  },
+  "devDependencies": {
+    "bun-types": "latest"
+  }
+}

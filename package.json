@@ -1,0 +1,5 @@
+{
+  "name": "tui-monorepo",
+  "private": true,
+  "workspaces": ["packages/*"]
+}
