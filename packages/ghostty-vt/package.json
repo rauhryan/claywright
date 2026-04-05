@@ -1,0 +1,16 @@
+{
+  "name": "@tui/ghostty-vt",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Bun FFI bindings for libghostty-vt terminal emulator",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "build": "bash src/wrapper/build.sh",
+    "test": "bun test",
+    "rebuild:ghostty": "cd ghostty-src && zig build -Demit-lib-vt && cp zig-out/lib/libghostty-vt.dylib ../lib/"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}

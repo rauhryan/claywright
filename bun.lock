@@ -5,6 +5,10 @@
     "": {
       "name": "tui-monorepo",
     },
+    "packages/ghostty-vt": {
+      "name": "@tui/ghostty-vt",
+      "version": "0.1.0",
+    },
     "packages/solid-xterm": {
       "name": "@tui/solid-xterm",
       "version": "0.1.0",
@@ -17,6 +21,13 @@
       },
       "devDependencies": {
         "bun-types": "latest",
+      },
+    },
+    "packages/test-harness": {
+      "name": "@tui/test-harness",
+      "version": "0.1.0",
+      "dependencies": {
+        "@tui/ghostty-vt": "workspace:*",
       },
     },
   },
@@ -89,7 +100,11 @@
 
     "@solidjs/signals": ["@solidjs/signals@0.13.9", "", {}, "sha512-+w+ShIB3hunVM0HZcXnhUhfLQvSdKlZflTQ0q3P9B/IfDOS8GPelY28wGouGt/6QzfJ1ueqx8bOg1TFQutPuaQ=="],
 
+    "@tui/ghostty-vt": ["@tui/ghostty-vt@workspace:packages/ghostty-vt"],
+
     "@tui/solid-xterm": ["@tui/solid-xterm@workspace:packages/solid-xterm"],
+
+    "@tui/test-harness": ["@tui/test-harness@workspace:packages/test-harness"],
 
     "@types/node": ["@types/node@25.5.2", "", { "dependencies": { "undici-types": "~7.18.0" } }, "sha512-tO4ZIRKNC+MDWV4qKVZe3Ql/woTnmHDr5JD8UI5hn2pwBrHEwOEMZK7WlNb5RKB6EoJ02gwmQS9OrjuFnZYdpg=="],
 

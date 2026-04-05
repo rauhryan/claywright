@@ -1,0 +1,17 @@
+{
+  "name": "@tui/test-harness",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Terminal UI test harness using ghostty-vt for accurate emulation",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "test": "bun test"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@tui/ghostty-vt": "workspace:*"
+  }
+}
