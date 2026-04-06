@@ -1,3 +1,7 @@
 node_modules/
 packages/ghostty-vt/ghostty-src
 packages/ghostty-vt/lib
+
+# formatter/linter ignore helpers
+.oxlintignore
+.prettierignore

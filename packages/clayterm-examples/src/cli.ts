@@ -1,6 +1,7 @@
 import { examples, type ExampleName } from "./index";
 
-const name = process.argv[2] as ExampleName | undefined;
+const arg = process.argv[2];
+const name = arg === "list" ? arg : (arg as ExampleName | undefined);
 const available = Object.keys(examples).join("\n  - ");
 
 if (!name || name === "list") {

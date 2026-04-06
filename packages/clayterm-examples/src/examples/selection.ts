@@ -10,7 +10,7 @@ interface State {
 
 const { width, height } = getTerminalSize();
 
-const example: ExampleDefinition<State, Op> = {
+const example: ExampleDefinition<State> = {
   width,
   height,
   initialState: {

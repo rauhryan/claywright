@@ -22,7 +22,7 @@ import {
 
 const size = getTerminalSize();
 
-const example: ExampleDefinition<CarouselState, Op> = {
+const example: ExampleDefinition<CarouselState> = {
   width: size.width,
   height: size.height,
   initialState: initialCarouselState(size),

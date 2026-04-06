@@ -1,0 +1,27 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "lib": ["dom", "dom.iterable", "es2022"],
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "skipLibCheck": true,
+    "target": "es2022",
+    "types": ["bun", "node"]
+  },
+  "include": [
+    "global.d.ts",
+    "packages/core/src/**/*.ts",
+    "packages/core/test/**/*.ts",
+    "packages/ghostty-vt/src/**/*.ts",
+    "packages/ghostty-vt/test/**/*.ts",
+    "packages/test-harness/src/**/*.ts",
+    "packages/test-harness/test/**/*.ts",
+    "packages/solid-bindings/**/*.ts",
+    "packages/solid-bindings/**/*.tsx",
+    "packages/clayterm-examples/src/**/*.ts",
+    "packages/clayterm-examples/test/**/*.ts"
+  ],
+  "exclude": ["packages/clayterm/**/*"]
+}

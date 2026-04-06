@@ -1,4 +1,4 @@
-import { createInput, createTerm, type InputEvent, type PointerEvent } from "clayterm";
+import { createInput, createTerm, type InputEvent, type Op, type PointerEvent } from "clayterm";
 
 export interface PointerState {
   x: number;
@@ -6,11 +6,11 @@ export interface PointerState {
   down: boolean;
 }
 
-export interface ExampleDefinition<State, Ops> {
+export interface ExampleDefinition<State> {
   width: number;
   height: number;
   initialState: State;
-  view(state: State, pointer: PointerState): Ops[];
+  view(state: State, pointer: PointerState): Op[];
   reduce(state: State, inputEvents: InputEvent[], pointerEvents: PointerEvent[]): State;
   summary?(state: State): string | null;
   animate?(state: State): State;
@@ -24,7 +24,7 @@ export function getTerminalSize() {
   return { width, height };
 }
 
-export async function runExample<State, Ops>(definition: ExampleDefinition<State, Ops>) {
+export async function runExample<State>(definition: ExampleDefinition<State>) {
   const term = await createTerm({ width: definition.width, height: definition.height });
   const input = await createInput();
 
@@ -105,13 +105,13 @@ export async function runExample<State, Ops>(definition: ExampleDefinition<State
 
   frame();
 
-  process.stdin.on("data", (buf) => {
+  process.stdin.on("data", (buf: Buffer) => {
     if (pendingInputTimer) {
       clearTimeout(pendingInputTimer);
       pendingInputTimer = undefined;
     }
 
-    const result = input.scan(new Uint8Array(buf));
+    const result = input.scan(new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength));
     const { events, pending } = result;
 
     for (const event of events) {

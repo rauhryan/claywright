@@ -5,11 +5,11 @@
     "jsx": "react-jsx",
     "jsxImportSource": "@tui/solid-bindings",
     "paths": {
-      "clayterm": ["packages/clayterm/build/npm/esm/mod.js"],
-      "clayterm/input": ["packages/clayterm/build/npm/esm/input.js"],
-      "clayterm/ops": ["packages/clayterm/build/npm/esm/ops.js"],
-      "clayterm/term": ["packages/clayterm/build/npm/esm/term.js"],
-      "clayterm/wasm": ["packages/clayterm/build/npm/esm/wasm.js"],
+      "clayterm": ["packages/clayterm/build/npm/esm/mod.d.ts"],
+      "clayterm/input": ["packages/clayterm/build/npm/esm/input.d.ts"],
+      "clayterm/ops": ["packages/clayterm/build/npm/esm/ops.d.ts"],
+      "clayterm/term": ["packages/clayterm/build/npm/esm/term.d.ts"],
+      "clayterm/wasm": ["packages/clayterm/build/npm/esm/wasm.d.ts"],
       "@tui/solid-bindings": ["packages/solid-bindings/src/index.ts"],
       "@tui/solid-bindings/jsx-runtime": ["packages/solid-bindings/src/jsx-runtime.ts"]
     }

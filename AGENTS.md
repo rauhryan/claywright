@@ -68,6 +68,31 @@ bun test packages/ghostty-vt packages/solid-bindings packages/test-harness packa
 bun test packages/solid-bindings
 ```
 
+## Quality Gates
+
+Before considering work complete, run the relevant checks for the files you touched.
+
+```bash
+# format the repo (markdown is ignored)
+bun run fmt
+
+# verify formatting in CI-style mode
+bun run fmt:check
+
+# lint actively developed packages
+bun run lint
+
+# focused regression tests for current architecture work
+bun test packages/core packages/solid-bindings
+```
+
+Rules:
+
+- Do not leave known TypeScript errors in files you touched.
+- If a broader workspace `tsc` failure is unrelated, mention it explicitly and keep your touched files clean.
+- Prefer adding a blackbox or integration test for interaction changes.
+- Run `bun run lint` and `bun run fmt:check` before proposing a commit.
+
 ## Building Clayterm
 
 Clayterm is a git submodule. Build it with:

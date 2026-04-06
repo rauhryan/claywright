@@ -165,7 +165,7 @@ function pointInRect(
   return x >= rect.x && x < rect.x + rect.width && y >= rect.y && y < rect.y + rect.height;
 }
 
-const example: ExampleDefinition<State, Op> = {
+const example: ExampleDefinition<State> = {
   width: size.width,
   height: size.height,
   initialState: {
