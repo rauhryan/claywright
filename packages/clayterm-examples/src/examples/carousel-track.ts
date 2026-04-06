@@ -50,13 +50,32 @@ const example: ExampleDefinition<CarouselState, Op> = {
 
     const ops: Op[] = [];
     ops.push(
-      open("root", { layout: { width: grow(), height: grow(), direction: "ttb" }, bg: palette.appBg }),
-      open("", { layout: { width: grow(), height: fixed(metrics.frameTopY) } }), close(),
-      open("center-row", { layout: { width: grow(), height: fixed(metrics.stackHeight), direction: "ltr" }, bg: palette.appBg }),
-      open("", { layout: { width: grow(), height: grow() } }), close(),
-      open("stack", { layout: { width: fixed(metrics.stackWidth), height: fixed(metrics.stackHeight), direction: "ttb" }, bg: palette.appBg }),
-      open("frame-row", { layout: { width: grow(), height: fixed(metrics.frameOuterHeight), direction: "ltr" }, bg: palette.appBg }),
-      open("", { layout: { width: grow(), height: grow() } }), close(),
+      open("root", {
+        layout: { width: grow(), height: grow(), direction: "ttb" },
+        bg: palette.appBg,
+      }),
+      open("", { layout: { width: grow(), height: fixed(metrics.frameTopY) } }),
+      close(),
+      open("center-row", {
+        layout: { width: grow(), height: fixed(metrics.stackHeight), direction: "ltr" },
+        bg: palette.appBg,
+      }),
+      open("", { layout: { width: grow(), height: grow() } }),
+      close(),
+      open("stack", {
+        layout: {
+          width: fixed(metrics.stackWidth),
+          height: fixed(metrics.stackHeight),
+          direction: "ttb",
+        },
+        bg: palette.appBg,
+      }),
+      open("frame-row", {
+        layout: { width: grow(), height: fixed(metrics.frameOuterHeight), direction: "ltr" },
+        bg: palette.appBg,
+      }),
+      open("", { layout: { width: grow(), height: grow() } }),
+      close(),
       open("frame", {
         layout: {
           width: fixed(metrics.frameOuterWidth),
@@ -74,38 +93,83 @@ const example: ExampleDefinition<CarouselState, Op> = {
         bg: palette.frameBg,
       }),
       open("track", {
-        layout: { width: fixed(trackWidth), height: fixed(metrics.frameInnerHeight), direction: "ltr" },
+        layout: {
+          width: fixed(trackWidth),
+          height: fixed(metrics.frameInnerHeight),
+          direction: "ltr",
+        },
         bg: palette.frameBg,
       }),
     );
 
     for (const index of indices) {
       const rows = buildSlideRows(slides[index], metrics.frameInnerWidth, metrics.frameInnerHeight);
-      ops.push(open("", { layout: { width: fixed(metrics.frameInnerWidth), height: fixed(metrics.frameInnerHeight), direction: "ttb" }, bg: palette.frameBg }));
+      ops.push(
+        open("", {
+          layout: {
+            width: fixed(metrics.frameInnerWidth),
+            height: fixed(metrics.frameInnerHeight),
+            direction: "ttb",
+          },
+          bg: palette.frameBg,
+        }),
+      );
       pushSlideRows(ops, rows, palette.frameBg);
       ops.push(close());
     }
 
     ops.push(
-      close(), close(), close(),
-      open("", { layout: { width: grow(), height: grow() } }), close(),
       close(),
-      open("", { layout: { width: grow(), height: fixed(CONTROL_TO_FRAME_GAP) } }), close(),
-      open("controls", { layout: { width: grow(), height: fixed(1), direction: "ltr" }, bg: palette.appBg }),
-      open("", { layout: { width: grow(), height: grow() } }), close(),
+      close(),
+      close(),
+      open("", { layout: { width: grow(), height: grow() } }),
+      close(),
+      close(),
+      open("", { layout: { width: grow(), height: fixed(CONTROL_TO_FRAME_GAP) } }),
+      close(),
+      open("controls", {
+        layout: { width: grow(), height: fixed(1), direction: "ltr" },
+        bg: palette.appBg,
+      }),
+      open("", { layout: { width: grow(), height: grow() } }),
+      close(),
     );
 
-    pushButton(ops, "Prev", metrics.controlWidth, hovered === "prev", state.pressedButton === "prev");
-    ops.push(open("", { layout: { width: fixed(CONTROL_GAP), height: fixed(1) }, bg: palette.appBg }), close());
-    ops.push(open("indicator", { layout: { width: fixed(9), height: fixed(1) }, bg: palette.appBg }), text(centerText(indicator, 9), { color: palette.indicatorText }), close());
-    ops.push(open("", { layout: { width: fixed(CONTROL_GAP), height: fixed(1) }, bg: palette.appBg }), close());
-    pushButton(ops, "Next", metrics.controlWidth, hovered === "next", state.pressedButton === "next");
+    pushButton(
+      ops,
+      "Prev",
+      metrics.controlWidth,
+      hovered === "prev",
+      state.pressedButton === "prev",
+    );
+    ops.push(
+      open("", { layout: { width: fixed(CONTROL_GAP), height: fixed(1) }, bg: palette.appBg }),
+      close(),
+    );
+    ops.push(
+      open("indicator", { layout: { width: fixed(9), height: fixed(1) }, bg: palette.appBg }),
+      text(centerText(indicator, 9), { color: palette.indicatorText }),
+      close(),
+    );
+    ops.push(
+      open("", { layout: { width: fixed(CONTROL_GAP), height: fixed(1) }, bg: palette.appBg }),
+      close(),
+    );
+    pushButton(
+      ops,
+      "Next",
+      metrics.controlWidth,
+      hovered === "next",
+      state.pressedButton === "next",
+    );
 
     ops.push(
-      open("", { layout: { width: grow(), height: grow() } }), close(),
+      open("", { layout: { width: grow(), height: grow() } }),
       close(),
       close(),
-      open("", { layout: { width: grow(), height: grow() } }), close(),
+      close(),
+      open("", { layout: { width: grow(), height: grow() } }),
+      close(),
       close(),
       close(),
     );
@@ -117,7 +181,16 @@ const example: ExampleDefinition<CarouselState, Op> = {
 
     for (const event of inputEvents) {
       if (event.type === "mousemove" || event.type === "mousedown" || event.type === "mouseup") {
-        next.pointer = { x: event.x, y: event.y, down: event.type === "mousedown" ? true : event.type === "mouseup" ? false : next.pointer.down };
+        next.pointer = {
+          x: event.x,
+          y: event.y,
+          down:
+            event.type === "mousedown"
+              ? true
+              : event.type === "mouseup"
+                ? false
+                : next.pointer.down,
+        };
       }
       if (event.type === "keydown") {
         if (event.key === "ArrowRight") next = beginTransition(next, 1);
@@ -130,7 +203,11 @@ const example: ExampleDefinition<CarouselState, Op> = {
         const pressed = next.pressedButton;
         const hovered = buttonAtPointer(next.pointer, layoutMetrics(next.size));
         next.pressedButton = null;
-        if ((event.button === "left" || event.button === "release") && pressed && hovered === pressed) {
+        if (
+          (event.button === "left" || event.button === "release") &&
+          pressed &&
+          hovered === pressed
+        ) {
           next = beginTransition(next, pressed === "prev" ? -1 : 1);
         }
       }

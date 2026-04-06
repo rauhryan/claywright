@@ -41,12 +41,12 @@ You send ops (desired state), trust the result, and stream to stdout.
 
 ### State Layers
 
-| Layer | What | Where |
-|-------|------|-------|
-| **Signals** | App state (what the app "is") | Your JS code |
-| **Ops** | Message format (what you want on screen "now") | Passed to clayterm |
-| **Front/Back buffers** | Screen cache (what was on screen) | Clayterm WASM internal |
-| **ANSI** | Minimal output (what changed) | Streamed to stdout |
+| Layer                  | What                                           | Where                  |
+| ---------------------- | ---------------------------------------------- | ---------------------- |
+| **Signals**            | App state (what the app "is")                  | Your JS code           |
+| **Ops**                | Message format (what you want on screen "now") | Passed to clayterm     |
+| **Front/Back buffers** | Screen cache (what was on screen)              | Clayterm WASM internal |
+| **ANSI**               | Minimal output (what changed)                  | Streamed to stdout     |
 
 ## Components
 
@@ -60,6 +60,7 @@ Renders text content.
 ```
 
 Props:
+
 - `color`: Text color (optional)
 
 ## JSX Transformation

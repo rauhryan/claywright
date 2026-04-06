@@ -1,6 +1,6 @@
 import { spawn, Subprocess } from "bun";
-import { 
-  createTerminal, 
+import {
+  createTerminal,
   GhosttyTerminal,
   type TerminalCell,
   type TerminalCellStyle,
@@ -67,7 +67,7 @@ export class TerminalSession {
       rows: this.rows,
       maxScrollback: 10000,
     });
-    this.mouseEncoder = new MouseEncoder({ 
+    this.mouseEncoder = new MouseEncoder({
       format: MouseFormat.SGR,
       tracking: MouseTracking.Any,
     });
@@ -85,26 +85,26 @@ export class TerminalSession {
       stdin: "pipe",
       stderr: "pipe",
       cwd: this.cwd,
-      env: { 
-        ...process.env, 
+      env: {
+        ...process.env,
         ...this.env,
-        TERM: "xterm-256color", 
-        COLUMNS: String(this.cols), 
-        LINES: String(this.rows) 
+        TERM: "xterm-256color",
+        COLUMNS: String(this.cols),
+        LINES: String(this.rows),
       },
     });
 
     const reader = this.process.stdout.getReader();
-    
+
     const readOutput = async () => {
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-        
+
         if (this.capturingSequences) {
           this.vtSequenceLog.push(value);
         }
-        
+
         this.terminal.write(value);
       }
     };
@@ -114,13 +114,13 @@ export class TerminalSession {
 
   write(data: string | Uint8Array): void {
     const bytes = typeof data === "string" ? new TextEncoder().encode(data) : data;
-    
+
     if (this.capturingSequences) {
       this.vtSequenceLog.push(bytes);
     }
-    
+
     this.terminal.write(bytes);
-    
+
     if (this.process?.stdin) {
       this.process.stdin.write(bytes);
     }
@@ -142,7 +142,7 @@ export class TerminalSession {
       pageup: "\x1b[5~",
       pagedown: "\x1b[6~",
     };
-    
+
     const sequence = keyMap[key.toLowerCase()] ?? key;
     this.write(sequence);
   }
@@ -158,21 +158,16 @@ export class TerminalSession {
     const cellHeight = 20;
     const x = options.col * cellWidth + cellWidth / 2;
     const y = options.row * cellHeight + cellHeight / 2;
-    
-    this.mouseEncoder.setSize(
-      this.cols * cellWidth,
-      this.rows * cellHeight,
-      cellWidth,
-      cellHeight
-    );
-    
+
+    this.mouseEncoder.setSize(this.cols * cellWidth, this.rows * cellHeight, cellWidth, cellHeight);
+
     this.mouseEvent.setAction(options.action);
     this.mouseEvent.setButton(options.button);
     this.mouseEvent.setPosition(x, y);
     if (options.modifiers !== undefined) {
       this.mouseEvent.setModifiers(options.modifiers);
     }
-    
+
     const sequence = this.mouseEncoder.encode(this.mouseEvent);
     if (sequence) {
       this.write(sequence);
@@ -198,18 +193,18 @@ export class TerminalSession {
   }
 
   mouseMove(col: number, row: number): void {
-    this.sendMouse({ 
-      action: MouseAction.Motion, 
-      button: MouseButton.Unknown, 
-      col, 
-      row 
+    this.sendMouse({
+      action: MouseAction.Motion,
+      button: MouseButton.Unknown,
+      col,
+      row,
     });
   }
 
   getScreen(): ScreenSnapshot {
     const raw = this.terminal.getScreen();
     const lines = raw.split("\n");
-    
+
     return {
       cols: this.cols,
       rows: this.rows,
@@ -241,7 +236,13 @@ export class TerminalSession {
     return this.terminal.getMouseTrackingMode();
   }
 
-  drag(startCol: number, startRow: number, endCol: number, endRow: number, button: MouseButton = MouseButton.Left): void {
+  drag(
+    startCol: number,
+    startRow: number,
+    endCol: number,
+    endRow: number,
+    button: MouseButton = MouseButton.Left,
+  ): void {
     this.sendMouse({ action: MouseAction.Press, button, col: startCol, row: startRow });
     this.sendMouse({ action: MouseAction.Motion, button, col: endCol, row: endRow });
     this.sendMouse({ action: MouseAction.Release, button, col: endCol, row: endRow });
@@ -279,7 +280,9 @@ export class TerminalSession {
     return parts.join("\n");
   }
 
-  getChangedCells(previous: ScreenSnapshot): Array<{ col: number; row: number; before: string; after: string }> {
+  getChangedCells(
+    previous: ScreenSnapshot,
+  ): Array<{ col: number; row: number; before: string; after: string }> {
     const current = this.getScreen();
     const changes: Array<{ col: number; row: number; before: string; after: string }> = [];
     const maxRows = Math.max(previous.lines.length, current.lines.length);
@@ -316,7 +319,9 @@ export class TerminalSession {
     return changes;
   }
 
-  captureStyles(cells: Array<{ col: number; row: number }>): Array<{ col: number; row: number; style: TerminalCellStyle }> {
+  captureStyles(
+    cells: Array<{ col: number; row: number }>,
+  ): Array<{ col: number; row: number; style: TerminalCellStyle }> {
     return cells.map((cell) => ({
       ...cell,
       style: this.getCellStyle(cell.col, cell.row),
@@ -352,7 +357,8 @@ export class TerminalSession {
   }
 
   private styleEquals(a: TerminalCellStyle, b: TerminalCellStyle): boolean {
-    return a.bold === b.bold &&
+    return (
+      a.bold === b.bold &&
       a.italic === b.italic &&
       a.faint === b.faint &&
       a.blink === b.blink &&
@@ -364,7 +370,8 @@ export class TerminalSession {
       a.fg.tag === b.fg.tag &&
       a.fg.palette === b.fg.palette &&
       a.bg.tag === b.bg.tag &&
-      a.bg.palette === b.bg.palette;
+      a.bg.palette === b.bg.palette
+    );
   }
 
   findText(text: string): { row: number; col: number } | null {
@@ -393,15 +400,17 @@ export class TerminalSession {
   }
 
   getVTSequences(): string[] {
-    return this.vtSequenceLog.map(chunk => 
+    return this.vtSequenceLog.map((chunk) =>
       Array.from(chunk)
-        .map(b => b < 32 || b > 126 ? `\\x${b.toString(16).padStart(2, '0')}` : String.fromCharCode(b))
-        .join('')
+        .map((b) =>
+          b < 32 || b > 126 ? `\\x${b.toString(16).padStart(2, "0")}` : String.fromCharCode(b),
+        )
+        .join(""),
     );
   }
 
   async wait(ms: number): Promise<void> {
-    await new Promise(resolve => setTimeout(resolve, ms));
+    await new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   async waitForText(text: string, timeout: number = 5000): Promise<boolean> {
@@ -419,7 +428,7 @@ export class TerminalSession {
     if (!this.process) {
       throw new Error("No process running");
     }
-    
+
     const start = Date.now();
     while (Date.now() - start < timeout) {
       const exitCode = await this.process.exited;
@@ -462,12 +471,12 @@ export function resolveExample(name: string): string {
 }
 
 export { createTerminal, GhosttyTerminal } from "@tui/ghostty-vt";
-export { 
-  MouseEncoder, 
-  MouseEvent, 
-  MouseAction, 
-  MouseButton, 
-  MouseFormat, 
+export {
+  MouseEncoder,
+  MouseEvent,
+  MouseAction,
+  MouseButton,
+  MouseFormat,
   MouseTracking,
   Modifiers,
 } from "@tui/ghostty-vt";

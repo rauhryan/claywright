@@ -1,6 +1,9 @@
 {
   "compilerOptions": {
+    "ignoreDeprecations": "6.0",
     "baseUrl": ".",
+    "jsx": "react-jsx",
+    "jsxImportSource": "@tui/solid-bindings",
     "paths": {
       "clayterm": ["packages/clayterm/build/npm/esm/mod.js"],
       "clayterm/input": ["packages/clayterm/build/npm/esm/input.js"],

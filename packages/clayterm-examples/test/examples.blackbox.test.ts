@@ -1,5 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
-import { createSession, MouseAction, MouseButton, resolveExample, type TerminalSession } from "../../test-harness/src/index";
+import {
+  createSession,
+  MouseAction,
+  MouseButton,
+  resolveExample,
+  type TerminalSession,
+} from "../../test-harness/src/index";
 
 const basicButton = resolveExample("basic-button");
 const modalMenu = resolveExample("modal-menu");

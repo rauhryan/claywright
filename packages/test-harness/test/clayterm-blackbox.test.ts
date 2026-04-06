@@ -100,6 +100,12 @@ describe("clayterm selection blackbox", () => {
     expect(await session.waitForText("Selected: Hello", 2000)).toBe(true);
     const changes = session.getStyleChanges(before);
     expect(changes.length).toBeGreaterThan(0);
-    expect(changes.some((change) => change.after.bg.palette !== change.before.bg.palette || change.after.fg.palette !== change.before.fg.palette)).toBe(true);
+    expect(
+      changes.some(
+        (change) =>
+          change.after.bg.palette !== change.before.bg.palette ||
+          change.after.fg.palette !== change.before.fg.palette,
+      ),
+    ).toBe(true);
   });
 });

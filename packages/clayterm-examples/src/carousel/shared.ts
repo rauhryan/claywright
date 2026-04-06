@@ -77,9 +77,24 @@ export type ButtonName = "prev" | "next";
 
 export const slides: Slide[] = [
   { id: "dunes", title: "DUNES / 01", body: ["slow light over a quiet ridge"], art: drawDunes },
-  { id: "tide", title: "TIDE / 02", body: ["night water and a patient little hull"], art: drawOcean },
-  { id: "city", title: "CITY / 03", body: ["late windows / low traffic / warm electric hum"], art: drawCity },
-  { id: "atlas", title: "ATLAS / 04", body: ["a room made from lines and timing"], art: drawGridRoom },
+  {
+    id: "tide",
+    title: "TIDE / 02",
+    body: ["night water and a patient little hull"],
+    art: drawOcean,
+  },
+  {
+    id: "city",
+    title: "CITY / 03",
+    body: ["late windows / low traffic / warm electric hum"],
+    art: drawCity,
+  },
+  {
+    id: "atlas",
+    title: "ATLAS / 04",
+    body: ["a room made from lines and timing"],
+    art: drawGridRoom,
+  },
 ];
 
 export function initialCarouselState(size: { width: number; height: number }): CarouselState {
@@ -114,18 +129,18 @@ export function layoutMetrics(size: { width: number; height: number }): LayoutMe
   const maxFrameWidth = Math.max(18, size.width - 6);
   const maxFrameHeight = Math.max(8, size.height - CONTROL_TO_FRAME_GAP - 1 - 4);
 
-  let frameOuterWidth = Math.min(maxFrameWidth, Math.floor(maxFrameHeight * 4 / 3));
-  let frameOuterHeight = Math.min(maxFrameHeight, Math.floor(frameOuterWidth * 3 / 4));
+  let frameOuterWidth = Math.min(maxFrameWidth, Math.floor((maxFrameHeight * 4) / 3));
+  let frameOuterHeight = Math.min(maxFrameHeight, Math.floor((frameOuterWidth * 3) / 4));
   frameOuterWidth = Math.max(18, frameOuterWidth);
   frameOuterHeight = Math.max(8, frameOuterHeight);
 
   if (frameOuterHeight > maxFrameHeight) {
     frameOuterHeight = maxFrameHeight;
-    frameOuterWidth = Math.max(18, Math.min(maxFrameWidth, Math.floor(frameOuterHeight * 4 / 3)));
+    frameOuterWidth = Math.max(18, Math.min(maxFrameWidth, Math.floor((frameOuterHeight * 4) / 3)));
   }
   if (frameOuterWidth > maxFrameWidth) {
     frameOuterWidth = maxFrameWidth;
-    frameOuterHeight = Math.max(8, Math.min(maxFrameHeight, Math.floor(frameOuterWidth * 3 / 4)));
+    frameOuterHeight = Math.max(8, Math.min(maxFrameHeight, Math.floor((frameOuterWidth * 3) / 4)));
   }
 
   const frameInnerWidth = Math.max(1, frameOuterWidth - 2);
@@ -157,8 +172,12 @@ export function layoutMetrics(size: { width: number; height: number }): LayoutMe
 }
 
 export function inRect(pointer: PointerState, rect: Rect) {
-  return pointer.x >= rect.x && pointer.x < rect.x + rect.width &&
-    pointer.y >= rect.y && pointer.y < rect.y + rect.height;
+  return (
+    pointer.x >= rect.x &&
+    pointer.x < rect.x + rect.width &&
+    pointer.y >= rect.y &&
+    pointer.y < rect.y + rect.height
+  );
 }
 
 export function buttonAtPointer(pointer: PointerState, metrics: LayoutMetrics): ButtonName | null {
@@ -225,13 +244,26 @@ export function write(canvas: string[][], x: number, y: number, value: string) {
   for (let i = 0; i < value.length; i++) put(canvas, x + i, y, value[i]);
 }
 
-export function fillRect(canvas: string[][], x: number, y: number, width: number, height: number, ch: string) {
+export function fillRect(
+  canvas: string[][],
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  ch: string,
+) {
   for (let yy = 0; yy < height; yy++) {
     for (let xx = 0; xx < width; xx++) put(canvas, x + xx, y + yy, ch);
   }
 }
 
-export function drawAsciiBox(canvas: string[][], x: number, y: number, width: number, height: number) {
+export function drawAsciiBox(
+  canvas: string[][],
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+) {
   if (width < 2 || height < 2) return;
   for (let xx = 1; xx < width - 1; xx++) {
     put(canvas, x + xx, y, "-");
@@ -269,14 +301,28 @@ export function buildSlideRows(slide: Slide, width: number, height: number) {
   return canvas.map((row) => row.join(""));
 }
 
-export function pushButton(ops: Op[], label: string, width: number, hovered: boolean, pressed: boolean) {
+export function pushButton(
+  ops: Op[],
+  label: string,
+  width: number,
+  hovered: boolean,
+  pressed: boolean,
+) {
   const bg = pressed ? palette.buttonPressed : hovered ? palette.buttonHover : palette.buttonBg;
-  ops.push(open("", { layout: { width: fixed(width), height: fixed(1) }, bg }), text(centerText(label, width), { color: palette.buttonText }), close());
+  ops.push(
+    open("", { layout: { width: fixed(width), height: fixed(1) }, bg }),
+    text(centerText(label, width), { color: palette.buttonText }),
+    close(),
+  );
 }
 
 export function pushSlideRows(ops: Op[], rows: string[], bg: number) {
   for (const row of rows) {
-    ops.push(open("", { layout: { width: grow(), height: fixed(1) }, bg }), text(row, { color: palette.frameText }), close());
+    ops.push(
+      open("", { layout: { width: grow(), height: fixed(1) }, bg }),
+      text(row, { color: palette.frameText }),
+      close(),
+    );
   }
 }
 
@@ -286,11 +332,12 @@ export function drawDunes(canvas: string[][]): void {
   const sunX = Math.floor(width * 0.7);
   const sunY = Math.max(2, Math.floor(height * 0.28));
   const radius = Math.max(2, Math.floor(Math.min(width, height) * 0.08));
-  for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {
-    const dx = x - sunX;
-    const dy = y - sunY;
-    if (dx * dx + dy * dy <= radius * radius) put(canvas, x, y, "o");
-  }
+  for (let y = 0; y < height; y++)
+    for (let x = 0; x < width; x++) {
+      const dx = x - sunX;
+      const dy = y - sunY;
+      if (dx * dx + dy * dy <= radius * radius) put(canvas, x, y, "o");
+    }
   const horizon = Math.floor(height * 0.58);
   for (let x = 0; x < width; x++) {
     const ridge = horizon + Math.floor(Math.sin(x / 5) * 1.4);
@@ -312,7 +359,8 @@ export function drawOcean(canvas: string[][]): void {
   put(canvas, moonX + 2, moonY, ")");
   for (let i = 0; i < Math.min(8, width / 6); i++) put(canvas, 4 + i * 6, 2 + (i % 2), ".");
   const waterStart = Math.floor(height * 0.58);
-  for (let y = waterStart; y < height; y++) for (let x = 0; x < width; x++) put(canvas, x, y, (x + y) % 4 < 2 ? "~" : "-");
+  for (let y = waterStart; y < height; y++)
+    for (let x = 0; x < width; x++) put(canvas, x, y, (x + y) % 4 < 2 ? "~" : "-");
   const boatY = Math.max(3, waterStart - 2);
   const boatX = Math.max(2, Math.floor(width * 0.38));
   write(canvas, boatX, boatY, "  /\\");
@@ -350,7 +398,7 @@ export function drawGridRoom(canvas: string[][]): void {
   for (let x = 0; x < width; x += 4) {
     const dx = x - vanishingX;
     for (let y = horizon; y < height; y++) {
-      const xx = vanishingX + Math.floor(dx * (y - horizon) / Math.max(1, height - horizon));
+      const xx = vanishingX + Math.floor((dx * (y - horizon)) / Math.max(1, height - horizon));
       put(canvas, xx, y, y % 2 === 0 ? "/" : "\\");
     }
   }

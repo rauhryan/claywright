@@ -8,11 +8,11 @@
     "./jsx-dev-runtime": "./src/jsx-runtime.ts"
   },
   "dependencies": {
-    "solid-js": "2.0.0-beta.5",
-    "babel-preset-solid": "2.0.0-beta.5",
     "@babel/core": "^7.28.0",
     "@babel/preset-typescript": "^7.27.1",
-    "@tui/core": "workspace:*"
+    "@tui/core": "workspace:*",
+    "babel-preset-solid": "2.0.0-beta.5",
+    "solid-js": "2.0.0-beta.5"
   },
   "devDependencies": {
     "@tui/test-harness": "workspace:*"

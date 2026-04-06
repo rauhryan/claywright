@@ -20,10 +20,7 @@ export interface RenderOptions {
   height?: number;
 }
 
-export async function render(
-  code: () => TerminalNode,
-  options: RenderOptions = {}
-): Promise<void> {
+export async function render(code: () => TerminalNode, options: RenderOptions = {}): Promise<void> {
   const width = options.width ?? process.stdout.columns ?? 80;
   const height = options.height ?? process.stdout.rows ?? 24;
 
@@ -44,7 +41,12 @@ export async function render(
   process.stdout.write(output);
 }
 
-export function toSizingAxis(sizing?: { type: string; value?: number; min?: number; max?: number }): SizingAxis | undefined {
+export function toSizingAxis(sizing?: {
+  type: string;
+  value?: number;
+  min?: number;
+  max?: number;
+}): SizingAxis | undefined {
   if (!sizing) return undefined;
   switch (sizing.type) {
     case "fixed":
@@ -79,8 +81,16 @@ function nodeToOps(node: TerminalNode): Op[] {
     } else if (node.type === "box") {
       const props = node.props as any;
       const openProps: any = {};
-      
-      if (props.width || props.height || props.direction || props.padding || props.gap || props.alignX || props.alignY) {
+
+      if (
+        props.width ||
+        props.height ||
+        props.direction ||
+        props.padding ||
+        props.gap ||
+        props.alignX ||
+        props.alignY
+      ) {
         openProps.layout = {};
         if (props.width) openProps.layout.width = toSizingAxis(props.width);
         if (props.height) openProps.layout.height = toSizingAxis(props.height);
@@ -90,11 +100,11 @@ function nodeToOps(node: TerminalNode): Op[] {
         if (props.alignX !== undefined) openProps.layout.alignX = props.alignX;
         if (props.alignY !== undefined) openProps.layout.alignY = props.alignY;
       }
-      
+
       if (props.bg !== undefined) openProps.bg = props.bg;
       if (props.border) openProps.border = props.border;
       if (props.cornerRadius) openProps.cornerRadius = props.cornerRadius;
-      
+
       ops.push(open(node.id, openProps));
       for (const child of node.children) {
         ops.push(...nodeToOps(child));

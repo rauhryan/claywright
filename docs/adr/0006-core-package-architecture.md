@@ -5,10 +5,12 @@
 We are building Solid.js bindings for terminal UIs using clayterm as the rendering layer. We need to decide how to organize the code and what abstractions to create.
 
 Opentui, a similar project, uses a two-package architecture:
+
 - `@opentui/core` - All rendering, focus, events, and component logic
 - `@opentui/solid` - Thin JSX bindings that map to core
 
 We currently have `@tui/solid-bindings` which contains:
+
 - Virtual DOM (ElementNode, TextNode, RootNode)
 - JSX runtime
 - Rendering logic (virtual DOM → clayterm ops)
@@ -40,16 +42,19 @@ Accepted.
 ## Consequences
 
 **Positive:**
+
 - Clear separation of concerns (core = behavior, bindings = JSX)
 - Can reuse core with other frameworks (React, etc.) in the future
 - Follows proven architecture from opentui
 - Core can be tested independently
 
 **Negative:**
+
 - More packages to maintain
 - Additional indirection layer
 - Need to manage dependencies between packages
 
 **Neutral:**
+
 - This matches opentui's architecture, making it easier to learn from their patterns
 - The core package will depend on clayterm directly

@@ -192,7 +192,7 @@ export class GhosttyTerminal {
       this.cols,
       this.rows,
       maxScrollback,
-      ptr(outPtr)
+      ptr(outPtr),
     );
     if (result !== 0) {
       throw new Error(`Failed to create terminal: ${result}`);
@@ -225,7 +225,11 @@ export class GhosttyTerminal {
     try {
       const bufPtr = new BigUint64Array(1);
       const lenPtr = new BigUint64Array(1);
-      const fmtResult = lib.symbols.ghostty_wrapper_formatter_format(formatter, ptr(bufPtr), ptr(lenPtr));
+      const fmtResult = lib.symbols.ghostty_wrapper_formatter_format(
+        formatter,
+        ptr(bufPtr),
+        ptr(lenPtr),
+      );
       if (fmtResult !== 0) {
         throw new Error(`Failed to format: ${fmtResult}`);
       }
@@ -298,17 +302,28 @@ export class GhosttyTerminal {
       throw new Error(`Failed to get style flags: ${flagsResult}`);
     }
 
-    const underlineResult = lib.symbols.ghostty_wrapper_cell_underline(ptr(refBuf), ptr(underlineBuf));
+    const underlineResult = lib.symbols.ghostty_wrapper_cell_underline(
+      ptr(refBuf),
+      ptr(underlineBuf),
+    );
     if (underlineResult !== 0) {
       throw new Error(`Failed to get underline: ${underlineResult}`);
     }
 
-    const fgResult = lib.symbols.ghostty_wrapper_cell_fg_color(ptr(refBuf), ptr(fgTagBuf), ptr(fgPaletteBuf));
+    const fgResult = lib.symbols.ghostty_wrapper_cell_fg_color(
+      ptr(refBuf),
+      ptr(fgTagBuf),
+      ptr(fgPaletteBuf),
+    );
     if (fgResult !== 0) {
       throw new Error(`Failed to get fg color: ${fgResult}`);
     }
 
-    const bgResult = lib.symbols.ghostty_wrapper_cell_bg_color(ptr(refBuf), ptr(bgTagBuf), ptr(bgPaletteBuf));
+    const bgResult = lib.symbols.ghostty_wrapper_cell_bg_color(
+      ptr(refBuf),
+      ptr(bgTagBuf),
+      ptr(bgPaletteBuf),
+    );
     if (bgResult !== 0) {
       throw new Error(`Failed to get bg color: ${bgResult}`);
     }
@@ -350,10 +365,12 @@ export class GhosttyTerminal {
   }
 
   isAltScreen(): boolean {
-    return this.getActiveScreen() === ActiveScreen.Alternate ||
+    return (
+      this.getActiveScreen() === ActiveScreen.Alternate ||
       this.getMode(MODE_ALT_SCREEN_LEGACY) ||
       this.getMode(MODE_ALT_SCREEN) ||
-      this.getMode(MODE_ALT_SCREEN_SAVE);
+      this.getMode(MODE_ALT_SCREEN_SAVE)
+    );
   }
 
   getMouseTrackingMode(): MouseTracking {
@@ -441,30 +458,36 @@ export class MouseEncoder {
   }
 
   setSize(screenWidth: number, screenHeight: number, cellWidth: number, cellHeight: number): void {
-    lib.symbols.ghostty_wrapper_mouse_encoder_set_size(this.handle, screenWidth, screenHeight, cellWidth, cellHeight);
+    lib.symbols.ghostty_wrapper_mouse_encoder_set_size(
+      this.handle,
+      screenWidth,
+      screenHeight,
+      cellWidth,
+      cellHeight,
+    );
   }
 
   encode(event: MouseEvent): string {
     const buf = new Uint8Array(64);
     const lenPtr = new BigUint64Array(1);
-    
+
     const result = lib.symbols.ghostty_wrapper_mouse_encode(
       this.handle,
       event.getHandle(),
       ptr(buf),
       buf.length,
-      ptr(lenPtr)
+      ptr(lenPtr),
     );
-    
+
     if (result !== 0) {
       throw new Error(`Failed to encode mouse event: ${result}`);
     }
-    
+
     const len = Number(lenPtr[0]);
     if (len === 0) {
       return "";
     }
-    
+
     return new TextDecoder().decode(buf.slice(0, len));
   }
 

@@ -1,13 +1,4 @@
-import {
-  createInput,
-  createTerm,
-  close,
-  fixed,
-  grow,
-  open,
-  rgba,
-  text,
-} from "clayterm";
+import { createInput, createTerm, close, fixed, grow, open, rgba, text } from "clayterm";
 
 let term = await createTerm({ width: 40, height: 10 });
 let input = await createInput();
@@ -21,25 +12,28 @@ function render() {
   let bg = hovered ? rgba(255, 255, 255) : undefined;
   let color = hovered ? rgba(0, 0, 0) : rgba(255, 255, 255);
 
-  let { output, events } = term.render([
-    open("root", {
-      layout: { width: grow(), height: grow(), direction: "ttb" },
-    }),
-    open("button", {
-      layout: { width: fixed(12), height: fixed(3), padding: { left: 1, top: 1 } },
-      border: {
-        color: rgba(255, 255, 255),
-        left: 1,
-        right: 1,
-        top: 1,
-        bottom: 1,
-      },
-      bg,
-    }),
-    text(label, { color }),
-    close(),
-    close(),
-  ], { pointer });
+  let { output, events } = term.render(
+    [
+      open("root", {
+        layout: { width: grow(), height: grow(), direction: "ttb" },
+      }),
+      open("button", {
+        layout: { width: fixed(12), height: fixed(3), padding: { left: 1, top: 1 } },
+        border: {
+          color: rgba(255, 255, 255),
+          left: 1,
+          right: 1,
+          top: 1,
+          bottom: 1,
+        },
+        bg,
+      }),
+      text(label, { color }),
+      close(),
+      close(),
+    ],
+    { pointer },
+  );
 
   for (let event of events) {
     if (event.type === "pointerenter" && event.id === "button") {
@@ -56,27 +50,30 @@ function render() {
   process.stdout.write(output);
 
   if (events.length > 0) {
-    let next = term.render([
-      open("root", {
-        layout: { width: grow(), height: grow(), direction: "ttb" },
-      }),
-      open("button", {
-        layout: { width: fixed(12), height: fixed(3), padding: { left: 1, top: 1 } },
-        border: {
-          color: rgba(255, 255, 255),
-          left: 1,
-          right: 1,
-          top: 1,
-          bottom: 1,
-        },
-        bg: hovered ? rgba(255, 255, 255) : undefined,
-      }),
-      text(clicked ? "Clicked" : hovered ? "Hovered" : "Idle", {
-        color: hovered ? rgba(0, 0, 0) : rgba(255, 255, 255),
-      }),
-      close(),
-      close(),
-    ], { pointer });
+    let next = term.render(
+      [
+        open("root", {
+          layout: { width: grow(), height: grow(), direction: "ttb" },
+        }),
+        open("button", {
+          layout: { width: fixed(12), height: fixed(3), padding: { left: 1, top: 1 } },
+          border: {
+            color: rgba(255, 255, 255),
+            left: 1,
+            right: 1,
+            top: 1,
+            bottom: 1,
+          },
+          bg: hovered ? rgba(255, 255, 255) : undefined,
+        }),
+        text(clicked ? "Clicked" : hovered ? "Hovered" : "Idle", {
+          color: hovered ? rgba(0, 0, 0) : rgba(255, 255, 255),
+        }),
+        close(),
+        close(),
+      ],
+      { pointer },
+    );
 
     process.stdout.write(next.output);
   }

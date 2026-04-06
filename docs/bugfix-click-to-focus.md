@@ -11,21 +11,25 @@ Clicking on focusable elements did nothing - no visual feedback, no focus change
 **File:** `packages/core/src/Renderer.ts:74`
 
 **Before:**
+
 ```typescript
-const { output, events } = this.term.render(ops)  // ❌ Missing pointer
+const { output, events } = this.term.render(ops); // ❌ Missing pointer
 ```
 
 **After:**
+
 ```typescript
-const { output, events } = this.term.render(ops, { pointer })  // ✅ Pass pointer
+const { output, events } = this.term.render(ops, { pointer }); // ✅ Pass pointer
 ```
 
 **Why it matters:**
+
 - Clayterm needs pointer position to generate click/hover events
 - Without it, clayterm never sends pointer events to Renderer
 - So clicking did nothing
 
 **Also updated:**
+
 - `runtime.ts` to pass pointer to `renderer.render(ops, pointer)`
 - `sendOps()` to also pass pointer
 
@@ -34,6 +38,7 @@ const { output, events } = this.term.render(ops, { pointer })  // ✅ Pass point
 **File:** `packages/solid-bindings/src/ElementRenderable.ts`
 
 **Problem:**
+
 - Parent class `Renderable` has `onFocus?: () => void` as a property
 - Child class `ElementRenderable` tried to override with getters
 - TypeScript/JavaScript doesn't properly override parent properties with child getters
@@ -41,14 +46,15 @@ const { output, events } = this.term.render(ops, { pointer })  // ✅ Pass point
 
 **Solution:**
 Use `Object.defineProperty` in constructor to dynamically set getters:
+
 ```typescript
 constructor(node: ElementNode) {
   super({ id: node.id, focusable: node.props.focusable as boolean | undefined })
   this.node = node
-  
+
   const handlers = ['onClick', 'onMouseDown', 'onMouseUp', 'onMouseMove',
                     'onKeyDown', 'onKeyUp', 'onPaste', 'onFocus', 'onBlur']
-  
+
   for (const handler of handlers) {
     Object.defineProperty(this, handler, {
       get: () => this.node.props[handler],
@@ -65,6 +71,7 @@ constructor(node: ElementNode) {
 **After fix:** 39 tests passing, click-to-focus works
 
 **New tests added:**
+
 - `click-to-focus.test.ts` - 3 tests verifying focus behavior
   - Clicking focusable element triggers focus
   - Clicking non-focusable element does nothing
@@ -81,12 +88,14 @@ constructor(node: ElementNode) {
 ## Demo
 
 Run `focus-demo.tsx` to see it in action:
+
 ```bash
 cd tui-monorepo/packages/solid-bindings
 bun focus-demo.tsx
 ```
 
 **What you'll see:**
+
 1. Blue box with "Click to focus"
 2. Click the box → turns green, shows "FOCUSED"
 3. Click elsewhere → turns back to blue

@@ -54,11 +54,7 @@ function createTextNode(value: string): TextNode {
   return new TextNode(value);
 }
 
-function insertNode(
-  parent: TerminalNode,
-  node: TerminalNode,
-  anchor?: TerminalNode
-): void {
+function insertNode(parent: TerminalNode, node: TerminalNode, anchor?: TerminalNode): void {
   if (!isParentNode(parent)) return;
   const index = anchor ? parent.children.indexOf(anchor as any) : -1;
   if (index >= 0) {
@@ -110,15 +106,15 @@ function getNextSibling(node: TerminalNode): TerminalNode | undefined {
   return node.parent.children[index + 1];
 }
 
-const effect = <T,>(
+const effect = <T>(
   fn: (prev: T | undefined) => T,
   effectFn: (value: T, prev: T | undefined) => void,
-  initial?: T
+  initial?: T,
 ): void => {
   createRenderEffect(fn as any, effectFn as any, initial as any);
 };
 
-const memoTransparent = <T,>(fn: () => T, transparent: boolean): (() => T) => {
+const memoTransparent = <T>(fn: () => T, transparent: boolean): (() => T) => {
   return createMemo(() => fn()) as any;
 };
 
@@ -126,7 +122,7 @@ function insert(
   parent: TerminalNode,
   accessor: unknown,
   marker?: TerminalNode,
-  initial?: unknown
+  initial?: unknown,
 ): void {
   const multi = marker !== undefined;
   if (multi && !initial) initial = [];
@@ -137,7 +133,7 @@ function insert(
         parent,
         accessor as TerminalNode | TerminalNode[],
         initial as TerminalNode[],
-        marker
+        marker,
       );
       return;
     }
@@ -150,9 +146,7 @@ function insert(
   }
   effect(
     () => {
-      const value = normalize((memoed as () => unknown)(), multi) as
-        | TerminalNode
-        | TerminalNode[];
+      const value = normalize((memoed as () => unknown)(), multi) as TerminalNode | TerminalNode[];
       return value;
     },
     (value, current) => {
@@ -160,10 +154,10 @@ function insert(
         parent,
         value as TerminalNode | TerminalNode[],
         current as TerminalNode[],
-        marker
+        marker,
       );
     },
-    initial as TerminalNode[]
+    initial as TerminalNode[],
   );
 }
 
@@ -171,7 +165,7 @@ function insertExpression(
   parent: TerminalNode,
   value: TerminalNode | TerminalNode[],
   current: TerminalNode[],
-  marker?: TerminalNode
+  marker?: TerminalNode,
 ): void {
   const multi = marker !== undefined;
 
@@ -225,18 +219,13 @@ function normalize(value: unknown, multi: boolean, doNotUnwrap = false): unknown
     for (let i = 0, len = value.length; i < len; i++) {
       const item = (value as unknown[])[i];
       const t = typeof item;
-      if (t === "string" || t === "number")
-        (value as unknown[])[i] = createTextNode(String(item));
+      if (t === "string" || t === "number") (value as unknown[])[i] = createTextNode(String(item));
     }
   }
   return value;
 }
 
-function reconcileArrays(
-  parent: TerminalNode,
-  a: TerminalNode[],
-  b: TerminalNode[]
-): void {
+function reconcileArrays(parent: TerminalNode, a: TerminalNode[], b: TerminalNode[]): void {
   let bLength = b.length;
   let aEnd = a.length;
   let bEnd = bLength;
@@ -259,11 +248,7 @@ function reconcileArrays(
 
     if (aEnd === aStart) {
       const node =
-        bEnd < bLength
-          ? bStart
-            ? getNextSibling(b[bStart - 1])
-            : b[bEnd - bStart]
-          : after;
+        bEnd < bLength ? (bStart ? getNextSibling(b[bStart - 1]) : b[bEnd - bStart]) : after;
       while (bStart < bEnd) insertNode(parent, b[bStart++], node);
     } else if (bEnd === bStart) {
       while (aStart < aEnd) {
@@ -314,7 +299,7 @@ function cleanChildren(
   parent: TerminalNode,
   current: TerminalNode[],
   marker?: TerminalNode,
-  replacement?: TerminalNode
+  replacement?: TerminalNode,
 ): void {
   if (marker === undefined) {
     let removed;
@@ -368,7 +353,7 @@ function spread(node: TerminalNode, props: Record<string, unknown>, skipChildren
       }
       return undefined;
     },
-    () => {}
+    () => {},
   );
   effect(
     () => {
@@ -392,7 +377,7 @@ function spread(node: TerminalNode, props: Record<string, unknown>, skipChildren
         setProperty(node, prop, value);
         prevProps[prop] = value;
       }
-    }
+    },
   );
 }
 
@@ -428,12 +413,31 @@ export function renderToString(node: TerminalNode): string {
 
 export namespace JSX {
   export type Element = TerminalNode;
+  interface FocusableProps {
+    focusable?: boolean;
+    onFocus?: () => void;
+    onBlur?: () => void;
+    onClick?: (event: unknown) => void;
+    onMouseDown?: (event: unknown) => void;
+    onMouseUp?: (event: unknown) => void;
+    onMouseMove?: (event: unknown) => void;
+  }
   export interface IntrinsicElements {
     text: { color?: number; children?: unknown };
-    box: {
+    box: FocusableProps & {
       children?: unknown;
-      width?: { type: "fixed" | "grow" | "percent" | "fit"; value?: number; min?: number; max?: number };
-      height?: { type: "fixed" | "grow" | "percent" | "fit"; value?: number; min?: number; max?: number };
+      width?: {
+        type: "fixed" | "grow" | "percent" | "fit";
+        value?: number;
+        min?: number;
+        max?: number;
+      };
+      height?: {
+        type: "fixed" | "grow" | "percent" | "fit";
+        value?: number;
+        min?: number;
+        max?: number;
+      };
       direction?: "ltr" | "ttb";
       padding?: { left?: number; right?: number; top?: number; bottom?: number };
       gap?: number;
@@ -446,10 +450,7 @@ export namespace JSX {
   }
 }
 
-export function jsx(
-  type: string,
-  props: Record<string, unknown> | null
-): ElementNode {
+export function jsx(type: string, props: Record<string, unknown> | null): ElementNode {
   const el = createElement(type);
   if (props) {
     for (const [key, value] of Object.entries(props)) {
@@ -479,7 +480,7 @@ export function jsxDEV(
   key?: string,
   isStaticChildren?: boolean,
   source?: { fileName: string; lineNumber: number; columnNumber: number },
-  self?: unknown
+  self?: unknown,
 ): ElementNode {
   return jsx(type, props);
 }

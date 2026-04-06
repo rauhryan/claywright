@@ -1,14 +1,4 @@
-import {
-  ATTACH_POINT,
-  ATTACH_TO,
-  close,
-  fixed,
-  grow,
-  open,
-  rgba,
-  text,
-  type Op,
-} from "clayterm";
+import { ATTACH_POINT, ATTACH_TO, close, fixed, grow, open, rgba, text, type Op } from "clayterm";
 import { getTerminalSize, runExample, type ExampleDefinition } from "../runtime";
 
 interface CommandItem {
@@ -167,7 +157,11 @@ function modalRect(screen: { width: number; height: number }) {
   };
 }
 
-function pointInRect(x: number, y: number, rect: { x: number; y: number; width: number; height: number }) {
+function pointInRect(
+  x: number,
+  y: number,
+  rect: { x: number; y: number; width: number; height: number },
+) {
   return x >= rect.x && x < rect.x + rect.width && y >= rect.y && y < rect.y + rect.height;
 }
 
@@ -197,142 +191,294 @@ const example: ExampleDefinition<State, Op> = {
     const visible = visibleCommandIndices(state.query);
     const selected = normalizeSelection(state.query, state.selectedIndex);
     const modal = modalMetrics(state.size);
-    const queryLine = state.query.length > 0
-      ? `> ${truncate(state.query, Math.max(0, modal.innerWidth - 2))}`
-      : `> ${truncate("Type to filter actions", Math.max(0, modal.innerWidth - 2))}`;
+    const queryLine =
+      state.query.length > 0
+        ? `> ${truncate(state.query, Math.max(0, modal.innerWidth - 2))}`
+        : `> ${truncate("Type to filter actions", Math.max(0, modal.innerWidth - 2))}`;
 
-    ops.push(open("root", {
-      layout: { width: grow(), height: grow(), direction: "ttb" },
-      bg: palette.appBg,
-    }));
+    ops.push(
+      open("root", {
+        layout: { width: grow(), height: grow(), direction: "ttb" },
+        bg: palette.appBg,
+      }),
+    );
     ops.push(open("", { layout: { width: grow(), height: fixed(2) } }));
     ops.push(close());
-    pushLine(ops, "titlebar", centerText("Atlas Workspace", state.size.width), palette.mutedText, palette.appBg);
-    ops.push(open("main-row", { layout: { width: grow(), height: grow(), direction: "ltr" }, bg: palette.appBg }));
+    pushLine(
+      ops,
+      "titlebar",
+      centerText("Atlas Workspace", state.size.width),
+      palette.mutedText,
+      palette.appBg,
+    );
+    ops.push(
+      open("main-row", {
+        layout: { width: grow(), height: grow(), direction: "ltr" },
+        bg: palette.appBg,
+      }),
+    );
     ops.push(open("", { layout: { width: grow(), height: grow() } }));
     ops.push(close());
-    ops.push(open("explorer", {
-      layout: {
-        width: fixed(railWidth),
-        height: fixed(12),
-        direction: "ttb",
-        padding: { left: 1, right: 1, top: 1, bottom: 1 },
-      },
-      bg: palette.railBg,
-      border: { color: palette.railBorder, left: 1, right: 1, top: 1, bottom: 1 },
-      cornerRadius: { tl: 1, tr: 1, bl: 1, br: 1 },
-    }));
-    pushLine(ops, "explorer-title", padRight("Explorer", railWidth - 2), palette.accentText, palette.railBg);
+    ops.push(
+      open("explorer", {
+        layout: {
+          width: fixed(railWidth),
+          height: fixed(12),
+          direction: "ttb",
+          padding: { left: 1, right: 1, top: 1, bottom: 1 },
+        },
+        bg: palette.railBg,
+        border: { color: palette.railBorder, left: 1, right: 1, top: 1, bottom: 1 },
+        cornerRadius: { tl: 1, tr: 1, bl: 1, br: 1 },
+      }),
+    );
+    pushLine(
+      ops,
+      "explorer-title",
+      padRight("Explorer", railWidth - 2),
+      palette.accentText,
+      palette.railBg,
+    );
     pushSpacer(ops);
     pushLine(ops, "explorer-1", padRight("src/", railWidth - 2), palette.panelText, palette.railBg);
     pushLine(ops, "explorer-2", padRight("ui/", railWidth - 2), palette.mutedText, palette.railBg);
-    pushLine(ops, "explorer-3", padRight("commands/", railWidth - 2), palette.mutedText, palette.railBg);
-    pushLine(ops, "explorer-4", padRight("tests/", railWidth - 2), palette.mutedText, palette.railBg);
+    pushLine(
+      ops,
+      "explorer-3",
+      padRight("commands/", railWidth - 2),
+      palette.mutedText,
+      palette.railBg,
+    );
+    pushLine(
+      ops,
+      "explorer-4",
+      padRight("tests/", railWidth - 2),
+      palette.mutedText,
+      palette.railBg,
+    );
     pushSpacer(ops);
-    pushLine(ops, "explorer-5", padRight("git: clean", railWidth - 2), palette.mutedText, palette.railBg);
-    pushLine(ops, "explorer-6", padRight("branch: demo", railWidth - 2), palette.mutedText, palette.railBg);
+    pushLine(
+      ops,
+      "explorer-5",
+      padRight("git: clean", railWidth - 2),
+      palette.mutedText,
+      palette.railBg,
+    );
+    pushLine(
+      ops,
+      "explorer-6",
+      padRight("branch: demo", railWidth - 2),
+      palette.mutedText,
+      palette.railBg,
+    );
     ops.push(close());
 
     ops.push(open("", { layout: { width: fixed(2), height: grow() } }));
     ops.push(close());
 
-    ops.push(open("workspace", {
-      layout: {
-        width: fixed(centerWidth),
-        height: fixed(12),
-        direction: "ttb",
-        padding: { left: 2, right: 2, top: 1, bottom: 1 },
-      },
-      bg: palette.panelBg,
-      border: { color: palette.panelBorder, left: 1, right: 1, top: 1, bottom: 1 },
-      cornerRadius: { tl: 1, tr: 1, bl: 1, br: 1 },
-    }));
+    ops.push(
+      open("workspace", {
+        layout: {
+          width: fixed(centerWidth),
+          height: fixed(12),
+          direction: "ttb",
+          padding: { left: 2, right: 2, top: 1, bottom: 1 },
+        },
+        bg: palette.panelBg,
+        border: { color: palette.panelBorder, left: 1, right: 1, top: 1, bottom: 1 },
+        cornerRadius: { tl: 1, tr: 1, bl: 1, br: 1 },
+      }),
+    );
     pushLine(ops, "workspace-title", "Canvas", palette.accentText, palette.panelBg);
     pushSpacer(ops);
-    pushLine(ops, "workspace-copy", padRight("Underlying panes stay visible around the modal.", centerWidth - 4), palette.panelText, palette.panelBg);
-    pushLine(ops, "workspace-copy-2", padRight("The palette floats above this canvas at a higher z-index.", centerWidth - 4), palette.mutedText, palette.panelBg);
+    pushLine(
+      ops,
+      "workspace-copy",
+      padRight("Underlying panes stay visible around the modal.", centerWidth - 4),
+      palette.panelText,
+      palette.panelBg,
+    );
+    pushLine(
+      ops,
+      "workspace-copy-2",
+      padRight("The palette floats above this canvas at a higher z-index.", centerWidth - 4),
+      palette.mutedText,
+      palette.panelBg,
+    );
     pushSpacer(ops);
-    pushLine(ops, "workspace-status", padRight(`Last action: ${state.lastAction}`, centerWidth - 4), palette.panelText, palette.panelBg);
-    pushLine(ops, "workspace-hint", padRight("Open with /, Ctrl+K, or the launcher button.", centerWidth - 4), palette.mutedText, palette.panelBg);
+    pushLine(
+      ops,
+      "workspace-status",
+      padRight(`Last action: ${state.lastAction}`, centerWidth - 4),
+      palette.panelText,
+      palette.panelBg,
+    );
+    pushLine(
+      ops,
+      "workspace-hint",
+      padRight("Open with /, Ctrl+K, or the launcher button.", centerWidth - 4),
+      palette.mutedText,
+      palette.panelBg,
+    );
     pushSpacer(ops);
-    ops.push(open("launcher", {
-      layout: { width: fixed(launcherWidth), height: fixed(1) },
-      bg: launcherBg,
-    }));
+    ops.push(
+      open("launcher", {
+        layout: { width: fixed(launcherWidth), height: fixed(1) },
+        bg: launcherBg,
+      }),
+    );
     ops.push(text(centerText(launcherLabel, launcherWidth), { color: palette.selectedText }));
     ops.push(close());
-    pushLine(ops, "workspace-shortcuts", padRight("Shortcut: / or Ctrl+K", centerWidth - 4), palette.mutedText, palette.panelBg);
+    pushLine(
+      ops,
+      "workspace-shortcuts",
+      padRight("Shortcut: / or Ctrl+K", centerWidth - 4),
+      palette.mutedText,
+      palette.panelBg,
+    );
     ops.push(close());
 
     ops.push(open("", { layout: { width: fixed(2), height: grow() } }));
     ops.push(close());
 
-    ops.push(open("inspector", {
-      layout: {
-        width: fixed(railWidth),
-        height: fixed(12),
-        direction: "ttb",
-        padding: { left: 1, right: 1, top: 1, bottom: 1 },
-      },
-      bg: palette.railBg,
-      border: { color: palette.railBorder, left: 1, right: 1, top: 1, bottom: 1 },
-      cornerRadius: { tl: 1, tr: 1, bl: 1, br: 1 },
-    }));
-    pushLine(ops, "inspector-title", padRight("Inspector", railWidth - 2), palette.accentText, palette.railBg);
+    ops.push(
+      open("inspector", {
+        layout: {
+          width: fixed(railWidth),
+          height: fixed(12),
+          direction: "ttb",
+          padding: { left: 1, right: 1, top: 1, bottom: 1 },
+        },
+        bg: palette.railBg,
+        border: { color: palette.railBorder, left: 1, right: 1, top: 1, bottom: 1 },
+        cornerRadius: { tl: 1, tr: 1, bl: 1, br: 1 },
+      }),
+    );
+    pushLine(
+      ops,
+      "inspector-title",
+      padRight("Inspector", railWidth - 2),
+      palette.accentText,
+      palette.railBg,
+    );
     pushSpacer(ops);
-    pushLine(ops, "inspector-1", padRight("focus: ui", railWidth - 2), palette.panelText, palette.railBg);
-    pushLine(ops, "inspector-2", padRight("modal: root", railWidth - 2), palette.mutedText, palette.railBg);
-    pushLine(ops, "inspector-3", padRight("layer: z30", railWidth - 2), palette.mutedText, palette.railBg);
-    pushLine(ops, "inspector-4", padRight("click: close", railWidth - 2), palette.mutedText, palette.railBg);
+    pushLine(
+      ops,
+      "inspector-1",
+      padRight("focus: ui", railWidth - 2),
+      palette.panelText,
+      palette.railBg,
+    );
+    pushLine(
+      ops,
+      "inspector-2",
+      padRight("modal: root", railWidth - 2),
+      palette.mutedText,
+      palette.railBg,
+    );
+    pushLine(
+      ops,
+      "inspector-3",
+      padRight("layer: z30", railWidth - 2),
+      palette.mutedText,
+      palette.railBg,
+    );
+    pushLine(
+      ops,
+      "inspector-4",
+      padRight("click: close", railWidth - 2),
+      palette.mutedText,
+      palette.railBg,
+    );
     pushSpacer(ops);
-    pushLine(ops, "inspector-5", padRight("hint: type", railWidth - 2), palette.mutedText, palette.railBg);
-    pushLine(ops, "inspector-6", padRight("state: ready", railWidth - 2), palette.mutedText, palette.railBg);
+    pushLine(
+      ops,
+      "inspector-5",
+      padRight("hint: type", railWidth - 2),
+      palette.mutedText,
+      palette.railBg,
+    );
+    pushLine(
+      ops,
+      "inspector-6",
+      padRight("state: ready", railWidth - 2),
+      palette.mutedText,
+      palette.railBg,
+    );
     ops.push(close());
     ops.push(open("", { layout: { width: grow(), height: grow() } }));
     ops.push(close());
     ops.push(close());
 
     if (state.menuOpen) {
-      ops.push(open("palette-shadow", {
-        layout: {
-          width: fixed(modal.width),
-          height: fixed(modal.height),
-        },
-        floating: {
-          x: 1,
-          y: 1,
-          attachTo: ATTACH_TO.ROOT,
-          attachPoints: { element: ATTACH_POINT.CENTER_CENTER, parent: ATTACH_POINT.CENTER_CENTER },
-          zIndex: 20,
-        },
-        bg: palette.shadowBg,
-        cornerRadius: { tl: 1, tr: 1, bl: 1, br: 1 },
-      }));
+      ops.push(
+        open("palette-shadow", {
+          layout: {
+            width: fixed(modal.width),
+            height: fixed(modal.height),
+          },
+          floating: {
+            x: 1,
+            y: 1,
+            attachTo: ATTACH_TO.ROOT,
+            attachPoints: {
+              element: ATTACH_POINT.CENTER_CENTER,
+              parent: ATTACH_POINT.CENTER_CENTER,
+            },
+            zIndex: 20,
+          },
+          bg: palette.shadowBg,
+          cornerRadius: { tl: 1, tr: 1, bl: 1, br: 1 },
+        }),
+      );
       ops.push(close());
 
-      ops.push(open("palette", {
-        layout: {
-          width: fixed(modal.width),
-          height: fixed(modal.height),
-          direction: "ttb",
-          padding: { left: 2, right: 2, top: 1, bottom: 1 },
-        },
-        floating: {
-          attachTo: ATTACH_TO.ROOT,
-          attachPoints: { element: ATTACH_POINT.CENTER_CENTER, parent: ATTACH_POINT.CENTER_CENTER },
-          zIndex: 30,
-        },
-        bg: palette.modalBg,
-        border: { color: palette.modalBorder, left: 1, right: 1, top: 1, bottom: 1 },
-        cornerRadius: { tl: 1, tr: 1, bl: 1, br: 1 },
-      }));
-      pushLine(ops, "palette-title", padRight("Command Palette", modal.innerWidth), palette.accentText, palette.modalBg);
+      ops.push(
+        open("palette", {
+          layout: {
+            width: fixed(modal.width),
+            height: fixed(modal.height),
+            direction: "ttb",
+            padding: { left: 2, right: 2, top: 1, bottom: 1 },
+          },
+          floating: {
+            attachTo: ATTACH_TO.ROOT,
+            attachPoints: {
+              element: ATTACH_POINT.CENTER_CENTER,
+              parent: ATTACH_POINT.CENTER_CENTER,
+            },
+            zIndex: 30,
+          },
+          bg: palette.modalBg,
+          border: { color: palette.modalBorder, left: 1, right: 1, top: 1, bottom: 1 },
+          cornerRadius: { tl: 1, tr: 1, bl: 1, br: 1 },
+        }),
+      );
+      pushLine(
+        ops,
+        "palette-title",
+        padRight("Command Palette", modal.innerWidth),
+        palette.accentText,
+        palette.modalBg,
+      );
       pushSpacer(ops);
-      pushLine(ops, "palette-query", padRight(queryLine, modal.innerWidth), state.query.length > 0 ? palette.panelText : palette.mutedText, palette.searchBg);
+      pushLine(
+        ops,
+        "palette-query",
+        padRight(queryLine, modal.innerWidth),
+        state.query.length > 0 ? palette.panelText : palette.mutedText,
+        palette.searchBg,
+      );
       pushSpacer(ops);
 
       if (visible.length === 0) {
-        pushLine(ops, "palette-empty", padRight("No matching actions", modal.innerWidth), palette.mutedText, palette.modalBg);
+        pushLine(
+          ops,
+          "palette-empty",
+          padRight("No matching actions", modal.innerWidth),
+          palette.mutedText,
+          palette.modalBg,
+        );
         pushSpacer(ops);
         pushSpacer(ops);
         pushSpacer(ops);
@@ -350,12 +496,24 @@ const example: ExampleDefinition<State, Op> = {
           );
         }
         for (let fill = visible.length; fill < 5; fill++) {
-          pushLine(ops, `palette-fill-${fill}`, " ".repeat(modal.innerWidth), palette.panelText, palette.modalBg);
+          pushLine(
+            ops,
+            `palette-fill-${fill}`,
+            " ".repeat(modal.innerWidth),
+            palette.panelText,
+            palette.modalBg,
+          );
         }
       }
 
       pushSpacer(ops);
-      pushLine(ops, "palette-footer", padRight("Enter run   Esc close   Click outside to dismiss", modal.innerWidth), palette.mutedText, palette.modalBg);
+      pushLine(
+        ops,
+        "palette-footer",
+        padRight("Enter run   Esc close   Click outside to dismiss", modal.innerWidth),
+        palette.mutedText,
+        palette.modalBg,
+      );
       ops.push(close());
     }
 
@@ -366,7 +524,12 @@ const example: ExampleDefinition<State, Op> = {
     let next = { ...state };
 
     for (const event of inputEvents) {
-      if (event.type === "mousedown" && event.button === "left" && next.hoveredLauncher && !next.menuOpen) {
+      if (
+        event.type === "mousedown" &&
+        event.button === "left" &&
+        next.hoveredLauncher &&
+        !next.menuOpen
+      ) {
         next.pressedLauncher = true;
       }
 

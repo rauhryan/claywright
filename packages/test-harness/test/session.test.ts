@@ -1,5 +1,11 @@
 import { describe, expect, it, beforeEach, afterEach } from "bun:test";
-import { createSession, TerminalSession, MouseAction, MouseButton, MouseTracking } from "../src/index";
+import {
+  createSession,
+  TerminalSession,
+  MouseAction,
+  MouseButton,
+  MouseTracking,
+} from "../src/index";
 
 describe("TerminalSession", () => {
   let session: TerminalSession;
@@ -22,7 +28,7 @@ describe("TerminalSession", () => {
   it("captures direct VT output", () => {
     const term = session.getTerminal();
     term.write("Hello World");
-    
+
     expect(session.containsText("Hello World")).toBe(true);
     expect(session.getLine(0)).toContain("Hello World");
   });
@@ -31,7 +37,7 @@ describe("TerminalSession", () => {
     const term = session.getTerminal();
     term.write("\x1b[5;10H");
     term.write("X");
-    
+
     const line = session.getLine(4);
     expect(line.substring(9, 10)).toBe("X");
   });
@@ -39,7 +45,7 @@ describe("TerminalSession", () => {
   it("handles colors and styles", () => {
     const term = session.getTerminal();
     term.write("\x1b[31mRed Text\x1b[0m Normal");
-    
+
     expect(session.containsText("Red Text")).toBe(true);
     expect(session.containsText("Normal")).toBe(true);
   });
@@ -50,7 +56,7 @@ describe("TerminalSession", () => {
     term.write("\x1b[2;1H");
     term.write("\x1b[2K");
     term.write("New Line 2");
-    
+
     expect(session.containsText("Line 1")).toBe(true);
     expect(session.containsText("New Line 2")).toBe(true);
   });
@@ -59,7 +65,7 @@ describe("TerminalSession", () => {
     session.startVTCapture();
     session.write("\x1b[31mRed\x1b[0m");
     const sequences = session.stopVTCapture();
-    
+
     expect(sequences.length).toBeGreaterThan(0);
   });
 
@@ -74,7 +80,7 @@ describe("TerminalSession", () => {
     const term = session.getTerminal();
     term.write("Hello at start\r\n");
     term.write("World on line 2");
-    
+
     const pos = session.findText("World");
     expect(pos).toEqual({ row: 1, col: 0 });
   });
@@ -109,8 +115,12 @@ describe("TerminalSession", () => {
     term.write("Hi");
 
     const changes = session.getChangedCells(before);
-    expect(changes.some((change) => change.col === 0 && change.row === 0 && change.after === "H")).toBe(true);
-    expect(changes.some((change) => change.col === 1 && change.row === 0 && change.after === "i")).toBe(true);
+    expect(
+      changes.some((change) => change.col === 0 && change.row === 0 && change.after === "H"),
+    ).toBe(true);
+    expect(
+      changes.some((change) => change.col === 1 && change.row === 0 && change.after === "i"),
+    ).toBe(true);
   });
 
   it("supports drag helper", () => {
@@ -137,7 +147,12 @@ describe("TerminalSession", () => {
     term.write("\x1b[7mHello\x1b[0m there");
 
     expect(() => session.assertSelection(0, 0, 4, 0)).not.toThrow();
-    expect(() => session.assertNoSelection([{ col: 5, row: 0 }, { col: 6, row: 0 }])).not.toThrow();
+    expect(() =>
+      session.assertNoSelection([
+        { col: 5, row: 0 },
+        { col: 6, row: 0 },
+      ]),
+    ).not.toThrow();
   });
 
   it("returns selected text from a range", () => {
@@ -166,7 +181,7 @@ describe("TerminalSession", () => {
     session.startVTCapture();
     session.click(5, 3);
     const sequences = session.getVTSequences();
-    
+
     expect(sequences.length).toBeGreaterThan(0);
     const seq = sequences.join("");
     expect(seq).toContain("M");
@@ -181,7 +196,7 @@ describe("TerminalSession", () => {
       row: 5,
     });
     const sequences = session.getVTSequences();
-    
+
     expect(sequences.length).toBeGreaterThan(0);
   });
 
@@ -194,7 +209,7 @@ describe("TerminalSession", () => {
       row: 10,
     });
     const sequences = session.getVTSequences();
-    
+
     expect(sequences.length).toBeGreaterThan(0);
   });
 });
@@ -213,21 +228,21 @@ describe("TerminalSession with process", () => {
   it("spawns and captures echo command", async () => {
     await session.spawn("echo", ["Hello from echo"]);
     await session.wait(100);
-    
+
     expect(session.containsText("Hello from echo")).toBe(true);
   });
 
   it("spawns and captures printf with formatting", async () => {
     await session.spawn("printf", ["\\033[31mRed\\033[0m\\n"]);
     await session.wait(100);
-    
+
     expect(session.containsText("Red")).toBe(true);
   });
 
   it("captures exit code", async () => {
     await session.spawn("sh", ["-c", "exit 42"]);
     const exitCode = await session.waitForExit();
-    
+
     expect(exitCode).toBe(42);
   });
 });

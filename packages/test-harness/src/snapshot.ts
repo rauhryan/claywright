@@ -16,10 +16,10 @@ export function matchSnapshot(
   snapshot: ScreenSnapshot,
   testFile: string,
   snapshotName: string,
-  update: boolean = false
+  update: boolean = false,
 ): { pass: boolean; diff?: string } {
   const snapshotPath = getSnapshotPath(testFile, snapshotName);
-  
+
   const expectedOutput = [
     `// ${snapshotName}`,
     `// cols: ${snapshot.cols}, rows: ${snapshot.rows}`,
@@ -50,13 +50,13 @@ function createDiff(expected: string, actual: string): string {
   const expectedLines = expected.split("\n");
   const actualLines = actual.split("\n");
   const maxLines = Math.max(expectedLines.length, actualLines.length);
-  
+
   const diff: string[] = ["--- Expected", "+++ Actual"];
-  
+
   for (let i = 0; i < maxLines; i++) {
     const exp = expectedLines[i] ?? "";
     const act = actualLines[i] ?? "";
-    
+
     if (exp !== act) {
       if (exp) diff.push(`-${exp}`);
       if (act) diff.push(`+${act}`);
@@ -64,18 +64,18 @@ function createDiff(expected: string, actual: string): string {
       diff.push(` ${exp}`);
     }
   }
-  
+
   return diff.join("\n");
 }
 
 export function expectSnapshot(
   snapshot: ScreenSnapshot,
   testFile: string,
-  snapshotName: string
+  snapshotName: string,
 ): void {
   const update = process.env.UPDATE_SNAPSHOTS === "true";
   const result = matchSnapshot(snapshot, testFile, snapshotName, update);
-  
+
   if (!result.pass) {
     throw new Error(`Snapshot mismatch:\n${result.diff}`);
   }

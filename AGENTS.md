@@ -8,14 +8,14 @@ Terminal UI experiments around `clayterm`, with a blackbox test harness powered 
 
 ## Packages
 
-| Package | Purpose |
-|---------|---------|
-| `core` | Focus management, event system, keyboard routing |
-| `ghostty-vt` | FFI bindings to Ghostty's VT emulator |
-| `test-harness` | Blackbox testing utilities for TUIs |
-| `solid-bindings` | Solid.js 2.0 JSX bindings for clayterm |
-| `clayterm-examples` | Example apps demonstrating clayterm |
-| `clayterm` | Vendored terminal renderer (git submodule) |
+| Package             | Purpose                                          |
+| ------------------- | ------------------------------------------------ |
+| `core`              | Focus management, event system, keyboard routing |
+| `ghostty-vt`        | FFI bindings to Ghostty's VT emulator            |
+| `test-harness`      | Blackbox testing utilities for TUIs              |
+| `solid-bindings`    | Solid.js 2.0 JSX bindings for clayterm           |
+| `clayterm-examples` | Example apps demonstrating clayterm              |
+| `clayterm`          | Vendored terminal renderer (git submodule)       |
 
 ## Architecture Decision Records
 
@@ -39,6 +39,7 @@ Key architectural decisions are documented in `docs/adr/`:
 ### Clayterm Mental Model
 
 Clayterm's WASM is the "UI thread":
+
 ```
 Your App (JS)              Clayterm (WASM)
 ─────────────              ───────────────
@@ -50,12 +51,12 @@ You send ops (desired state), trust the result, stream to stdout.
 
 ### State Layers
 
-| Layer | What | Where |
-|-------|------|-------|
-| Signals | App state | Your JS |
-| Ops | Desired screen state | Passed to clayterm |
-| Front/Back buffers | Screen cache | Clayterm WASM internal |
-| ANSI | Changed cells | stdout |
+| Layer              | What                 | Where                  |
+| ------------------ | -------------------- | ---------------------- |
+| Signals            | App state            | Your JS                |
+| Ops                | Desired screen state | Passed to clayterm     |
+| Front/Back buffers | Screen cache         | Clayterm WASM internal |
+| ANSI               | Changed cells        | stdout                 |
 
 ## Running Tests
 
@@ -78,6 +79,7 @@ bun run build:clayterm
 ## Import Resolution
 
 Clayterm imports are resolved via `tsconfig.json` path aliases:
+
 ```json
 {
   "clayterm": ["packages/clayterm/build/npm/esm/mod.js"]

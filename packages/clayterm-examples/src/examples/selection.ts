@@ -21,27 +21,41 @@ const example: ExampleDefinition<State, Op> = {
   },
   view(state) {
     const ops: Op[] = [];
-    ops.push(open("root", {
-      layout: { width: grow(), height: grow(), direction: "ttb" },
-      bg: rgba(12, 14, 18),
-    }));
-    ops.push(open("line", {
-      layout: { width: fixed(Math.max(20, state.value.length + 4)), height: fixed(3), padding: { left: 2, top: 1 } },
-      border: {
-        color: rgba(255, 210, 120),
-        left: 1,
-        right: 1,
-        top: 1,
-        bottom: 1,
-      },
-    }));
+    ops.push(
+      open("root", {
+        layout: { width: grow(), height: grow(), direction: "ttb" },
+        bg: rgba(12, 14, 18),
+      }),
+    );
+    ops.push(
+      open("line", {
+        layout: {
+          width: fixed(Math.max(20, state.value.length + 4)),
+          height: fixed(3),
+          padding: { left: 2, top: 1 },
+        },
+        border: {
+          color: rgba(255, 210, 120),
+          left: 1,
+          right: 1,
+          top: 1,
+          bottom: 1,
+        },
+      }),
+    );
 
     for (let i = 0; i < state.value.length; i++) {
-      const selected = state.anchor !== -1 && state.focus !== -1 && i >= Math.min(state.anchor, state.focus) && i <= Math.max(state.anchor, state.focus);
-      ops.push(open(`char-${i}`, {
-        layout: { width: fixed(1), height: fixed(1) },
-        bg: selected ? rgba(255, 255, 255) : undefined,
-      }));
+      const selected =
+        state.anchor !== -1 &&
+        state.focus !== -1 &&
+        i >= Math.min(state.anchor, state.focus) &&
+        i <= Math.max(state.anchor, state.focus);
+      ops.push(
+        open(`char-${i}`, {
+          layout: { width: fixed(1), height: fixed(1) },
+          bg: selected ? rgba(255, 255, 255) : undefined,
+        }),
+      );
       ops.push(text(state.value[i], { color: selected ? rgba(0, 0, 0) : rgba(255, 255, 255) }));
       ops.push(close());
     }

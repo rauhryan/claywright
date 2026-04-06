@@ -17,12 +17,13 @@ export interface AppContext {
 }
 
 export type AppView = (ctx: AppContext) => TerminalNode;
-export type AppReduce = (ctx: AppContext, inputEvents: InputEvent[], pointerEvents: PointerEvent[]) => void;
+export type AppReduce = (
+  ctx: AppContext,
+  inputEvents: InputEvent[],
+  pointerEvents: PointerEvent[],
+) => void;
 
-export async function runApp(
-  view: AppView,
-  options: AppOptions = {}
-): Promise<void> {
+export async function runApp(view: AppView, options: AppOptions = {}): Promise<void> {
   const width = options.width ?? process.stdout.columns ?? 80;
   const height = options.height ?? process.stdout.rows ?? 24;
 
@@ -56,7 +57,7 @@ export async function runApp(
     resetNodeIds();
     const root = new RootNode();
     const node = view({ width, height, pointer, sendOps });
-    
+
     if (node instanceof TextNode || node instanceof ElementNode) {
       root.children.push(node);
       node.parent = root;

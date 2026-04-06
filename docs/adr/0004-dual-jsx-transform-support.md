@@ -10,9 +10,11 @@ We need JSX to work in two contexts:
 The problem: Babel preload only works for the test runner process, not for spawned subprocesses. When a test spawns a fixture, that fixture runs without the babel transform.
 
 Bun has a built-in JSX transform that expects different exports:
+
 - `jsx(type, props)` / `jsxs(type, props)` / `jsxDEV(type, props, key, isStatic, source, self)`
 
 babel-preset-solid generates different code:
+
 - `createElement(tag)`, `insertNode(parent, node)`, `createTextNode(text)`, etc.
 
 Both need to produce the same virtual DOM structure.
@@ -33,17 +35,20 @@ Accepted.
 ## Consequences
 
 **Positive:**
+
 - Fixtures run standalone without preload plugin
 - Tests work with babel-preset-solid
 - Both transforms produce identical virtual DOM
 - No special configuration needed for either path
 
 **Negative:**
+
 - Must export both sets of functions from jsx-runtime
 - Slight code duplication in exports
 - Two code paths to maintain and test
 
 **Neutral:**
+
 - Bun's JSX transform is faster (no babel overhead)
 - babel-preset-solid is more configurable
 - Both are valid choices for production use

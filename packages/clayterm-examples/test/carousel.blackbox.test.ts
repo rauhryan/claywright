@@ -43,7 +43,7 @@ function carouselSuite(name: string, fixture: string, transitionLabel: string) {
       await session.spawn("bun", [fixture]);
       expect(await session.waitForText("DUNES / 01", 2000)).toBe(true);
 
-       const next = buttonPoint(session, "Next");
+      const next = buttonPoint(session, "Next");
 
       const before = session.captureStyles([next]);
       session.mouseMove(next.col, next.row);

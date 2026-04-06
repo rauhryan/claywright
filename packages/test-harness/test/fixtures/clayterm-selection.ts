@@ -1,13 +1,4 @@
-import {
-  createInput,
-  createTerm,
-  close,
-  fixed,
-  grow,
-  open,
-  rgba,
-  text,
-} from "clayterm";
+import { createInput, createTerm, close, fixed, grow, open, rgba, text } from "clayterm";
 
 let term = await createTerm({ width: 40, height: 8 });
 let input = await createInput();
@@ -21,19 +12,26 @@ const value = "Hello world";
 
 function paintText() {
   const ops = [] as ReturnType<typeof text | typeof open | typeof close>[];
-  ops.push(open("root", {
-    layout: { width: grow(), height: grow(), direction: "ttb" },
-  }));
-  ops.push(open("line", {
-    layout: { width: fixed(20), height: fixed(1) },
-  }));
+  ops.push(
+    open("root", {
+      layout: { width: grow(), height: grow(), direction: "ttb" },
+    }),
+  );
+  ops.push(
+    open("line", {
+      layout: { width: fixed(20), height: fixed(1) },
+    }),
+  );
 
   for (let i = 0; i < value.length; i++) {
-    const selected = anchor !== -1 && focus !== -1 && i >= Math.min(anchor, focus) && i <= Math.max(anchor, focus);
-    ops.push(open(`char-${i}`, {
-      layout: { width: fixed(1), height: fixed(1) },
-      bg: selected ? rgba(255, 255, 255) : undefined,
-    }));
+    const selected =
+      anchor !== -1 && focus !== -1 && i >= Math.min(anchor, focus) && i <= Math.max(anchor, focus);
+    ops.push(
+      open(`char-${i}`, {
+        layout: { width: fixed(1), height: fixed(1) },
+        bg: selected ? rgba(255, 255, 255) : undefined,
+      }),
+    );
     ops.push(text(value[i], { color: selected ? rgba(0, 0, 0) : rgba(255, 255, 255) }));
     ops.push(close());
   }

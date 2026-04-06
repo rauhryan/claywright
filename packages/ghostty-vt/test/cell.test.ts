@@ -21,7 +21,7 @@ describe("GhosttyTerminal cell inspection", () => {
 
   it("gets cell with text", () => {
     term.write("Hello");
-    
+
     const cell = term.getCell(0, 0);
     expect(cell.hasText).toBe(true);
     expect(cell.text).toBe("H");
@@ -30,11 +30,11 @@ describe("GhosttyTerminal cell inspection", () => {
 
   it("gets cells at different positions", () => {
     term.write("ABC");
-    
+
     const cell0 = term.getCell(0, 0);
     const cell1 = term.getCell(1, 0);
     const cell2 = term.getCell(2, 0);
-    
+
     expect(cell0.text).toBe("A");
     expect(cell1.text).toBe("B");
     expect(cell2.text).toBe("C");
@@ -42,10 +42,10 @@ describe("GhosttyTerminal cell inspection", () => {
 
   it("gets cells on different rows", () => {
     term.write("Line1\r\nLine2");
-    
+
     const row0 = term.getCell(0, 0);
     const row1 = term.getCell(0, 1);
-    
+
     expect(row0.text).toBe("L");
     expect(row1.text).toBe("L");
   });
@@ -53,7 +53,7 @@ describe("GhosttyTerminal cell inspection", () => {
   it("handles cursor positioning", () => {
     term.write("\x1b[3;5H");
     term.write("X");
-    
+
     const cell = term.getCell(4, 2);
     expect(cell.hasText).toBe(true);
     expect(cell.text).toBe("X");
@@ -61,7 +61,7 @@ describe("GhosttyTerminal cell inspection", () => {
 
   it("handles wide characters", () => {
     term.write("日");
-    
+
     const cell0 = term.getCell(0, 0);
     expect(cell0.hasText).toBe(true);
     expect(cell0.wide).toBe(1);
@@ -88,35 +88,35 @@ describe("GhosttyTerminal style inspection", () => {
 
   it("detects bold style", () => {
     term.write("\x1b[1mBold\x1b[0m");
-    
+
     const style = term.getCellStyle(0, 0);
     expect(style.bold).toBe(true);
   });
 
   it("detects italic style", () => {
     term.write("\x1b[3mItalic\x1b[0m");
-    
+
     const style = term.getCellStyle(0, 0);
     expect(style.italic).toBe(true);
   });
 
   it("detects inverse style", () => {
     term.write("\x1b[7mInverse\x1b[0m");
-    
+
     const style = term.getCellStyle(0, 0);
     expect(style.inverse).toBe(true);
   });
 
   it("detects underline style", () => {
     term.write("\x1b[4mUnderline\x1b[0m");
-    
+
     const style = term.getCellStyle(0, 0);
     expect(style.underline).toBe(1);
   });
 
   it("detects foreground color", () => {
     term.write("\x1b[31mRed\x1b[0m");
-    
+
     const style = term.getCellStyle(0, 0);
     expect(style.fg.tag).toBe(1);
     expect(style.fg.palette).toBe(1);
@@ -124,7 +124,7 @@ describe("GhosttyTerminal style inspection", () => {
 
   it("detects background color", () => {
     term.write("\x1b[41mRed BG\x1b[0m");
-    
+
     const style = term.getCellStyle(0, 0);
     expect(style.bg.tag).toBe(1);
     expect(style.bg.palette).toBe(1);
@@ -132,7 +132,7 @@ describe("GhosttyTerminal style inspection", () => {
 
   it("detects strikethrough", () => {
     term.write("\x1b[9mStrike\x1b[0m");
-    
+
     const style = term.getCellStyle(0, 0);
     expect(style.strikethrough).toBe(true);
   });

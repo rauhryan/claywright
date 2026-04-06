@@ -38,18 +38,19 @@ Signals ──► Ops ─────────► Layout/Render/Diff ──�
 
 ### State Layers (IMPORTANT)
 
-| Layer | What | Where | Mutable? |
-|-------|------|-------|----------|
-| **Signals** | App state | Your JS | Yes (via setters) |
-| **Ops** | Desired screen state | Passed to clayterm | No (just a message) |
-| **Front/Back buffers** | Screen cache | Clayterm WASM | Internal only |
-| **ANSI** | Changed cells | stdout | N/A |
+| Layer                  | What                 | Where              | Mutable?            |
+| ---------------------- | -------------------- | ------------------ | ------------------- |
+| **Signals**            | App state            | Your JS            | Yes (via setters)   |
+| **Ops**                | Desired screen state | Passed to clayterm | No (just a message) |
+| **Front/Back buffers** | Screen cache         | Clayterm WASM      | Internal only       |
+| **ANSI**               | Changed cells        | stdout             | N/A                 |
 
 **Ops are stateless from your perspective.** You pass "what I want now" and clayterm figures out "what changed."
 
 ### Why Virtual DOM?
 
 NOT for diffing (clayterm handles that in WASM). For:
+
 1. Solid.js compatibility (babel-preset-solid expects tree-building functions)
 2. Component composition
 3. Debugging/inspection
@@ -74,6 +75,7 @@ Both produce the same virtual DOM structure.
 ### Performance Optimizations
 
 For IDE-scale (500+ ops, 12,000+ cells):
+
 - Current: Rebuild virtual DOM each frame (simple, works)
 - Future: Use Solid.js fine-grained reactivity to update ops in-place
 - Don't add JS-level diffing (clayterm handles this in WASM)
@@ -106,10 +108,10 @@ expect(await session.waitForText("text", 2000)).toBe(true);
 
 ## File Purposes
 
-| File | Purpose |
-|------|---------|
-| `jsx-runtime.ts` | Node types + Solid.js runtime + Bun JSX exports |
-| `render.ts` | `render()` function, virtual DOM → clayterm ops |
-| `index.ts` | Public API, re-exports for babel preset |
-| `scripts/solid-*.ts` | Babel transform pipeline |
-| `bunfig.toml` | Preload config for tests |
+| File                 | Purpose                                         |
+| -------------------- | ----------------------------------------------- |
+| `jsx-runtime.ts`     | Node types + Solid.js runtime + Bun JSX exports |
+| `render.ts`          | `render()` function, virtual DOM → clayterm ops |
+| `index.ts`           | Public API, re-exports for babel preset         |
+| `scripts/solid-*.ts` | Babel transform pipeline                        |
+| `bunfig.toml`        | Preload config for tests                        |

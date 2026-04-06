@@ -1,8 +1,8 @@
 /** @jsxImportSource @tui/solid-bindings */
-import { createSignal } from "solid-js"
-import { fixed, grow, rgba, runApp } from "@tui/solid-bindings"
+import { createSignal } from "solid-js";
+import { fixed, grow, rgba, runApp } from "@tui/solid-bindings";
 
-const [focused, setFocused] = createSignal(false)
+const [focused, setFocused] = createSignal(false);
 
 runApp(() => (
   <box width={grow()} height={grow()} bg={rgba(10, 14, 22)}>
@@ -19,4 +19,4 @@ runApp(() => (
       <text color={rgba(255, 255, 255)}>{focused() ? "FOCUSED" : "Click to focus"}</text>
     </box>
   </box>
-))
+));

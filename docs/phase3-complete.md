@@ -7,21 +7,25 @@ Successfully built the minimum viable bridge between solid-bindings virtual DOM 
 ## What Was Built
 
 ### 1. ElementRenderable (solid-bindings/src/ElementRenderable.ts)
+
 - Concrete Renderable that wraps ElementNode
 - Reads event handlers from ElementNode.props
 - No circular dependency (placed in solid-bindings, not core)
 
 ### 2. Reconciler (solid-bindings/src/reconciler.ts)
+
 - `createRenderableTree(node)` - Creates Renderable tree from virtual DOM
 - Skips TextNodes (no focus/events needed)
 - Mirrors virtual DOM structure
 
 ### 3. Renderable-to-Ops (solid-bindings/src/renderable-to-ops.ts)
+
 - `renderableToOps(renderable)` - Converts Renderable tree to clayterm ops
 - Handles box, text, and generic elements
 - Reuses existing prop conversion logic
 
 ### 4. Updated Runtime (solid-bindings/src/runtime.ts)
+
 - Uses core's Renderer instead of inline clayterm
 - Creates Renderable tree each frame (simple, works)
 - Uses renderer.handleInput() for keyboard events
@@ -77,6 +81,7 @@ Virtual DOM (ElementNode)     Core Package
 ## Next Steps
 
 Phase 4 could add:
+
 - Input element (text editing)
 - Tab navigation
 - Keyboard shortcuts
