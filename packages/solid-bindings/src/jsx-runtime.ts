@@ -1,25 +1,14 @@
-import { createRoot, createRenderEffect, createMemo, flatten, flush } from "solid-js/dist/solid.js";
+import { createRoot, createMemo, flatten, flush } from "solid-js/dist/solid.js";
 
-const effect = <T,>(fn: (prev: T | undefined) => T, effectFn: (value: T, prev: T | undefined) => void, initial?: T): void => {
-  createRenderEffect(fn as any, effectFn as any, initial as any);
-};
-
-const memoTransparent = <T,>(fn: () => T, transparent: boolean): (() => T) => {
-  return createMemo(() => fn());
-};
-
-export type TerminalNode = TextNode | ElementNode | RootNode;
-
-export class RootNode {
-  readonly type = "root";
-  children: TerminalNode[] = [];
-  parent: TerminalNode | null = null;
+let idCounter = 0;
+function generateId(): string {
+  return `el_${idCounter++}`;
 }
 
 export class TextNode {
   readonly type = "text";
   value: string;
-  parent: TerminalNode | null = null;
+  parent: ElementNode | RootNode | null = null;
 
   constructor(value: string) {
     this.value = value;
@@ -28,61 +17,57 @@ export class TextNode {
 
 export class ElementNode {
   readonly type: string;
+  id: string;
   props: Record<string, unknown> = {};
-  children: TerminalNode[] = [];
-  parent: TerminalNode | null = null;
+  children: (TextNode | ElementNode)[] = [];
+  parent: ElementNode | RootNode | null = null;
 
   constructor(type: string) {
     this.type = type;
+    this.id = generateId();
   }
 }
+
+export class RootNode {
+  readonly type = "root";
+  children: (TextNode | ElementNode)[] = [];
+}
+
+export type TerminalNode = TextNode | ElementNode | RootNode;
 
 function isParentNode(node: TerminalNode): node is RootNode | ElementNode {
   return node instanceof RootNode || node instanceof ElementNode;
 }
 
-function createElement(tag: string): TerminalNode {
+function createElement(tag: string): ElementNode {
   return new ElementNode(tag);
 }
 
-function createTextNode(value: string): TerminalNode {
+function createTextNode(value: string): TextNode {
   return new TextNode(value);
 }
 
-function createSentinel(): TerminalNode {
-  return new TextNode("");
-}
-
-function isTextNode(node: TerminalNode): boolean {
-  return node instanceof TextNode;
-}
-
-function replaceText(node: TerminalNode, value: string): void {
-  if (node instanceof TextNode) {
-    node.value = value;
-  }
-}
-
-function insertNode(parent: TerminalNode, node: TerminalNode, anchor?: TerminalNode): void {
-  if (!isParentNode(parent)) {
-    console.error("Cannot insert into non-parent node:", parent.type);
-    return;
-  }
-  const index = anchor ? parent.children.indexOf(anchor) : -1;
+function insertNode(
+  parent: TerminalNode,
+  node: TerminalNode,
+  anchor?: TerminalNode
+): void {
+  if (!isParentNode(parent)) return;
+  const index = anchor ? parent.children.indexOf(anchor as any) : -1;
   if (index >= 0) {
-    parent.children.splice(index, 0, node);
+    parent.children.splice(index, 0, node as any);
   } else {
-    parent.children.push(node);
+    parent.children.push(node as any);
   }
-  node.parent = parent;
+  (node as any).parent = parent;
 }
 
 function removeNode(parent: TerminalNode, node: TerminalNode): void {
   if (!isParentNode(parent)) return;
-  const index = parent.children.indexOf(node);
+  const index = parent.children.indexOf(node as any);
   if (index >= 0) {
     parent.children.splice(index, 1);
-    node.parent = null;
+    (node as any).parent = null;
   }
 }
 
@@ -114,33 +99,62 @@ function getFirstChild(node: TerminalNode): TerminalNode | undefined {
 
 function getNextSibling(node: TerminalNode): TerminalNode | undefined {
   if (!node.parent || !isParentNode(node.parent)) return undefined;
-  const index = node.parent.children.indexOf(node);
+  const index = node.parent.children.indexOf(node as any);
   return node.parent.children[index + 1];
 }
 
-function insert(parent: TerminalNode, accessor: unknown, marker?: TerminalNode, initial?: unknown): void {
+const effect = <T,>(
+  fn: (prev: T | undefined) => T,
+  effectFn: (value: T, prev: T | undefined) => void,
+  initial?: T
+): void => {
+  (createMemo as any)(fn, effectFn, initial);
+};
+
+const memoTransparent = <T,>(fn: () => T, transparent: boolean): (() => T) => {
+  return createMemo(() => fn()) as any;
+};
+
+function insert(
+  parent: TerminalNode,
+  accessor: unknown,
+  marker?: TerminalNode,
+  initial?: unknown
+): void {
   const multi = marker !== undefined;
   if (multi && !initial) initial = [];
   if (typeof accessor !== "function") {
     accessor = normalize(accessor, multi, true);
     if (typeof accessor !== "function") {
-      insertExpression(parent, accessor as TerminalNode | TerminalNode[], initial as TerminalNode[], marker);
+      insertExpression(
+        parent,
+        accessor as TerminalNode | TerminalNode[],
+        initial as TerminalNode[],
+        marker
+      );
       return;
     }
   }
   const memoed = memoTransparent(() => (accessor as () => unknown)(), true);
   if (multi && (initial as TerminalNode[]).length === 0) {
-    const sentinel = createSentinel();
+    const sentinel = createTextNode("");
     insertNode(parent, sentinel, marker);
     initial = [sentinel];
   }
   effect(
     () => {
-      const value = normalize((memoed as () => unknown)(), multi) as TerminalNode | TerminalNode[];
+      const value = normalize((memoed as () => unknown)(), multi) as
+        | TerminalNode
+        | TerminalNode[];
       return value;
     },
     (value, current) => {
-      insertExpression(parent, value as TerminalNode | TerminalNode[], current as TerminalNode[], marker);
+      insertExpression(
+        parent,
+        value as TerminalNode | TerminalNode[],
+        current as TerminalNode[],
+        marker
+      );
     },
     initial as TerminalNode[]
   );
@@ -154,13 +168,11 @@ function insertExpression(
 ): void {
   const multi = marker !== undefined;
 
-  // Handle string/number values
   if (typeof value === "string" || typeof value === "number") {
     if (parent instanceof TextNode) {
       parent.value = String(value);
       return;
     }
-    // For ElementNode, create a TextNode and insert it
     const textNode = createTextNode(String(value));
     if (Array.isArray(current)) {
       cleanChildren(parent, current, marker, textNode);
@@ -206,13 +218,18 @@ function normalize(value: unknown, multi: boolean, doNotUnwrap = false): unknown
     for (let i = 0, len = value.length; i < len; i++) {
       const item = (value as unknown[])[i];
       const t = typeof item;
-      if (t === "string" || t === "number") (value as unknown[])[i] = createTextNode(String(item));
+      if (t === "string" || t === "number")
+        (value as unknown[])[i] = createTextNode(String(item));
     }
   }
   return value;
 }
 
-function reconcileArrays(parent: TerminalNode, a: TerminalNode[], b: TerminalNode[]): void {
+function reconcileArrays(
+  parent: TerminalNode,
+  a: TerminalNode[],
+  b: TerminalNode[]
+): void {
   let bLength = b.length;
   let aEnd = a.length;
   let bEnd = bLength;
@@ -234,7 +251,12 @@ function reconcileArrays(parent: TerminalNode, a: TerminalNode[], b: TerminalNod
     }
 
     if (aEnd === aStart) {
-      const node = bEnd < bLength ? (bStart ? getNextSibling(b[bStart - 1]) : b[bEnd - bStart]) : after;
+      const node =
+        bEnd < bLength
+          ? bStart
+            ? getNextSibling(b[bStart - 1])
+            : b[bEnd - bStart]
+          : after;
       while (bStart < bEnd) insertNode(parent, b[bStart++], node);
     } else if (bEnd === bStart) {
       while (aStart < aEnd) {
@@ -400,7 +422,44 @@ export function renderToString(node: TerminalNode): string {
 export namespace JSX {
   export type Element = TerminalNode;
   export interface IntrinsicElements {
-    box: {};
-    text: {};
+    text: { color?: string; children?: unknown };
   }
+}
+
+export function jsx(
+  type: string,
+  props: Record<string, unknown> | null
+): ElementNode {
+  const el = createElement(type);
+  if (props) {
+    for (const [key, value] of Object.entries(props)) {
+      if (key !== "children") {
+        el.props[key] = value;
+      }
+    }
+    if (props.children !== undefined) {
+      const children = Array.isArray(props.children) ? props.children : [props.children];
+      for (const child of children) {
+        if (typeof child === "string" || typeof child === "number") {
+          insertNode(el, createTextNode(String(child)));
+        } else if (child instanceof TextNode || child instanceof ElementNode) {
+          insertNode(el, child);
+        }
+      }
+    }
+  }
+  return el;
+}
+
+export const jsxs = jsx;
+
+export function jsxDEV(
+  type: string,
+  props: Record<string, unknown> | null,
+  key?: string,
+  isStaticChildren?: boolean,
+  source?: { fileName: string; lineNumber: number; columnNumber: number },
+  self?: unknown
+): ElementNode {
+  return jsx(type, props);
 }

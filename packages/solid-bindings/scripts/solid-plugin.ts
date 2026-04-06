@@ -7,7 +7,7 @@ export const solidPlugin = plugin({
     build.onLoad({ filter: /\.(js|ts)x$/ }, async (args) => {
       const file = Bun.file(args.path);
       const code = await file.text();
-      const transformed = await transformSolidJSX(code, args.path, "@tui/solid-xterm");
+      const transformed = await transformSolidJSX(code, args.path, "@tui/solid-bindings");
       return { contents: transformed, loader: "js" };
     });
   },
