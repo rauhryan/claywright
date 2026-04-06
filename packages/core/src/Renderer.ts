@@ -87,6 +87,7 @@ export class Renderer {
   }
 
   focusRenderable(renderable: Renderable): void {
+    if (!renderable.focusable) return;
     if (this.focusedRenderable === renderable) return;
 
     if (this.focusedRenderable) {
@@ -95,6 +96,45 @@ export class Renderer {
 
     this.focusedRenderable = renderable;
     renderable.focus();
+  }
+
+  getFocusableRenderables(): Renderable[] {
+    if (!this.rootRenderable) {
+      return [];
+    }
+
+    const focusables: Renderable[] = [];
+    this.collectFocusableRenderables(this.rootRenderable, focusables);
+    return focusables;
+  }
+
+  focusNext(backward: boolean = false): Renderable | null {
+    const focusables = this.getFocusableRenderables();
+    if (focusables.length === 0) {
+      return null;
+    }
+
+    if (!this.focusedRenderable) {
+      const next = backward ? focusables[focusables.length - 1]! : focusables[0]!;
+      this.focusRenderable(next);
+      return next;
+    }
+
+    const currentIndex = focusables.findIndex(
+      (renderable) => renderable.id === this.focusedRenderable?.id,
+    );
+
+    if (currentIndex === -1) {
+      const next = backward ? focusables[focusables.length - 1]! : focusables[0]!;
+      this.focusRenderable(next);
+      return next;
+    }
+
+    const delta = backward ? -1 : 1;
+    const nextIndex = (currentIndex + delta + focusables.length) % focusables.length;
+    const next = focusables[nextIndex]!;
+    this.focusRenderable(next);
+    return next;
   }
 
   beginPointerPress(): void {
@@ -207,6 +247,16 @@ export class Renderer {
     return events;
   }
 
+  private collectFocusableRenderables(renderable: Renderable, focusables: Renderable[]): void {
+    if (renderable.focusable) {
+      focusables.push(renderable);
+    }
+
+    for (const child of renderable.children) {
+      this.collectFocusableRenderables(child, focusables);
+    }
+  }
+
   private processInputEvent(event: InputEvent): void {
     if (event.type === "keydown" || event.type === "keyrepeat") {
       const keyEvent = new KeyboardEvent("keydown", this.focusedRenderable, {
@@ -221,9 +271,19 @@ export class Renderer {
         repeated: event.type === "keyrepeat",
       });
 
+      const isTabNavigationKey =
+        (keyEvent.key === "Tab" || keyEvent.code === "Tab") &&
+        !keyEvent.modifiers.ctrl &&
+        !keyEvent.modifiers.alt &&
+        !keyEvent.modifiers.meta;
+
       // Dispatch to focused element
       if (this.focusedRenderable) {
         this.focusedRenderable.processEvent(keyEvent);
+      }
+
+      if (isTabNavigationKey && !keyEvent.defaultPrevented) {
+        this.focusNext(keyEvent.modifiers.shift);
       }
     } else if (event.type === "keyup") {
       const keyEvent = new KeyboardEvent("keyup", this.focusedRenderable, {
