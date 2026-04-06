@@ -81,7 +81,7 @@ function setProperty(node: TerminalNode, name: string, value: unknown): void {
   }
 }
 
-export function setProp(node: TerminalNode, name: string, value: unknown): unknown {
+export function setProp(node: TerminalNode, name: string, value: unknown, prev?: unknown): unknown {
   setProperty(node, name, value);
   return value;
 }
@@ -393,7 +393,7 @@ export function createComponent<T>(Comp: (props: T) => TerminalNode, props: T): 
   return createRoot(() => Comp(props));
 }
 
-export { createElement, createTextNode, insertNode, insert, spread, flush };
+export { createElement, createTextNode, insertNode, insert, spread, flush, effect };
 
 export function render(code: () => TerminalNode, root: RootNode): () => void {
   let disposer: () => void;
@@ -422,7 +422,20 @@ export function renderToString(node: TerminalNode): string {
 export namespace JSX {
   export type Element = TerminalNode;
   export interface IntrinsicElements {
-    text: { color?: string; children?: unknown };
+    text: { color?: number; children?: unknown };
+    box: {
+      children?: unknown;
+      width?: { type: "fixed" | "grow" | "percent" | "fit"; value?: number; min?: number; max?: number };
+      height?: { type: "fixed" | "grow" | "percent" | "fit"; value?: number; min?: number; max?: number };
+      direction?: "ltr" | "ttb";
+      padding?: { left?: number; right?: number; top?: number; bottom?: number };
+      gap?: number;
+      alignX?: number;
+      alignY?: number;
+      bg?: number;
+      border?: { color: number; left?: number; right?: number; top?: number; bottom?: number };
+      cornerRadius?: { tl?: number; tr?: number; bl?: number; br?: number };
+    };
   }
 }
 

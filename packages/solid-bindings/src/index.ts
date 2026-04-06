@@ -1,4 +1,4 @@
-export { render } from "./render";
+export { render, grow, fixed, percent, fit, rgba } from "./render";
 export {
   RootNode,
   ElementNode,
@@ -13,6 +13,7 @@ export {
   flush,
   setProp,
   renderToString,
+  effect,
   jsx,
   jsxs,
   jsxDEV,
