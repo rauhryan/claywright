@@ -25,6 +25,13 @@ Key architectural decisions are documented in `docs/adr/`:
 - [ADR 0003: Stateless Ops](docs/adr/0003-stateless-ops.md)
 - [ADR 0004: Dual JSX Transform Support](docs/adr/0004-dual-jsx-transform-support.md)
 - [ADR 0005: Blackbox Testing](docs/adr/0005-blackbox-testing.md)
+- [ADR 0006: Core Package Architecture](docs/adr/0006-core-package-architecture.md)
+- [ADR 0007: Virtual DOM as Data, Renderable as Wrapper](docs/adr/0007-virtual-dom-as-data.md)
+- [ADR 0008: Renderable Tree Mirrors Virtual DOM](docs/adr/0008-renderable-tree-mirrors-virtual-dom.md)
+- [ADR 0009: Direct Clayterm Dependency](docs/adr/0009-direct-clayterm-dependency.md)
+- [ADR 0010: Two-Tier Keyboard Event Routing](docs/adr/0010-two-tier-keyboard-routing.md)
+- [ADR 0011: Event Bubbling Through Renderable Tree](docs/adr/0011-event-bubbling.md)
+- [ADR 0012: Click-to-Focus with preventDefault](docs/adr/0012-click-to-focus.md)
 
 ## Key Concepts
 
