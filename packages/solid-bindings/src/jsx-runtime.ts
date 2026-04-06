@@ -1,4 +1,6 @@
-import { createRoot, createMemo, flatten, flush } from "solid-js/dist/solid.js";
+import { createRoot, createMemo, createRenderEffect, flatten, flush } from "solid-js/dist/solid.js";
+
+export const memo = createMemo;
 
 let idCounter = 0;
 function generateId(): string {
@@ -108,7 +110,7 @@ const effect = <T,>(
   effectFn: (value: T, prev: T | undefined) => void,
   initial?: T
 ): void => {
-  (createMemo as any)(fn, effectFn, initial);
+  createRenderEffect(fn as any, effectFn as any, initial as any);
 };
 
 const memoTransparent = <T,>(fn: () => T, transparent: boolean): (() => T) => {

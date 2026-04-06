@@ -44,7 +44,7 @@ export async function render(
   process.stdout.write(output);
 }
 
-function toSizingAxis(sizing?: { type: string; value?: number; min?: number; max?: number }): SizingAxis | undefined {
+export function toSizingAxis(sizing?: { type: string; value?: number; min?: number; max?: number }): SizingAxis | undefined {
   if (!sizing) return undefined;
   switch (sizing.type) {
     case "fixed":

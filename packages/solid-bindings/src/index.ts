@@ -1,4 +1,5 @@
 export { render, grow, fixed, percent, fit, rgba } from "./render";
+export { runApp, type AppOptions, type AppContext, type AppView } from "./runtime";
 export {
   RootNode,
   ElementNode,
@@ -14,6 +15,7 @@ export {
   setProp,
   renderToString,
   effect,
+  memo,
   jsx,
   jsxs,
   jsxDEV,
