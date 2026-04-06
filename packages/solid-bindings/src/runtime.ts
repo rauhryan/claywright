@@ -1,6 +1,8 @@
-import { createTerm, createInput, open, close, text, grow, type InputEvent, type PointerEvent, type Op } from "clayterm";
-import { RootNode, ElementNode, TextNode, type TerminalNode } from "./jsx-runtime";
-import { toSizingAxis } from "./render";
+import { createInput, type InputEvent, type PointerEvent, type Op } from "clayterm";
+import { Renderer } from "@tui/core";
+import { RootNode, ElementNode, TextNode, resetNodeIds, type TerminalNode } from "./jsx-runtime";
+import { createRenderableTree } from "./reconciler";
+import { renderableToOps } from "./renderable-to-ops";
 
 export interface AppOptions {
   width?: number;
@@ -24,7 +26,8 @@ export async function runApp(
   const width = options.width ?? process.stdout.columns ?? 80;
   const height = options.height ?? process.stdout.rows ?? 24;
 
-  const term = await createTerm({ width, height });
+  const renderer = new Renderer({ width, height });
+  await renderer.init();
   const input = await createInput();
 
   let pointer = { x: -1, y: -1, down: false };
@@ -42,12 +45,15 @@ export async function runApp(
     if (process.stdin.isTTY && typeof process.stdin.setRawMode === "function") {
       process.stdin.setRawMode(false);
     }
+
+    renderer.destroy();
   }
 
-  function frame() {
+  function frame(allowRerender = true) {
     if (cleanedUp) return;
     frameScheduled = false;
 
+    resetNodeIds();
     const root = new RootNode();
     const node = view({ width, height, pointer, sendOps });
     
@@ -56,10 +62,19 @@ export async function runApp(
       node.parent = root;
     }
 
-    const ops = nodeToOps(root);
-    const { output, events } = term.render(ops, { pointer });
+    const rootRenderable = createRenderableTree(root);
+    if (rootRenderable) {
+      renderer.setRoot(rootRenderable);
+    }
+
+    const ops = rootRenderable ? renderableToOps(rootRenderable) : [];
+    const output = renderer.render(ops, pointer);
 
     process.stdout.write(output);
+
+    if (allowRerender && renderer.lastPointerEvents.length > 0) {
+      frame(false);
+    }
   }
 
   function scheduleFrame() {
@@ -69,7 +84,7 @@ export async function runApp(
   }
 
   function sendOps(ops: Op[]) {
-    const { output } = term.render(ops);
+    const output = renderer.render(ops, pointer);
     process.stdout.write(output);
   }
 
@@ -110,62 +125,18 @@ export async function runApp(
       }
       if (event.type === "mousedown") {
         pointer = { x: event.x, y: event.y, down: true };
+        renderer.beginPointerPress();
+        frame();
       }
       if (event.type === "mouseup") {
         pointer = { x: event.x, y: event.y, down: false };
       }
     }
 
+    renderer.handleInput(new Uint8Array(buf));
+
     scheduleFrame();
   });
 
   process.stdin.resume();
-}
-
-function nodeToOps(node: TerminalNode): Op[] {
-  const ops: Op[] = [];
-
-  if (node instanceof RootNode) {
-    ops.push(open("root", { layout: { width: grow(), height: grow() } }));
-    for (const child of node.children) {
-      ops.push(...nodeToOps(child));
-    }
-    ops.push(close());
-  } else if (node instanceof ElementNode) {
-    if (node.type === "text") {
-      const content = node.children
-        .filter((c): c is TextNode => c instanceof TextNode)
-        .map((c) => c.value)
-        .join("");
-      ops.push(text(content, { color: node.props.color as any }));
-    } else if (node.type === "box") {
-      const props = node.props as any;
-      const openProps: any = {};
-      
-      if (props.width || props.height || props.direction || props.padding || props.gap || props.alignX || props.alignY) {
-        openProps.layout = {};
-        if (props.width) openProps.layout.width = toSizingAxis(props.width);
-        if (props.height) openProps.layout.height = toSizingAxis(props.height);
-        if (props.direction) openProps.layout.direction = props.direction;
-        if (props.padding) openProps.layout.padding = props.padding;
-        if (props.gap !== undefined) openProps.layout.gap = props.gap;
-        if (props.alignX !== undefined) openProps.layout.alignX = props.alignX;
-        if (props.alignY !== undefined) openProps.layout.alignY = props.alignY;
-      }
-      
-      if (props.bg !== undefined) openProps.bg = props.bg;
-      if (props.border) openProps.border = props.border;
-      if (props.cornerRadius) openProps.cornerRadius = props.cornerRadius;
-      
-      ops.push(open(node.id, openProps));
-      for (const child of node.children) {
-        ops.push(...nodeToOps(child));
-      }
-      ops.push(close());
-    }
-  } else if (node instanceof TextNode) {
-    ops.push(text(node.value, {}));
-  }
-
-  return ops;
 }

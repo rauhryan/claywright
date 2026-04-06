@@ -16,6 +16,9 @@ export class Renderer {
   
   focusedRenderable: Renderable | null = null
   rootRenderable: Renderable | null = null
+  lastPointerEvents: any[] = []
+  hoveredRenderables: Renderable[] = []
+  pressedRenderable: Renderable | null = null
   
   private renderablesById: Map<string, Renderable> = new Map()
   
@@ -30,11 +33,35 @@ export class Renderer {
   }
   
   setRoot(renderable: Renderable): void {
-    // Clear previous ID map
+    const previouslyFocusedId = this.focusedRenderable?.id ?? null
+    const previouslyPressedId = this.pressedRenderable?.id ?? null
+    const previouslyHoveredIds = this.hoveredRenderables.map((hovered) => hovered.id)
+
     this.renderablesById.clear()
-    
+
     this.rootRenderable = renderable
     this.buildIdMap(renderable)
+
+    this.hoveredRenderables = previouslyHoveredIds
+      .map((id) => this.findRenderable(id))
+      .filter((hovered): hovered is Renderable => Boolean(hovered))
+
+    this.pressedRenderable = previouslyPressedId
+      ? this.findRenderable(previouslyPressedId) ?? null
+      : null
+
+    if (!previouslyFocusedId) return
+
+    const nextFocusedRenderable = this.findRenderable(previouslyFocusedId)
+    if (!nextFocusedRenderable) {
+      this.focusedRenderable = null
+      return
+    }
+
+    this.focusedRenderable = nextFocusedRenderable
+    if (nextFocusedRenderable.focusable) {
+      nextFocusedRenderable.focused = true
+    }
   }
   
   private buildIdMap(renderable: Renderable): void {
@@ -58,6 +85,14 @@ export class Renderer {
     this.focusedRenderable = renderable
     renderable.focus()
   }
+
+  beginPointerPress(): void {
+    this.pressedRenderable = this.getHoveredRenderable()
+  }
+
+  getHoveredRenderable(): Renderable | null {
+    return this.hoveredRenderables[this.hoveredRenderables.length - 1] ?? null
+  }
   
   blurRenderable(renderable: Renderable): void {
     if (this.focusedRenderable !== renderable) return
@@ -66,16 +101,21 @@ export class Renderer {
     this.focusedRenderable = null
   }
   
-  render(ops: Op[]): string {
+  render(ops: Op[], pointer?: { x: number; y: number; down: boolean }): string {
     if (!this.term) {
       throw new Error("Renderer not initialized. Call init() first.")
     }
     
-    const { output, events } = this.term.render(ops)
+    const { output, events } = this.term.render(ops, { pointer })
+    this.lastPointerEvents = events
     
     // Process events from clayterm
     for (const event of events) {
       this.handlePointerEvent(event)
+    }
+
+    if (pointer && !pointer.down) {
+      this.pressedRenderable = null
     }
     
     return output
@@ -108,14 +148,28 @@ export class Renderer {
     
     // Dispatch event (bubbles through tree)
     renderable.processEvent(mouseEvent)
+
+    if (event.type === "pointerenter") {
+      this.hoveredRenderables = [
+        ...this.hoveredRenderables.filter((hovered) => hovered.id !== renderable.id),
+        renderable,
+      ]
+    }
+
+    if (event.type === "pointerleave") {
+      this.hoveredRenderables = this.hoveredRenderables.filter((hovered) => hovered.id !== renderable.id)
+    }
     
     // Auto-focus on left click, unless prevented
-    if (event.type === "pointerclick" && 
-        event.button === 0 && 
-        !mouseEvent.defaultPrevented) {
+    if (event.type === "pointerclick" && !mouseEvent.defaultPrevented) {
       const focusable = renderable.getFocusableAncestor()
       if (focusable) {
         this.focusRenderable(focusable)
+      } else if (this.focusedRenderable) {
+        const pressedFocusable = this.pressedRenderable?.getFocusableAncestor() ?? null
+        if (pressedFocusable?.id !== this.focusedRenderable.id) {
+          this.blurRenderable(this.focusedRenderable)
+        }
       }
     }
   }
@@ -192,6 +246,8 @@ export class Renderer {
       this.rootRenderable.destroy()
     }
     this.renderablesById.clear()
+    this.hoveredRenderables = []
+    this.pressedRenderable = null
     this.focusedRenderable = null
     this.rootRenderable = null
     this.term = null

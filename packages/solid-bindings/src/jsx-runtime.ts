@@ -3,6 +3,11 @@ import { createRoot, createMemo, createRenderEffect, flatten, flush } from "soli
 export const memo = createMemo;
 
 let idCounter = 0;
+
+export function resetNodeIds(): void {
+  idCounter = 0;
+}
+
 function generateId(): string {
   return `el_${idCounter++}`;
 }

@@ -1,0 +1,66 @@
+import { afterEach, beforeEach, describe, expect, test } from "bun:test"
+import { createSession, MouseButton, type TerminalSession } from "@tui/test-harness"
+
+const fixture = new URL("./fixtures/focus-demo.tsx", import.meta.url).pathname
+
+describe("focus blackbox", () => {
+  let session: TerminalSession
+
+  beforeEach(() => {
+    session = createSession({ cols: 80, rows: 24, cwd: process.cwd() })
+  })
+
+  afterEach(() => {
+    session.cleanup()
+  })
+
+  test("clicking a focusable box updates the UI", async () => {
+    await session.spawn("bun", [fixture])
+
+    expect(await session.waitForText("Click to focus", 2000)).toBe(true)
+
+    session.mouseMove(5, 3)
+    await session.wait(100)
+    session.click(5, 3, MouseButton.Left)
+
+    expect(await session.waitForText("FOCUSED", 1500)).toBe(true)
+  })
+
+  test("clicking outside a focused box blurs it", async () => {
+    await session.spawn("bun", [fixture])
+
+    expect(await session.waitForText("Click to focus", 2000)).toBe(true)
+
+    session.mouseMove(5, 3)
+    await session.wait(100)
+    session.click(5, 3, MouseButton.Left)
+
+    expect(await session.waitForText("FOCUSED", 1500)).toBe(true)
+
+    session.mouseMove(50, 10)
+    await session.wait(100)
+    session.click(50, 10, MouseButton.Left)
+
+    expect(await session.waitForText("Click to focus", 1500)).toBe(true)
+  })
+
+  test("dragging off a focused box does not blur it", async () => {
+    await session.spawn("bun", [fixture])
+
+    expect(await session.waitForText("Click to focus", 2000)).toBe(true)
+
+    session.mouseMove(5, 3)
+    await session.wait(100)
+    session.click(5, 3, MouseButton.Left)
+
+    expect(await session.waitForText("FOCUSED", 1500)).toBe(true)
+
+    session.mouseDown(5, 3, MouseButton.Left)
+    await session.wait(100)
+    session.mouseMove(50, 10)
+    await session.wait(100)
+    session.mouseUp(50, 10, MouseButton.Left)
+
+    expect(await session.waitForText("FOCUSED", 1500)).toBe(true)
+  })
+})
