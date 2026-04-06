@@ -1,6 +1,5 @@
 /** @jsxImportSource @tui/solid-bindings */
-import { runApp } from "./src/runtime.ts";
-import { grow, fixed, rgba } from "@tui/solid-bindings";
+import { fixed, grow, rgba, runApp } from "@tui/solid-bindings";
 
 runApp(({ width, height, pointer }) => (
   <box width={grow()} height={grow()} direction="ttb" bg={rgba(10, 14, 22)}>

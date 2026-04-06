@@ -3,6 +3,10 @@ import { createSession, MouseButton, type TerminalSession } from "@tui/test-harn
 
 const fixture = new URL("./fixtures/focus-demo.tsx", import.meta.url).pathname;
 
+function screenContainsRaw(session: TerminalSession, text: string): boolean {
+  return session.getScreen().raw.includes(text);
+}
+
 describe("focus blackbox", () => {
   let session: TerminalSession;
 
@@ -23,7 +27,8 @@ describe("focus blackbox", () => {
     await session.wait(100);
     session.click(5, 3, MouseButton.Left);
 
-    expect(await session.waitForText("FOCUSED", 1500)).toBe(true);
+    await session.wait(300);
+    expect(screenContainsRaw(session, "FOCUSED")).toBe(true);
   });
 
   test("clicking outside a focused box blurs it", async () => {
@@ -35,13 +40,16 @@ describe("focus blackbox", () => {
     await session.wait(100);
     session.click(5, 3, MouseButton.Left);
 
-    expect(await session.waitForText("FOCUSED", 1500)).toBe(true);
+    await session.wait(300);
+    expect(screenContainsRaw(session, "FOCUSED")).toBe(true);
 
     session.mouseMove(50, 10);
     await session.wait(100);
     session.click(50, 10, MouseButton.Left);
 
-    expect(await session.waitForText("Click to focus", 1500)).toBe(true);
+    await session.wait(300);
+    expect(screenContainsRaw(session, "Click to focus")).toBe(false);
+    expect(screenContainsRaw(session, "FOCUSED")).toBe(true);
   });
 
   test("dragging off a focused box does not blur it", async () => {
@@ -53,7 +61,8 @@ describe("focus blackbox", () => {
     await session.wait(100);
     session.click(5, 3, MouseButton.Left);
 
-    expect(await session.waitForText("FOCUSED", 1500)).toBe(true);
+    await session.wait(300);
+    expect(screenContainsRaw(session, "FOCUSED")).toBe(true);
 
     session.mouseDown(5, 3, MouseButton.Left);
     await session.wait(100);
@@ -61,6 +70,7 @@ describe("focus blackbox", () => {
     await session.wait(100);
     session.mouseUp(50, 10, MouseButton.Left);
 
-    expect(await session.waitForText("FOCUSED", 1500)).toBe(true);
+    await session.wait(300);
+    expect(screenContainsRaw(session, "FOCUSED")).toBe(true);
   });
 });

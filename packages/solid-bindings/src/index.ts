@@ -11,7 +11,6 @@ export {
   insert,
   spread,
   createComponent,
-  flush,
   setProp,
   renderToString,
   effect,

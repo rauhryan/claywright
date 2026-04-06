@@ -1,13 +1,4 @@
-import {
-  createTerm,
-  createInput,
-  open,
-  close,
-  text,
-  grow,
-  type Op,
-  type InputEvent,
-} from "clayterm";
+import { createInput, createTerm, type InputEvent, type Op } from "clayterm";
 import { Renderable } from "./Renderable.js";
 import {
   MouseEvent,
@@ -48,6 +39,7 @@ export class Renderer {
   }
 
   setRoot(renderable: Renderable): void {
+    const previousFocusedRenderable = this.focusedRenderable;
     const previouslyFocusedId = this.focusedRenderable?.id ?? null;
     const previouslyPressedId = this.pressedRenderable?.id ?? null;
     const previouslyHoveredIds = this.hoveredRenderables.map((hovered) => hovered.id);
@@ -76,6 +68,10 @@ export class Renderer {
     this.focusedRenderable = nextFocusedRenderable;
     if (nextFocusedRenderable.focusable) {
       nextFocusedRenderable.focused = true;
+    }
+
+    if (previousFocusedRenderable && nextFocusedRenderable.id === previousFocusedRenderable.id) {
+      nextFocusedRenderable.hydrate(previousFocusedRenderable);
     }
   }
 
@@ -116,7 +112,7 @@ export class Renderer {
     this.focusedRenderable = null;
   }
 
-  render(ops: Op[], pointer?: { x: number; y: number; down: boolean }): string {
+  render(ops: Op[], pointer?: { x: number; y: number; down: boolean }): Uint8Array {
     if (!this.term) {
       throw new Error("Renderer not initialized. Call init() first.");
     }
@@ -184,7 +180,8 @@ export class Renderer {
 
     // Auto-focus on left click, unless prevented
     if (event.type === "pointerclick" && !mouseEvent.defaultPrevented) {
-      const focusable = renderable.getFocusableAncestor();
+      const focusable =
+        renderable.getFocusableAncestor() ?? renderable.getFirstFocusableDescendant();
       if (focusable) {
         this.focusRenderable(focusable);
       } else if (this.focusedRenderable) {
@@ -219,7 +216,7 @@ export class Renderer {
           shift: event.shift ?? false,
           alt: event.alt ?? false,
           ctrl: event.ctrl ?? false,
-          meta: event.meta ?? false,
+          meta: false,
         },
         repeated: event.type === "keyrepeat",
       });
@@ -236,15 +233,18 @@ export class Renderer {
           shift: event.shift ?? false,
           alt: event.alt ?? false,
           ctrl: event.ctrl ?? false,
-          meta: event.meta ?? false,
+          meta: false,
         },
       });
 
       if (this.focusedRenderable) {
         this.focusedRenderable.processEvent(keyEvent);
       }
-    } else if (event.type === "paste") {
-      const pasteEvent = new PasteEvent(this.focusedRenderable, event.text ?? "");
+    } else if (typeof (event as { text?: unknown }).text === "string") {
+      const pasteEvent = new PasteEvent(
+        this.focusedRenderable,
+        (event as unknown as { text: string }).text,
+      );
 
       if (this.focusedRenderable) {
         this.focusedRenderable.processEvent(pasteEvent);

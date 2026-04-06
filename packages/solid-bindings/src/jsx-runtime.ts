@@ -1,4 +1,4 @@
-import { createRoot, createMemo, createRenderEffect, flatten, flush } from "solid-js/dist/solid.js";
+import { createMemo, createRenderEffect, createRoot } from "solid-js";
 
 export const memo = createMemo;
 
@@ -38,6 +38,7 @@ export class ElementNode {
 export class RootNode {
   readonly type = "root";
   children: (TextNode | ElementNode)[] = [];
+  parent: null = null;
 }
 
 export type TerminalNode = TextNode | ElementNode | RootNode;
@@ -212,7 +213,12 @@ function insertExpression(
 }
 
 function normalize(value: unknown, multi: boolean, doNotUnwrap = false): unknown {
-  value = flatten(value as any, { skipNonRendered: true, doNotUnwrap } as any);
+  if (!(doNotUnwrap && typeof value === "function")) {
+    value = flattenChildren(value);
+    if (!multi && Array.isArray(value)) {
+      value = value.length <= 1 ? (value[0] ?? "") : value;
+    }
+  }
   if (doNotUnwrap && typeof value === "function") return value;
   if (multi && !Array.isArray(value)) value = [value != null ? value : ""];
   if (Array.isArray(value)) {
@@ -385,15 +391,14 @@ export function createComponent<T>(Comp: (props: T) => TerminalNode, props: T): 
   return createRoot(() => Comp(props));
 }
 
-export { createElement, createTextNode, insertNode, insert, spread, flush, effect };
+export { createElement, createTextNode, insertNode, insert, spread, effect };
 
 export function render(code: () => TerminalNode, root: RootNode): () => void {
   let disposer: () => void;
-  createRoot((dispose) => {
+  createRoot((dispose: () => void) => {
     disposer = dispose;
     insert(root, code());
   });
-  flush();
   return disposer!;
 }
 
@@ -413,6 +418,9 @@ export function renderToString(node: TerminalNode): string {
 
 export namespace JSX {
   export type Element = TerminalNode;
+  export interface ElementChildrenAttribute {
+    children: {};
+  }
   interface FocusableProps {
     focusable?: boolean;
     onFocus?: () => void;
@@ -424,6 +432,12 @@ export namespace JSX {
   }
   export interface IntrinsicElements {
     text: { color?: number; children?: unknown };
+    input: FocusableProps & {
+      value?: string;
+      placeholder?: string;
+      cursorOffset?: number;
+      onInput?: (value: string) => void;
+    };
     box: FocusableProps & {
       children?: unknown;
       width?: {
@@ -483,4 +497,11 @@ export function jsxDEV(
   self?: unknown,
 ): ElementNode {
   return jsx(type, props);
+}
+function flattenChildren(value: unknown): unknown[] {
+  if (Array.isArray(value)) {
+    return value.flatMap((item) => flattenChildren(item));
+  }
+
+  return value == null || value === false || value === true ? [] : [value];
 }

@@ -1,3 +1,5 @@
+import type { Renderable } from "./Renderable.js";
+
 export abstract class TerminalEvent {
   readonly type: string;
   readonly target: Renderable | null;

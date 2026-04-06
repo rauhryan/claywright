@@ -105,8 +105,9 @@ export async function runApp(view: AppView, options: AppOptions = {}): Promise<v
 
   frame();
 
-  process.stdin.on("data", (buf) => {
-    const result = input.scan(new Uint8Array(buf));
+  process.stdin.on("data", (buf: Buffer) => {
+    const bytes = new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength);
+    const result = input.scan(bytes);
     const { events } = result;
 
     for (const event of events) {
@@ -134,7 +135,7 @@ export async function runApp(view: AppView, options: AppOptions = {}): Promise<v
       }
     }
 
-    renderer.handleInput(new Uint8Array(buf));
+    renderer.handleInput(bytes);
 
     scheduleFrame();
   });

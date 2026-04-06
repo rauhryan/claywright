@@ -50,7 +50,7 @@ export function toSizingAxis(sizing?: {
   if (!sizing) return undefined;
   switch (sizing.type) {
     case "fixed":
-      return fixed(sizing.value ?? 0, sizing.min, sizing.max);
+      return fixed(sizing.value ?? 0);
     case "grow":
       return grow(sizing.min, sizing.max);
     case "percent":

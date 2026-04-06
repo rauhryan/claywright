@@ -1,6 +1,7 @@
 import { Renderable } from "@tui/core";
-import { ElementNode, TextNode, RootNode, type TerminalNode } from "./jsx-runtime";
+import { ElementNode, RootNode, TextNode, type TerminalNode } from "./jsx-runtime";
 import { ElementRenderable } from "./ElementRenderable";
+import { InputElementRenderable } from "./InputElementRenderable";
 
 export function createRenderableTree(node: TerminalNode): Renderable | null {
   if (node instanceof TextNode) {
@@ -23,7 +24,8 @@ export function createRenderableTree(node: TerminalNode): Renderable | null {
   }
 
   if (node instanceof ElementNode) {
-    const renderable = new ElementRenderable(node);
+    const renderable: Renderable =
+      node.type === "input" ? new InputElementRenderable(node) : new ElementRenderable(node);
 
     for (const child of node.children) {
       const childRenderable = createRenderableTree(child);

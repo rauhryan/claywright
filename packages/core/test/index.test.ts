@@ -1,41 +1,43 @@
-import { test, expect, describe } from "bun:test";
-import { Renderable, MouseEvent, KeyboardEvent, PasteEvent } from "../src/index.js";
+import { describe, expect, test } from "bun:test";
+import { KeyboardEvent, MouseEvent, Renderable } from "../src/index.js";
+
+class TestRenderable extends Renderable {}
 
 describe("Renderable", () => {
   test("creates with id", () => {
-    const renderable = new Renderable({ id: "test" });
+    const renderable = new TestRenderable({ id: "test" });
     expect(renderable.id).toBe("test");
   });
 
   test("auto-generates id if not provided", () => {
-    const renderable = new Renderable();
+    const renderable = new TestRenderable();
     expect(renderable.id).toMatch(/^renderable_\d+$/);
   });
 
   test("focusable defaults to false", () => {
-    const renderable = new Renderable();
+    const renderable = new TestRenderable();
     expect(renderable.focusable).toBe(false);
   });
 
   test("can set focusable via options", () => {
-    const renderable = new Renderable({ focusable: true });
+    const renderable = new TestRenderable({ focusable: true });
     expect(renderable.focusable).toBe(true);
   });
 
   test("focus() sets focused to true", () => {
-    const renderable = new Renderable({ focusable: true });
+    const renderable = new TestRenderable({ focusable: true });
     renderable.focus();
     expect(renderable.focused).toBe(true);
   });
 
   test("focus() does nothing if not focusable", () => {
-    const renderable = new Renderable({ focusable: false });
+    const renderable = new TestRenderable({ focusable: false });
     renderable.focus();
     expect(renderable.focused).toBe(false);
   });
 
   test("blur() sets focused to false", () => {
-    const renderable = new Renderable({ focusable: true });
+    const renderable = new TestRenderable({ focusable: true });
     renderable.focus();
     renderable.blur();
     expect(renderable.focused).toBe(false);
@@ -44,8 +46,8 @@ describe("Renderable", () => {
 
 describe("Renderable tree", () => {
   test("add() sets parent", () => {
-    const parent = new Renderable({ id: "parent" });
-    const child = new Renderable({ id: "child" });
+    const parent = new TestRenderable({ id: "parent" });
+    const child = new TestRenderable({ id: "child" });
 
     parent.add(child);
 
@@ -54,8 +56,8 @@ describe("Renderable tree", () => {
   });
 
   test("remove() clears parent", () => {
-    const parent = new Renderable({ id: "parent" });
-    const child = new Renderable({ id: "child" });
+    const parent = new TestRenderable({ id: "parent" });
+    const child = new TestRenderable({ id: "child" });
 
     parent.add(child);
     parent.remove(child);
@@ -65,10 +67,10 @@ describe("Renderable tree", () => {
   });
 
   test("getRenderableById() finds nested children", () => {
-    const root = new Renderable({ id: "root" });
-    const child1 = new Renderable({ id: "child1" });
-    const child2 = new Renderable({ id: "child2" });
-    const grandchild = new Renderable({ id: "grandchild" });
+    const root = new TestRenderable({ id: "root" });
+    const child1 = new TestRenderable({ id: "child1" });
+    const child2 = new TestRenderable({ id: "child2" });
+    const grandchild = new TestRenderable({ id: "grandchild" });
 
     root.add(child1);
     root.add(child2);
@@ -79,9 +81,9 @@ describe("Renderable tree", () => {
   });
 
   test("getFocusableAncestor() walks up tree", () => {
-    const root = new Renderable({ id: "root", focusable: true });
-    const child = new Renderable({ id: "child" });
-    const grandchild = new Renderable({ id: "grandchild" });
+    const root = new TestRenderable({ id: "root", focusable: true });
+    const child = new TestRenderable({ id: "child" });
+    const grandchild = new TestRenderable({ id: "grandchild" });
 
     root.add(child);
     child.add(grandchild);
@@ -92,8 +94,8 @@ describe("Renderable tree", () => {
 
 describe("Event bubbling", () => {
   test("processEvent() bubbles to parent", () => {
-    const parent = new Renderable({ id: "parent" });
-    const child = new Renderable({ id: "child" });
+    const parent = new TestRenderable({ id: "parent" });
+    const child = new TestRenderable({ id: "child" });
     parent.add(child);
 
     let parentGotEvent = false;
@@ -106,13 +108,13 @@ describe("Event bubbling", () => {
   });
 
   test("stopPropagation() stops bubbling", () => {
-    const parent = new Renderable({ id: "parent" });
-    const child = new Renderable({ id: "child" });
+    const parent = new TestRenderable({ id: "parent" });
+    const child = new TestRenderable({ id: "child" });
     parent.add(child);
 
     let parentGotEvent = false;
     parent.onClick = () => (parentGotEvent = true);
-    child.onClick = (e) => e.stopPropagation();
+    child.onClick = (e: MouseEvent) => e.stopPropagation();
 
     const event = new MouseEvent("click", child, { x: 0, y: 0, button: 0 });
     child.processEvent(event);
@@ -123,7 +125,7 @@ describe("Event bubbling", () => {
 
 describe("Events", () => {
   test("MouseEvent has correct properties", () => {
-    const target = new Renderable({ id: "target" });
+    const target = new TestRenderable({ id: "target" });
     const event = new MouseEvent("click", target, {
       x: 10,
       y: 20,
@@ -140,7 +142,7 @@ describe("Events", () => {
   });
 
   test("KeyboardEvent has correct properties", () => {
-    const target = new Renderable({ id: "target" });
+    const target = new TestRenderable({ id: "target" });
     const event = new KeyboardEvent("keydown", target, {
       key: "a",
       code: "KeyA",
@@ -154,7 +156,7 @@ describe("Events", () => {
   });
 
   test("preventDefault() sets flag", () => {
-    const target = new Renderable({ id: "target" });
+    const target = new TestRenderable({ id: "target" });
     const event = new MouseEvent("click", target, { x: 0, y: 0, button: 0 });
 
     expect(event.defaultPrevented).toBe(false);
@@ -165,8 +167,8 @@ describe("Events", () => {
 
 describe("Lifecycle", () => {
   test("destroy() removes from parent", () => {
-    const parent = new Renderable({ id: "parent" });
-    const child = new Renderable({ id: "child" });
+    const parent = new TestRenderable({ id: "parent" });
+    const child = new TestRenderable({ id: "child" });
     parent.add(child);
 
     child.destroy();
@@ -176,8 +178,8 @@ describe("Lifecycle", () => {
   });
 
   test("destroy() destroys children recursively", () => {
-    const parent = new Renderable({ id: "parent" });
-    const child = new Renderable({ id: "child" });
+    const parent = new TestRenderable({ id: "parent" });
+    const child = new TestRenderable({ id: "child" });
     parent.add(child);
 
     parent.destroy();
@@ -187,7 +189,7 @@ describe("Lifecycle", () => {
   });
 
   test("destroy() blurs if focused", () => {
-    const renderable = new Renderable({ id: "test", focusable: true });
+    const renderable = new TestRenderable({ id: "test", focusable: true });
     renderable.focus();
     expect(renderable.focused).toBe(true);
 

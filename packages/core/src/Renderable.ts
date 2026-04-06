@@ -78,7 +78,15 @@ export abstract class Renderable {
   }
 
   // Event processing
+  protected beforeProcessEvent(_event: TerminalEvent): void {}
+
+  protected afterProcessEvent(_event: TerminalEvent): void {}
+
+  hydrate(_previous: Renderable): void {}
+
   processEvent(event: TerminalEvent): void {
+    this.beforeProcessEvent(event);
+
     // Call appropriate handler
     if (event instanceof MouseEventClass) {
       switch (event.type) {
@@ -112,6 +120,8 @@ export abstract class Renderable {
     if (this.parent && !event.propagationStopped) {
       this.parent.processEvent(event);
     }
+
+    this.afterProcessEvent(event);
   }
 
   // Lifecycle
@@ -156,6 +166,21 @@ export abstract class Renderable {
       if (current.focusable) return current;
       current = current.parent;
     }
+    return undefined;
+  }
+
+  getFirstFocusableDescendant(): Renderable | undefined {
+    for (const child of this.children) {
+      if (child.focusable) {
+        return child;
+      }
+
+      const nested = child.getFirstFocusableDescendant();
+      if (nested) {
+        return nested;
+      }
+    }
+
     return undefined;
   }
 }
