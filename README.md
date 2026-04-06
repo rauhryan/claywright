@@ -6,6 +6,7 @@ Terminal UI experiments around `clayterm`, with a blackbox test harness powered 
 
 - `packages/ghostty-vt`: Bun FFI bindings to `libghostty-vt` plus mouse helpers and screen inspection
 - `packages/test-harness`: blackbox testing utilities for spawning TUIs, sending input, and asserting rendered output
+- `packages/solid-bindings`: Solid.js 2.0 JSX bindings that compile to clayterm operations
 - `packages/clayterm-examples`: runnable example apps used to exercise interaction and animation behavior
 - `packages/clayterm`: vendored git submodule for the renderer/runtime being exercised
 
@@ -39,7 +40,7 @@ bun run examples modal-menu
 Run tests:
 
 ```bash
-bun test packages/ghostty-vt packages/test-harness packages/clayterm-examples
+bun test packages/ghostty-vt packages/solid-bindings packages/test-harness packages/clayterm-examples
 ```
 
 Or run the full workspace test flow:
