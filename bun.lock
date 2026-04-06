@@ -9,6 +9,10 @@
       "name": "@tui/clayterm-examples",
       "version": "0.1.0",
     },
+    "packages/core": {
+      "name": "@tui/core",
+      "version": "0.1.0",
+    },
     "packages/ghostty-vt": {
       "name": "@tui/ghostty-vt",
       "version": "0.1.0",
@@ -104,6 +108,8 @@
     "@solidjs/signals": ["@solidjs/signals@0.13.9", "", {}, "sha512-+w+ShIB3hunVM0HZcXnhUhfLQvSdKlZflTQ0q3P9B/IfDOS8GPelY28wGouGt/6QzfJ1ueqx8bOg1TFQutPuaQ=="],
 
     "@tui/clayterm-examples": ["@tui/clayterm-examples@workspace:packages/clayterm-examples"],
+
+    "@tui/core": ["@tui/core@workspace:packages/core"],
 
     "@tui/ghostty-vt": ["@tui/ghostty-vt@workspace:packages/ghostty-vt"],
 

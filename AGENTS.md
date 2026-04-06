@@ -10,6 +10,7 @@ Terminal UI experiments around `clayterm`, with a blackbox test harness powered 
 
 | Package | Purpose |
 |---------|---------|
+| `core` | Focus management, event system, keyboard routing |
 | `ghostty-vt` | FFI bindings to Ghostty's VT emulator |
 | `test-harness` | Blackbox testing utilities for TUIs |
 | `solid-bindings` | Solid.js 2.0 JSX bindings for clayterm |
