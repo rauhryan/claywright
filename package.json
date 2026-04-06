@@ -12,6 +12,7 @@
     "example:carousel-track": "bun run build:clayterm && bun run ./packages/clayterm-examples/src/examples/carousel-track.ts",
     "example:carousel-floating": "bun run build:clayterm && bun run ./packages/clayterm-examples/src/examples/carousel-floating.ts",
     "example:carousel-transition": "bun run build:clayterm && bun run ./packages/clayterm-examples/src/examples/carousel-transition.ts",
+    "example:modal-menu": "bun run build:clayterm && bun run ./packages/clayterm-examples/src/examples/modal-menu.ts",
     "example:selection": "bun run build:clayterm && bun run ./packages/clayterm-examples/src/examples/selection.ts"
   }
 }

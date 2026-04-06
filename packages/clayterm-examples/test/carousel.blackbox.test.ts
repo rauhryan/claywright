@@ -5,6 +5,20 @@ const track = new URL("../src/examples/carousel-track.ts", import.meta.url).path
 const floating = new URL("../src/examples/carousel-floating.ts", import.meta.url).pathname;
 const transition = new URL("../src/examples/carousel-transition.ts", import.meta.url).pathname;
 
+function requireTextPosition(session: TerminalSession, value: string) {
+  const match = session.findText(value);
+  expect(match).not.toBeNull();
+  return match!;
+}
+
+function buttonPoint(session: TerminalSession, label: string) {
+  const match = requireTextPosition(session, label);
+  return {
+    col: match.col + Math.floor(label.length / 2),
+    row: match.row,
+  };
+}
+
 function carouselSuite(name: string, fixture: string, transitionLabel: string) {
   describe(name, () => {
     let session: TerminalSession;
@@ -29,14 +43,16 @@ function carouselSuite(name: string, fixture: string, transitionLabel: string) {
       await session.spawn("bun", [fixture]);
       expect(await session.waitForText("DUNES / 01", 2000)).toBe(true);
 
-      const before = session.captureStyles([{ col: 22, row: 12 }]);
-      session.mouseMove(22, 12);
+       const next = buttonPoint(session, "Next");
+
+      const before = session.captureStyles([next]);
+      session.mouseMove(next.col, next.row);
       await session.wait(120);
       expect(session.getStyleChanges(before).length).toBeGreaterThan(0);
 
-      session.mouseDown(22, 12);
+      session.mouseDown(next.col, next.row);
       await session.wait(50);
-      session.mouseUp(22, 12);
+      session.mouseUp(next.col, next.row);
 
       expect(await session.waitForText(transitionLabel, 2000)).toBe(true);
       expect(await session.waitForText("TIDE / 02", 2000)).toBe(true);
@@ -47,16 +63,21 @@ function carouselSuite(name: string, fixture: string, transitionLabel: string) {
       await session.spawn("bun", [fixture]);
       expect(await session.waitForText("DUNES / 01", 2000)).toBe(true);
 
-      session.mouseDown(22, 12);
-      await session.wait(50);
-      session.mouseUp(22, 12);
-      expect(await session.waitForText("TIDE / 02", 2000)).toBe(true);
+      const next = buttonPoint(session, "Next");
 
-      session.mouseMove(4, 12);
-      await session.wait(120);
-      session.mouseDown(4, 12);
+      session.mouseDown(next.col, next.row);
       await session.wait(50);
-      session.mouseUp(4, 12);
+      session.mouseUp(next.col, next.row);
+      expect(await session.waitForText("TIDE / 02", 2000)).toBe(true);
+      await session.wait(350);
+
+      const prev = buttonPoint(session, "Prev");
+
+      session.mouseMove(prev.col, prev.row);
+      await session.wait(120);
+      session.mouseDown(prev.col, prev.row);
+      await session.wait(50);
+      session.mouseUp(prev.col, prev.row);
 
       expect(await session.waitForText(transitionLabel, 2000)).toBe(true);
       expect(await session.waitForText("DUNES / 01", 2000)).toBe(true);

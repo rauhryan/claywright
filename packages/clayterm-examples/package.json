@@ -11,6 +11,7 @@
     "carousel-track": "bun run ./src/examples/carousel-track.ts",
     "carousel-floating": "bun run ./src/examples/carousel-floating.ts",
     "carousel-transition": "bun run ./src/examples/carousel-transition.ts",
+    "modal-menu": "bun run ./src/examples/modal-menu.ts",
     "selection": "bun run ./src/examples/selection.ts"
   }
 }
