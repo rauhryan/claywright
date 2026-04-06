@@ -78,8 +78,8 @@ function render() {
 
 render();
 
-process.stdin.on("data", (buf) => {
-  const { events } = input.scan(new Uint8Array(buf));
+process.stdin.on("data", (buf: Buffer) => {
+  const { events } = input.scan(new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength));
 
   for (const event of events) {
     if (event.type === "mousemove") {

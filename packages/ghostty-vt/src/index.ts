@@ -1,4 +1,4 @@
-import { dlopen, FFIType, ptr, toArrayBuffer } from "bun:ffi";
+import { dlopen, FFIType, ptr, toArrayBuffer, type Pointer } from "bun:ffi";
 
 const libPath = new URL("../lib/libghostty-wrapper.dylib", import.meta.url).pathname;
 
@@ -242,7 +242,7 @@ export class GhosttyTerminal {
       }
 
       try {
-        const buffer = toArrayBuffer(buf, 0, len);
+        const buffer = toArrayBuffer(buf as unknown as Pointer, 0, len);
         if (!buffer) {
           return "";
         }
