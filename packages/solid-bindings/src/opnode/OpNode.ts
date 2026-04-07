@@ -8,6 +8,7 @@ export abstract class OpNode {
   parent: OpNode | null = null;
   protected _dirty: boolean = true;
   protected _destroyed: boolean = false;
+  private _invalidationListener?: () => void;
 
   constructor(type: string, id: string) {
     this.type = type;
@@ -26,10 +27,18 @@ export abstract class OpNode {
     this._dirty = false;
   }
 
+  setInvalidationListener(listener: (() => void) | undefined): void {
+    this._invalidationListener = listener;
+  }
+
   markDirty(): void {
     if (this._dirty) return;
     this._dirty = true;
-    this.parent?.markDirty();
+    if (this.parent) {
+      this.parent.markDirty();
+      return;
+    }
+    this._invalidationListener?.();
   }
 
   abstract toOps(): Op[];

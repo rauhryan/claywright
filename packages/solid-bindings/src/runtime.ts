@@ -51,6 +51,8 @@ export async function runApp(view: AppView, options: AppOptions = {}): Promise<v
   const [getPointer, setPointer] = createSignal({ x: -1, y: -1, down: false });
   let cleanedUp = false;
   let frameScheduled = false;
+  let frameInProgress = false;
+  let frameInvalidatedDuringPass = false;
 
   const pointer = {
     get x() {
@@ -66,6 +68,19 @@ export async function runApp(view: AppView, options: AppOptions = {}): Promise<v
 
   // Create persistent root once — mounted for the app's entire lifetime
   const rootOpNode = new ElementOpNode("root", "root");
+
+  function scheduleFrame() {
+    if (cleanedUp) return;
+    if (frameInProgress) {
+      frameInvalidatedDuringPass = true;
+      return;
+    }
+    if (frameScheduled) return;
+    frameScheduled = true;
+    setImmediate(frame);
+  }
+
+  rootOpNode.setInvalidationListener(scheduleFrame);
 
   function sendOps(ops: Op[]) {
     const output = renderer.render(ops, getPointer());
@@ -84,6 +99,7 @@ export async function runApp(view: AppView, options: AppOptions = {}): Promise<v
   function cleanup() {
     if (cleanedUp) return;
     cleanedUp = true;
+    rootOpNode.setInvalidationListener(undefined);
 
     if (process.stdout.isTTY) {
       process.stdout.write("\x1b[?25h\x1b[?1006l\x1b[?1003l\x1b[?1049l");
@@ -106,11 +122,11 @@ export async function runApp(view: AppView, options: AppOptions = {}): Promise<v
     return ops;
   }
 
-  function frame(allowRerender = true) {
-    if (cleanedUp) return;
-    frameScheduled = false;
+  function renderFramePass(allowRerender: boolean): boolean {
+    frameInvalidatedDuringPass = false;
 
-    // Flush pending Solid effects so the OpNode tree reflects recent signal updates
+    // Async signal writes re-run Solid effects independently; each render pass
+    // flushes pending work into the persistent OpNode tree before serialization.
     flush();
 
     const rootRenderable = createRenderableTree(rootOpNode);
@@ -124,18 +140,32 @@ export async function runApp(view: AppView, options: AppOptions = {}): Promise<v
     const output = renderer.render(ops, getPointer());
     process.stdout.write(output);
 
-    if (allowRerender && renderer.lastPointerEvents.length > 0) {
-      // Renderer dispatched pointer events which may have updated signals;
-      // flush again before the follow-up render pass.
-      flush();
-      frame(false);
-    }
+    return allowRerender && renderer.lastPointerEvents.length > 0;
   }
 
-  function scheduleFrame() {
-    if (frameScheduled) return;
-    frameScheduled = true;
-    setImmediate(frame);
+  function frame() {
+    if (cleanedUp) return;
+    frameScheduled = false;
+
+    if (frameInProgress) {
+      frameInvalidatedDuringPass = true;
+      return;
+    }
+
+    frameInProgress = true;
+
+    try {
+      let allowRerender = true;
+      while (renderFramePass(allowRerender)) {
+        allowRerender = false;
+      }
+    } finally {
+      frameInProgress = false;
+    }
+
+    if (frameInvalidatedDuringPass || rootOpNode.isDirty) {
+      scheduleFrame();
+    }
   }
 
   if (process.stdout.isTTY) {

@@ -384,7 +384,7 @@ export function createReconciler(options: ReconcilerOptions): Reconciler {
       let disposer: Disposer;
       createRoot((dispose) => {
         disposer = dispose;
-        insert(root, code());
+        insert(root, code);
       });
       return disposer!;
     },
