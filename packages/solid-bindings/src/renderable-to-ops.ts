@@ -46,6 +46,7 @@ export function renderableToOps(renderable: Renderable): Op[] {
     if (props.bg !== undefined) openProps.bg = props.bg;
     if (props.border) openProps.border = props.border;
     if (props.cornerRadius) openProps.cornerRadius = props.cornerRadius;
+    if (props.floating) openProps.floating = props.floating;
 
     ops.push(open(node.id, openProps));
     for (const child of renderable.children) {

@@ -1,5 +1,7 @@
 export { render, grow, fixed, percent, fit, rgba } from "./render";
 export { runApp, type AppOptions, type AppContext, type AppView } from "./runtime";
+export { Portal } from "./Portal";
+export { ATTACH_POINT, ATTACH_TO } from "clayterm";
 export {
   RootNode,
   ElementNode,
