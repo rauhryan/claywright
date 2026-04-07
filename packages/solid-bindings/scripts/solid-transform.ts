@@ -7,9 +7,11 @@ export async function transformSolidJSX(
   filename: string,
   moduleName: string,
 ): Promise<string> {
-  const result = await transformAsync(code, {
+  const transformed = await transformAsync(code, {
     filename,
+    configFile: false,
+    babelrc: false,
     presets: [[solid, { moduleName, generate: "universal" }], [ts]],
   });
-  return result?.code ?? code;
+  return transformed?.code ?? code;
 }

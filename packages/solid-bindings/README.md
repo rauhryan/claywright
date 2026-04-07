@@ -77,6 +77,24 @@ Used in test context via preload plugin. Configured with `generate: "universal"`
 
 Both produce the same virtual DOM structure.
 
+## Solid 2.0 Readiness
+
+This package is already pinned to `solid-js@2.0.0-beta.5` and uses the Solid universal JSX transform.
+
+What is wired up now:
+
+- Solid 2.0 control flow exports like `For`, `Show`, `Switch`, `Match`, `Repeat`, `Loading`, and `Errored`
+- Async and mutation helpers like `action`, `refresh`, `latest`, `isPending`, `createOptimistic`, and `createOptimisticStore`
+- Store and ownership helpers like `createStore`, `snapshot`, `storePath`, `merge`, `omit`, `onSettled`, and `runWithOwner`
+- Universal renderer helper exports expected by Solid 2 transforms: `mergeProps`, `spread`, and `ref`
+
+Current runtime constraint:
+
+- `runApp()` still rebuilds the op tree every frame instead of keeping a single persistent reactive tree alive
+- that means Solid 2 APIs are available to app code, but long-lived in-place renderer reactivity and boundary-driven persistent updates are not fully implemented yet
+
+In practice, ordinary Solid signal-driven terminal apps work today, and Solid 2 syntax compiles correctly, but the renderer is not yet taking full advantage of the new persistent async/boundary model.
+
 ## Virtual DOM
 
 The virtual DOM is an intermediate representation between JSX and clayterm ops:

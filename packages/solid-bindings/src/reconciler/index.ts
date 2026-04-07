@@ -32,7 +32,7 @@ export interface ReconcilerOptions {
 }
 
 export interface Reconciler {
-  render: (code: () => OpNode, root: OpNode) => Disposer;
+  render: (code: () => unknown, root: OpNode) => Disposer;
   insert: (
     parent: OpNode,
     accessor: unknown,
@@ -380,7 +380,7 @@ export function createReconciler(options: ReconcilerOptions): Reconciler {
   }
 
   return {
-    render: (code: () => OpNode, root: OpNode): Disposer => {
+    render: (code: () => unknown, root: OpNode): Disposer => {
       let disposer: Disposer;
       createRoot((dispose) => {
         disposer = dispose;

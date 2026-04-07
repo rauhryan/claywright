@@ -46,13 +46,36 @@ export function setProp<T>(node: OpNode, name: string, value: T, prev?: T): T {
   return reconciler.setProp(node, name, value, prev);
 }
 
+export function mergeProps<T extends Record<string, unknown>>(...sources: (T | undefined)[]): T {
+  return reconciler.mergeProps(...sources);
+}
+
+function applyRef(value: unknown, node: OpNode): void {
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      applyRef(item, node);
+    }
+    return;
+  }
+
+  if (typeof value === "function") {
+    value(node);
+  }
+}
+
+export function ref(accessor: () => unknown, node: OpNode): void {
+  createRenderEffect(accessor, (value) => {
+    applyRef(value, node);
+  });
+}
+
 export const effect = createRenderEffect;
 
 export function createComponent<T extends Record<string, unknown>>(
-  Comp: (props: T) => OpNode,
+  Comp: (props: T) => unknown,
   props: T,
-): OpNode {
-  return solidCreateComponent(Comp as any, props as any) as unknown as OpNode;
+): unknown {
+  return solidCreateComponent(Comp as any, props as any);
 }
 
 export function Fragment(props: { children?: unknown }): OpNode {
@@ -61,7 +84,7 @@ export function Fragment(props: { children?: unknown }): OpNode {
   return root;
 }
 
-export function render(code: () => OpNode, root: OpNode): () => void {
+export function render(code: () => unknown, root: OpNode): () => void {
   return reconciler.render(code, root);
 }
 
@@ -74,7 +97,7 @@ export function renderToString(node: OpNode): string {
 }
 
 export namespace JSX {
-  export type Element = OpNode;
+  export type Element = unknown;
   export interface ElementChildrenAttribute {
     children: {};
   }
@@ -126,6 +149,10 @@ export namespace JSX {
 }
 
 function appendChildren(parent: OpNode, value: unknown): void {
+  while (typeof value === "function") {
+    value = value();
+  }
+
   if (value == null || typeof value === "boolean") {
     return;
   }
@@ -143,7 +170,7 @@ function appendChildren(parent: OpNode, value: unknown): void {
   }
 
   if (value instanceof RootNode) {
-    for (const child of value.children) {
+    for (const child of value.children.slice()) {
       insertNode(parent, child);
     }
     return;
@@ -155,9 +182,9 @@ function appendChildren(parent: OpNode, value: unknown): void {
 }
 
 export function jsx(
-  type: string | ((props: Record<string, unknown>) => OpNode),
+  type: string | ((props: Record<string, unknown>) => unknown),
   props: Record<string, unknown> | null,
-): OpNode {
+): unknown {
   if (typeof type === "function") {
     return createComponent(type, props ?? {});
   }
@@ -179,12 +206,12 @@ export function jsx(
 export const jsxs = jsx;
 
 export function jsxDEV(
-  type: string | ((props: Record<string, unknown>) => OpNode),
+  type: string | ((props: Record<string, unknown>) => unknown),
   props: Record<string, unknown> | null,
   _key?: string,
   _isStaticChildren?: boolean,
   _source?: { fileName: string; lineNumber: number; columnNumber: number },
   _self?: unknown,
-): OpNode {
+): unknown {
   return jsx(type, props);
 }

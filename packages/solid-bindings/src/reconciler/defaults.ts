@@ -27,6 +27,14 @@ export const defaultReconcilerOptions: ReconcilerOptions = {
   },
 
   setProperty(node: OpNode, name: string, value: unknown, _prev: unknown): void {
+    if (name === "id") {
+      if (typeof value === "string") {
+        node.id = value;
+        node.markDirty();
+      }
+      return;
+    }
+
     if (name.startsWith("on:")) {
       node.props[name] = value;
       return;

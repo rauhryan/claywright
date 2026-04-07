@@ -1,3 +1,5 @@
+preload = ["./packages/solid-bindings/scripts/preload.ts"]
+
 [test]
 preload = ["./packages/solid-bindings/scripts/preload.ts"]
 root = "."

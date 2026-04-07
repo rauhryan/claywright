@@ -10,7 +10,7 @@ export interface RenderOptions {
 
 const reconciler = createReconciler(defaultReconcilerOptions);
 
-export async function render(code: () => OpNode, options: RenderOptions = {}): Promise<void> {
+export async function render(code: () => unknown, options: RenderOptions = {}): Promise<void> {
   const width = options.width ?? process.stdout.columns ?? 80;
   const height = options.height ?? process.stdout.rows ?? 24;
 

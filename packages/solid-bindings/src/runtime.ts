@@ -7,8 +7,10 @@ import {
   type Op,
   type PointerEvent,
 } from "clayterm";
+import { createSignal, flush } from "solid-js";
 import { Renderer } from "@tui/core";
-import { ElementOpNode, TextOpNode, resetIdCounter, type OpNode } from "./opnode";
+import { render as mountSolid } from "./jsx-runtime";
+import { ElementOpNode, OpNode } from "./opnode";
 import { createRenderableTree } from "./reconciler";
 import { renderableToOps } from "./renderable-to-ops";
 
@@ -24,7 +26,7 @@ export interface AppContext {
   sendOps: (ops: Op[]) => void;
 }
 
-export type AppView = (ctx: AppContext) => OpNode;
+export type AppView = (ctx: AppContext) => unknown;
 export type AppReduce = (
   ctx: AppContext,
   inputEvents: InputEvent[],
@@ -46,9 +48,38 @@ export async function runApp(view: AppView, options: AppOptions = {}): Promise<v
   await renderer.init();
   const input = await createInput();
 
-  let pointer = { x: -1, y: -1, down: false };
+  const [getPointer, setPointer] = createSignal({ x: -1, y: -1, down: false });
   let cleanedUp = false;
   let frameScheduled = false;
+
+  const pointer = {
+    get x() {
+      return getPointer().x;
+    },
+    get y() {
+      return getPointer().y;
+    },
+    get down() {
+      return getPointer().down;
+    },
+  };
+
+  // Create persistent root once — mounted for the app's entire lifetime
+  const rootOpNode = new ElementOpNode("root", "root");
+
+  function sendOps(ops: Op[]) {
+    const output = renderer.render(ops, getPointer());
+    process.stdout.write(output);
+  }
+
+  // Mount Solid tree once; reactive signals drive in-place OpNode mutations
+  const ctx: AppContext = {
+    width,
+    height,
+    pointer,
+    sendOps,
+  };
+  const dispose = mountSolid(() => view(ctx), rootOpNode);
 
   function cleanup() {
     if (cleanedUp) return;
@@ -62,6 +93,7 @@ export async function runApp(view: AppView, options: AppOptions = {}): Promise<v
       process.stdin.setRawMode(false);
     }
 
+    dispose();
     renderer.destroy();
   }
 
@@ -78,13 +110,8 @@ export async function runApp(view: AppView, options: AppOptions = {}): Promise<v
     if (cleanedUp) return;
     frameScheduled = false;
 
-    resetIdCounter();
-    const rootOpNode = new ElementOpNode("root", "root");
-    const node = view({ width, height, pointer, sendOps });
-
-    if (node instanceof ElementOpNode || node instanceof TextOpNode) {
-      rootOpNode.add(node);
-    }
+    // Flush pending Solid effects so the OpNode tree reflects recent signal updates
+    flush();
 
     const rootRenderable = createRenderableTree(rootOpNode);
     if (rootRenderable) {
@@ -94,10 +121,13 @@ export async function runApp(view: AppView, options: AppOptions = {}): Promise<v
     const ops = rootRenderable ? renderableToOps(rootRenderable) : collectOps(rootOpNode);
     clearDirty(rootOpNode);
 
-    const output = renderer.render(ops, pointer);
+    const output = renderer.render(ops, getPointer());
     process.stdout.write(output);
 
     if (allowRerender && renderer.lastPointerEvents.length > 0) {
+      // Renderer dispatched pointer events which may have updated signals;
+      // flush again before the follow-up render pass.
+      flush();
       frame(false);
     }
   }
@@ -106,11 +136,6 @@ export async function runApp(view: AppView, options: AppOptions = {}): Promise<v
     if (frameScheduled) return;
     frameScheduled = true;
     setImmediate(frame);
-  }
-
-  function sendOps(ops: Op[]) {
-    const output = renderer.render(ops, pointer);
-    process.stdout.write(output);
   }
 
   if (process.stdout.isTTY) {
@@ -147,15 +172,15 @@ export async function runApp(view: AppView, options: AppOptions = {}): Promise<v
 
     for (const event of events) {
       if (event.type === "mousemove") {
-        pointer = { x: event.x, y: event.y, down: pointer.down };
+        setPointer({ x: event.x, y: event.y, down: getPointer().down });
       }
       if (event.type === "mousedown") {
-        pointer = { x: event.x, y: event.y, down: true };
+        setPointer({ x: event.x, y: event.y, down: true });
         renderer.beginPointerPress();
         frame();
       }
       if (event.type === "mouseup") {
-        pointer = { x: event.x, y: event.y, down: false };
+        setPointer({ x: event.x, y: event.y, down: false });
       }
     }
 

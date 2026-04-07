@@ -126,6 +126,18 @@ export class TerminalSession {
     }
   }
 
+  sendInput(data: string | Uint8Array): void {
+    const bytes = typeof data === "string" ? new TextEncoder().encode(data) : data;
+
+    if (this.capturingSequences) {
+      this.vtSequenceLog.push(bytes);
+    }
+
+    if (this.process?.stdin) {
+      this.process.stdin.write(bytes);
+    }
+  }
+
   sendKey(key: string): void {
     const keyMap: Record<string, string> = {
       enter: "\r",
@@ -144,7 +156,7 @@ export class TerminalSession {
     };
 
     const sequence = keyMap[key.toLowerCase()] ?? key;
-    this.write(sequence);
+    this.sendInput(sequence);
   }
 
   sendMouse(options: {
@@ -170,7 +182,7 @@ export class TerminalSession {
 
     const sequence = this.mouseEncoder.encode(this.mouseEvent);
     if (sequence) {
-      this.write(sequence);
+      this.sendInput(sequence);
     }
   }
 
