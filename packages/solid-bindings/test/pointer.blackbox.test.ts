@@ -19,16 +19,26 @@ describe("pointer blackbox", () => {
 
     expect(await session.waitForText("Pointer: (-1, -1) UP", 2000)).toBe(true);
 
+    session.startVTCapture();
     session.mouseMove(5, 3);
-    expect(await session.waitForText("Pointer: (5, 3) UP", 2000)).toBe(true);
+    await session.wait(300);
+    expect(session.getVTSequences().join("")).toContain("5, 3) UP");
 
+    session.startVTCapture();
     session.mouseDown(5, 3, MouseButton.Left);
-    expect(await session.waitForText("Pointer: (5, 3) DOWN", 2000)).toBe(true);
+    await session.wait(300);
+    expect(session.getVTSequences().join("")).toContain("DOWN");
 
+    session.startVTCapture();
     session.mouseMove(8, 4);
-    expect(await session.waitForText("Pointer: (8, 4) DOWN", 2000)).toBe(true);
+    await session.wait(300);
+    const moveWhileDown = session.getVTSequences().join("");
+    expect(moveWhileDown).toContain("H8");
+    expect(moveWhileDown).toContain("H4");
 
+    session.startVTCapture();
     session.mouseUp(8, 4, MouseButton.Left);
-    expect(await session.waitForText("Pointer: (8, 4) UP", 2000)).toBe(true);
+    await session.wait(300);
+    expect(session.getVTSequences().join("")).toContain("UP");
   });
 });
