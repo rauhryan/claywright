@@ -4,6 +4,31 @@ import { createSession, MouseAction, MouseButton, type TerminalSession } from ".
 const fixture = new URL("./fixtures/clayterm-basic.ts", import.meta.url).pathname;
 const selectionFixture = new URL("./fixtures/clayterm-selection.ts", import.meta.url).pathname;
 
+async function click(session: TerminalSession, col: number, row: number): Promise<void> {
+  session.mouseDown(col, row);
+  await session.wait(50);
+  session.mouseUp(col, row);
+}
+
+async function dragSelect(
+  session: TerminalSession,
+  startCol: number,
+  startRow: number,
+  endCol: number,
+  endRow: number,
+): Promise<void> {
+  session.mouseDown(startCol, startRow);
+  await session.wait(50);
+  session.sendMouse({
+    action: MouseAction.Motion,
+    button: MouseButton.Left,
+    col: endCol,
+    row: endRow,
+  });
+  await session.wait(50);
+  session.mouseUp(endCol, endRow);
+}
+
 describe("clayterm blackbox", () => {
   let session: TerminalSession;
 
@@ -31,9 +56,7 @@ describe("clayterm blackbox", () => {
     session.mouseMove(2, 1);
     expect(await session.waitForText("Hovered", 2000)).toBe(true);
 
-    session.mouseDown(2, 1);
-    await session.wait(50);
-    session.mouseUp(2, 1);
+    await click(session, 2, 1);
     expect(await session.waitForText("Clicked", 2000)).toBe(true);
   });
 
@@ -45,7 +68,9 @@ describe("clayterm blackbox", () => {
     expect(await session.waitForText("Hovered", 2000)).toBe(true);
 
     session.mouseMove(20, 6);
-    await session.wait(150);
+    expect(
+      await session.waitForTextConvergence("Idle", { timeout: 2000, settleMs: 100 }),
+    ).not.toBeNull();
     expect(session.containsText("Hovered")).toBe(false);
     expect(session.containsText("Idle")).toBe(true);
   });
@@ -60,9 +85,10 @@ describe("clayterm blackbox", () => {
     session.mouseDown(2, 1);
     await session.wait(50);
     session.mouseMove(20, 6);
-    await session.wait(50);
     session.mouseUp(20, 6);
-    await session.wait(150);
+    expect(
+      await session.waitForTextConvergence("Idle", { timeout: 2000, settleMs: 100 }),
+    ).not.toBeNull();
 
     expect(session.containsText("Clicked")).toBe(false);
   });
@@ -91,11 +117,7 @@ describe("clayterm selection blackbox", () => {
       { col: 4, row: 0 },
     ]);
 
-    session.mouseDown(0, 0);
-    await session.wait(50);
-    session.sendMouse({ action: MouseAction.Motion, button: MouseButton.Left, col: 4, row: 0 });
-    await session.wait(50);
-    session.mouseUp(4, 0);
+    await dragSelect(session, 0, 0, 4, 0);
 
     expect(await session.waitForText("Selected: Hello", 2000)).toBe(true);
     const changes = session.getStyleChanges(before);

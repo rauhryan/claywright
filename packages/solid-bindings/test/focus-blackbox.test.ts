@@ -7,6 +7,12 @@ function screenContainsRaw(session: TerminalSession, text: string): boolean {
   return session.getScreen().raw.includes(text);
 }
 
+async function clickAndSettle(session: TerminalSession, col: number, row: number): Promise<void> {
+  session.mouseMove(col, row);
+  await session.wait(100);
+  session.click(col, row, MouseButton.Left);
+}
+
 describe("focus blackbox", () => {
   let session: TerminalSession;
 
@@ -23,11 +29,10 @@ describe("focus blackbox", () => {
 
     expect(await session.waitForText("Click to focus", 2000)).toBe(true);
 
-    session.mouseMove(5, 3);
-    await session.wait(100);
-    session.click(5, 3, MouseButton.Left);
-
-    await session.wait(300);
+    await clickAndSettle(session, 5, 3);
+    expect(
+      await session.waitForTextConvergence("FOCUSED", { timeout: 2000, settleMs: 100 }),
+    ).not.toBeNull();
     expect(screenContainsRaw(session, "FOCUSED")).toBe(true);
   });
 
@@ -36,18 +41,16 @@ describe("focus blackbox", () => {
 
     expect(await session.waitForText("Click to focus", 2000)).toBe(true);
 
-    session.mouseMove(5, 3);
-    await session.wait(100);
-    session.click(5, 3, MouseButton.Left);
-
-    await session.wait(300);
+    await clickAndSettle(session, 5, 3);
+    expect(
+      await session.waitForTextConvergence("FOCUSED", { timeout: 2000, settleMs: 100 }),
+    ).not.toBeNull();
     expect(screenContainsRaw(session, "FOCUSED")).toBe(true);
 
-    session.mouseMove(50, 10);
-    await session.wait(100);
-    session.click(50, 10, MouseButton.Left);
-
-    await session.wait(300);
+    await clickAndSettle(session, 50, 10);
+    expect(
+      await session.waitForTextConvergence("FOCUSED", { timeout: 2000, settleMs: 100 }),
+    ).not.toBeNull();
     expect(screenContainsRaw(session, "Click to focus")).toBe(false);
     expect(screenContainsRaw(session, "FOCUSED")).toBe(true);
   });
@@ -57,11 +60,10 @@ describe("focus blackbox", () => {
 
     expect(await session.waitForText("Click to focus", 2000)).toBe(true);
 
-    session.mouseMove(5, 3);
-    await session.wait(100);
-    session.click(5, 3, MouseButton.Left);
-
-    await session.wait(300);
+    await clickAndSettle(session, 5, 3);
+    expect(
+      await session.waitForTextConvergence("FOCUSED", { timeout: 2000, settleMs: 100 }),
+    ).not.toBeNull();
     expect(screenContainsRaw(session, "FOCUSED")).toBe(true);
 
     session.mouseDown(5, 3, MouseButton.Left);
@@ -70,7 +72,9 @@ describe("focus blackbox", () => {
     await session.wait(100);
     session.mouseUp(50, 10, MouseButton.Left);
 
-    await session.wait(300);
+    expect(
+      await session.waitForTextConvergence("FOCUSED", { timeout: 2000, settleMs: 100 }),
+    ).not.toBeNull();
     expect(screenContainsRaw(session, "FOCUSED")).toBe(true);
   });
 });

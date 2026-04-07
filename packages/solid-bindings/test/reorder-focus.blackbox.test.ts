@@ -7,6 +7,15 @@ function screenContainsRaw(session: TerminalSession, text: string): boolean {
   return session.getScreen().raw.includes(text);
 }
 
+async function clickAndFocus(session: TerminalSession, col: number, row: number): Promise<void> {
+  session.mouseMove(col, row);
+  await session.wait(100);
+  session.click(col, row, MouseButton.Left);
+  expect(
+    await session.waitForTextConvergence("Focused id: beta", { timeout: 2000, settleMs: 100 }),
+  ).not.toBeNull();
+}
+
 describe("reorder focus blackbox", () => {
   let session: TerminalSession;
 
@@ -24,23 +33,30 @@ describe("reorder focus blackbox", () => {
     expect(await session.waitForText("Alpha idle", 2000)).toBe(true);
     expect(await session.waitForText("Beta idle", 2000)).toBe(true);
 
-    session.mouseMove(5, 7);
-    await session.wait(100);
-    session.click(5, 7, MouseButton.Left);
-    await session.wait(300);
+    await clickAndFocus(session, 5, 7);
 
     expect(screenContainsRaw(session, "Beta FOCUSED")).toBe(true);
     expect(screenContainsRaw(session, "Focused id: beta")).toBe(true);
 
     session.sendKey("r");
-    await session.wait(300);
+    expect(
+      await session.waitForTextConvergence("Order: Gamma, Beta, Alpha", {
+        timeout: 2000,
+        settleMs: 100,
+      }),
+    ).not.toBeNull();
 
     expect(screenContainsRaw(session, "Order: Gamma, Beta, Alpha")).toBe(true);
     expect(screenContainsRaw(session, "Beta FOCUSED")).toBe(true);
     expect(screenContainsRaw(session, "Focused id: beta")).toBe(true);
 
     session.sendKey("x");
-    await session.wait(300);
+    expect(
+      await session.waitForTextConvergence("Last key target: Beta", {
+        timeout: 2000,
+        settleMs: 100,
+      }),
+    ).not.toBeNull();
 
     expect(screenContainsRaw(session, "Last key target: Beta")).toBe(true);
   });

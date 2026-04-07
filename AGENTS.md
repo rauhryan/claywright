@@ -91,6 +91,7 @@ Rules:
 - Do not leave known TypeScript errors in files you touched.
 - If a broader workspace `tsc` failure is unrelated, mention it explicitly and keep your touched files clean.
 - Prefer adding a blackbox or integration test for interaction changes.
+- For blackbox terminal tests, prefer convergence-style assertions (`waitForTextConvergence`, `waitForFrameText`, `waitForFrame`) over fixed sleeps. Use raw `wait()` only when modeling real elapsed time or when no convergence signal exists.
 - Run `bun run lint` and `bun run fmt:check` before proposing a commit.
 
 ## Building Clayterm

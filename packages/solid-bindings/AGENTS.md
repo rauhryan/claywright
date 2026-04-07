@@ -134,6 +134,29 @@ await session.spawn("bun", [fixture]);
 expect(await session.waitForText("text", 2000)).toBe(true);
 ```
 
+For interaction tests, prefer convergence-style helpers over blind sleeps:
+
+```ts
+await session.spawn("bun", [fixture]);
+session.click(3, 2);
+
+const focused = await session.waitForTextConvergence("Focused: yes", {
+  timeout: 2000,
+  settleMs: 100,
+});
+expect(focused).not.toBeNull();
+
+session.sendKey("h");
+expect(await session.waitForFrameText("Value: h", { timeout: 2000 })).not.toBeNull();
+```
+
+Preference order:
+
+1. `waitForText()` for initial readiness
+2. `waitForTextConvergence()` for settled visible UI state
+3. `waitForFrame()` / `waitForFrameText()` for transient intermediate states
+4. `wait()` only when modeling deliberate elapsed time or when there is no observable convergence signal
+
 ## File Purposes
 
 | File | Purpose |

@@ -7,6 +7,13 @@ function screenLines(session: TerminalSession): string[] {
   return session.getScreen().lines;
 }
 
+async function tabAndSettle(session: TerminalSession): Promise<void> {
+  session.sendKey("tab");
+  expect(
+    await session.waitForTextConvergence("yes", { timeout: 2000, settleMs: 100 }),
+  ).not.toBeNull();
+}
+
 describe("tab navigation blackbox", () => {
   let session: TerminalSession;
 
@@ -22,26 +29,22 @@ describe("tab navigation blackbox", () => {
     await session.spawn("bun", [fixture]);
     expect(await session.waitForText("Tab Navigation Demo", 2000)).toBe(true);
 
-    session.sendKey("tab");
-    await session.wait(200);
+    await tabAndSettle(session);
     let lines = screenLines(session);
     expect(lines.some((line) => line.includes("|First"))).toBe(true);
     expect(lines.some((line) => line.trim() === "yes")).toBe(true);
 
-    session.sendKey("tab");
-    await session.wait(200);
+    await tabAndSettle(session);
     lines = screenLines(session);
     expect(lines.some((line) => line.includes("|Second"))).toBe(true);
     expect(lines.some((line) => line.trim() === "yes")).toBe(true);
 
-    session.sendKey("tab");
-    await session.wait(200);
+    await tabAndSettle(session);
     lines = screenLines(session);
     expect(lines.some((line) => line.includes("|Third"))).toBe(true);
     expect(lines.some((line) => line.trim() === "yes")).toBe(true);
 
-    session.sendKey("tab");
-    await session.wait(200);
+    await tabAndSettle(session);
     lines = screenLines(session);
     expect(lines.some((line) => line.includes("|First"))).toBe(true);
   });
@@ -49,11 +52,12 @@ describe("tab navigation blackbox", () => {
   test("shift+tab cycles focus backward", async () => {
     await session.spawn("bun", [fixture]);
 
-    session.sendKey("tab");
-    await session.wait(200);
+    await tabAndSettle(session);
 
     session.write("\x1b[9;2u");
-    await session.wait(200);
+    expect(
+      await session.waitForTextConvergence("|Third", { timeout: 2000, settleMs: 100 }),
+    ).not.toBeNull();
 
     const lines = screenLines(session);
     expect(lines.some((line) => line.includes("|Third"))).toBe(true);

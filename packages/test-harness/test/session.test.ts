@@ -1,5 +1,6 @@
 import { describe, expect, it, beforeEach, afterEach } from "bun:test";
 import {
+  type CapturedFrame,
   createSession,
   TerminalSession,
   MouseAction,
@@ -237,6 +238,63 @@ describe("TerminalSession with process", () => {
     await session.wait(100);
 
     expect(session.containsText("Red")).toBe(true);
+  });
+
+  it("captures process output frames", async () => {
+    session.startFrameCapture();
+    await session.spawn("sh", ["-c", "printf 'Hello'; sleep 0.05; printf ' World'"]);
+    expect(await session.waitForText("Hello World", 2000)).toBe(true);
+    const frames = session.stopFrameCapture();
+
+    expect(frames.length).toBeGreaterThan(0);
+    expect(frames[0]?.screen.raw).toContain("Hello");
+    expect(frames[frames.length - 1]?.screen.raw).toContain("Hello World");
+    expect(frames[0]?.escaped).toContain("Hello");
+  });
+
+  it("streams process output frames with async iteration", async () => {
+    await session.spawn("sh", ["-c", "printf 'one'; sleep 0.05; printf ' two'"]);
+
+    const frames: CapturedFrame[] = [];
+    for await (const frame of session.frames()) {
+      frames.push(frame);
+      if (frame.screen.raw.includes("one two")) {
+        break;
+      }
+    }
+
+    expect(frames.length).toBeGreaterThan(0);
+    expect(frames.some((frame) => frame.screen.raw.includes("one"))).toBe(true);
+    expect(frames.some((frame) => frame.screen.raw.includes("one two"))).toBe(true);
+  });
+
+  it("waits for a matching frame", async () => {
+    await session.spawn("sh", ["-c", "printf 'one'; sleep 0.05; printf ' two'"]);
+
+    const frame = await session.waitForFrameText("one two", { timeout: 2000 });
+
+    expect(frame).not.toBeNull();
+    expect(frame?.screen.raw).toContain("one two");
+  });
+
+  it("waits for converged text after multiple frames", async () => {
+    await session.spawn("sh", ["-c", "printf 'start'; sleep 0.05; printf '\rfinal'"]);
+
+    const screen = await session.waitForTextConvergence("final", { settleMs: 75, timeout: 2000 });
+
+    expect(screen).not.toBeNull();
+    expect(screen?.raw).toContain("final");
+  });
+
+  it("ends async frame iteration when the process exits", async () => {
+    await session.spawn("printf", ["done"]);
+
+    const seen: string[] = [];
+    for await (const frame of session.frames()) {
+      seen.push(frame.screen.raw);
+    }
+
+    expect(seen.some((raw) => raw.includes("done"))).toBe(true);
   });
 
   it("captures exit code", async () => {

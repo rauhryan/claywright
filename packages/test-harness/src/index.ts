@@ -45,6 +45,30 @@ export interface StyleChange {
   after: TerminalCellStyle;
 }
 
+export interface CapturedFrame {
+  index: number;
+  at: number;
+  chunk: Uint8Array;
+  escaped: string;
+  screen: ScreenSnapshot;
+}
+
+export interface ConvergenceOptions {
+  timeout?: number;
+  settleMs?: number;
+}
+
+interface PendingFrameRequest {
+  resolve: (frame: CapturedFrame | null) => void;
+}
+
+interface FrameCaptureState {
+  frames: CapturedFrame[];
+  queue: CapturedFrame[];
+  waiting: PendingFrameRequest[];
+  closed: boolean;
+}
+
 export class TerminalSession {
   private terminal: GhosttyTerminal;
   private process: Subprocess<"pipe", "pipe", "pipe"> | null = null;
@@ -54,6 +78,7 @@ export class TerminalSession {
   private cwd: string | undefined;
   private vtSequenceLog: Uint8Array[] = [];
   private capturingSequences: boolean = false;
+  private frameCapture: FrameCaptureState | null = null;
   private mouseEncoder: MouseEncoder;
   private mouseEvent: MouseEvent;
 
@@ -106,10 +131,15 @@ export class TerminalSession {
         }
 
         this.terminal.write(value);
+        this.recordFrame(value);
       }
+
+      this.closeFrameCapture();
     };
 
-    readOutput().catch(() => {});
+    readOutput().catch(() => {
+      this.closeFrameCapture();
+    });
   }
 
   write(data: string | Uint8Array): void {
@@ -421,6 +451,127 @@ export class TerminalSession {
     );
   }
 
+  startFrameCapture(): void {
+    this.frameCapture = {
+      frames: [],
+      queue: [],
+      waiting: [],
+      closed: false,
+    };
+  }
+
+  stopFrameCapture(): CapturedFrame[] {
+    if (!this.frameCapture) {
+      return [];
+    }
+
+    const frames = [...this.frameCapture.frames];
+    this.closeFrameCapture();
+    return frames;
+  }
+
+  getFrames(): CapturedFrame[] {
+    return this.frameCapture ? [...this.frameCapture.frames] : [];
+  }
+
+  async *frames(): AsyncGenerator<CapturedFrame, void, void> {
+    if (!this.frameCapture) {
+      this.startFrameCapture();
+    }
+
+    while (this.frameCapture) {
+      const queued = this.frameCapture.queue.shift();
+      if (queued) {
+        yield queued;
+        continue;
+      }
+
+      if (this.frameCapture.closed) {
+        return;
+      }
+
+      const frame = await new Promise<CapturedFrame | null>((resolve) => {
+        this.frameCapture?.waiting.push({ resolve });
+      });
+      if (!frame) {
+        return;
+      }
+      yield frame;
+    }
+  }
+
+  async waitForFrame(
+    predicate: (frame: CapturedFrame) => boolean,
+    options: ConvergenceOptions = {},
+  ): Promise<CapturedFrame | null> {
+    const timeout = options.timeout ?? 5000;
+    const existing = this.getFrames().find(predicate);
+    if (existing) {
+      return existing;
+    }
+
+    const start = Date.now();
+    const frames = this.frames();
+
+    while (Date.now() - start < timeout) {
+      const remaining = timeout - (Date.now() - start);
+      const nextFrame = frames.next();
+      const timeoutResult = await Promise.race([
+        nextFrame,
+        this.wait(remaining).then(() => ({ done: true as const, value: undefined })),
+      ]);
+
+      if (timeoutResult.done) {
+        return null;
+      }
+
+      if (predicate(timeoutResult.value)) {
+        return timeoutResult.value;
+      }
+    }
+
+    return null;
+  }
+
+  async waitForFrameText(
+    text: string,
+    options: ConvergenceOptions = {},
+  ): Promise<CapturedFrame | null> {
+    return this.waitForFrame((frame) => frame.screen.raw.includes(text), options);
+  }
+
+  async waitForConvergence(
+    predicate: (screen: ScreenSnapshot) => boolean,
+    options: ConvergenceOptions = {},
+  ): Promise<ScreenSnapshot | null> {
+    const timeout = options.timeout ?? 5000;
+    const settleMs = options.settleMs ?? 100;
+    const start = Date.now();
+
+    while (Date.now() - start < timeout) {
+      const screen = this.getScreen();
+      if (predicate(screen)) {
+        const baselineCount = this.getFrames().length;
+        await this.wait(Math.min(settleMs, timeout - (Date.now() - start)));
+        const latest = this.getScreen();
+        if (this.getFrames().length === baselineCount && predicate(latest)) {
+          return latest;
+        }
+      }
+
+      await this.wait(25);
+    }
+
+    return null;
+  }
+
+  async waitForTextConvergence(
+    text: string,
+    options: ConvergenceOptions = {},
+  ): Promise<ScreenSnapshot | null> {
+    return this.waitForConvergence((screen) => screen.raw.includes(text), options);
+  }
+
   async wait(ms: number): Promise<void> {
     await new Promise((resolve) => setTimeout(resolve, ms));
   }
@@ -463,6 +614,7 @@ export class TerminalSession {
   }
 
   cleanup(): void {
+    this.closeFrameCapture();
     this.kill();
     this.mouseEvent.free();
     this.mouseEncoder.free();
@@ -471,6 +623,50 @@ export class TerminalSession {
 
   getTerminal(): GhosttyTerminal {
     return this.terminal;
+  }
+
+  private recordFrame(chunk: Uint8Array): void {
+    if (!this.frameCapture || this.frameCapture.closed) {
+      return;
+    }
+
+    const frame: CapturedFrame = {
+      index: this.frameCapture.frames.length,
+      at: Date.now(),
+      chunk: new Uint8Array(chunk),
+      escaped: this.escapeBytes(chunk),
+      screen: this.getScreen(),
+    };
+
+    this.frameCapture.frames.push(frame);
+
+    const waiting = this.frameCapture.waiting.shift();
+    if (waiting) {
+      waiting.resolve(frame);
+      return;
+    }
+
+    this.frameCapture.queue.push(frame);
+  }
+
+  private closeFrameCapture(): void {
+    if (!this.frameCapture || this.frameCapture.closed) {
+      return;
+    }
+
+    this.frameCapture.closed = true;
+    for (const waiting of this.frameCapture.waiting) {
+      waiting.resolve(null);
+    }
+    this.frameCapture.waiting = [];
+  }
+
+  private escapeBytes(chunk: Uint8Array): string {
+    return Array.from(chunk)
+      .map((b) =>
+        b < 32 || b > 126 ? `\\x${b.toString(16).padStart(2, "0")}` : String.fromCharCode(b),
+      )
+      .join("");
   }
 }
 

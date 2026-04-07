@@ -11,6 +11,15 @@ function screenLines(session: TerminalSession): string[] {
   return session.getScreen().lines;
 }
 
+async function focusInput(session: TerminalSession, col: number, row: number): Promise<void> {
+  session.mouseMove(col, row);
+  await session.wait(100);
+  session.click(col, row, MouseButton.Left);
+  expect(
+    await session.waitForTextConvergence("yes", { timeout: 2000, settleMs: 100 }),
+  ).not.toBeNull();
+}
+
 describe("input element", () => {
   let session: TerminalSession;
 
@@ -33,12 +42,7 @@ describe("input element", () => {
     const inputCol = 3;
     const inputRow = 2;
 
-    session.mouseMove(inputCol, inputRow);
-    await session.wait(100);
-    session.click(inputCol, inputRow, MouseButton.Left);
-    await session.wait(100);
-
-    await session.wait(300);
+    await focusInput(session, inputCol, inputRow);
     const linesAfterFocus = screenLines(session);
     expect(linesAfterFocus.some((line) => line.includes("|Type here"))).toBe(true);
     expect(linesAfterFocus.some((line) => line.trim() === "yes")).toBe(true);
@@ -47,7 +51,9 @@ describe("input element", () => {
     session.sendKey("h");
     session.sendKey("i");
 
-    await session.wait(300);
+    expect(
+      await session.waitForTextConvergence("hi", { timeout: 2000, settleMs: 100 }),
+    ).not.toBeNull();
     const linesAfterTyping = screenLines(session);
     expect(linesAfterTyping.some((line) => line.includes("│hi"))).toBe(true);
     expect(linesAfterTyping.some((line) => line.trim() === "hi")).toBe(true);
@@ -59,17 +65,18 @@ describe("input element", () => {
     const inputCol = 3;
     const inputRow = 2;
 
-    session.mouseMove(inputCol, inputRow);
-    await session.wait(100);
-    session.click(inputCol, inputRow, MouseButton.Left);
-    await session.wait(100);
+    await focusInput(session, inputCol, inputRow);
+
+    const linesAfterFocus = screenLines(session);
+    expect(linesAfterFocus.some((line) => line.includes("|Type here"))).toBe(true);
 
     session.sendKey("h");
     session.sendKey("i");
     session.sendKey("backspace");
 
-    await session.wait(300);
+    expect(await session.waitForFrameText("│h|", { timeout: 2000 })).not.toBeNull();
     const linesAfterBackspace = screenLines(session);
+
     expect(linesAfterBackspace.some((line) => line.includes("│h|"))).toBe(true);
     expect(linesAfterBackspace.some((line) => line.trim() === "h")).toBe(true);
   });
@@ -80,18 +87,19 @@ describe("input element", () => {
     const inputCol = 3;
     const inputRow = 2;
 
-    session.mouseMove(inputCol, inputRow);
-    await session.wait(100);
-    session.click(inputCol, inputRow, MouseButton.Left);
-    await session.wait(100);
+    await focusInput(session, inputCol, inputRow);
+
+    const linesAfterFocus = screenLines(session);
+    expect(linesAfterFocus.some((line) => line.includes("|Type here"))).toBe(true);
 
     session.sendKey("h");
     session.sendKey("o");
     session.sendKey("left");
     session.sendKey("i");
 
-    await session.wait(300);
+    expect(await session.waitForFrameText("│hi|o", { timeout: 2000 })).not.toBeNull();
     const linesAfterInsert = screenLines(session);
+
     expect(linesAfterInsert.some((line) => line.includes("│hi|o"))).toBe(true);
     expect(linesAfterInsert.some((line) => line.trim() === "hio")).toBe(true);
   });

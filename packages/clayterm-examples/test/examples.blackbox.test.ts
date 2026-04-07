@@ -11,6 +11,31 @@ const basicButton = resolveExample("basic-button");
 const modalMenu = resolveExample("modal-menu");
 const selection = resolveExample("selection");
 
+async function click(session: TerminalSession, col: number, row: number): Promise<void> {
+  session.mouseDown(col, row);
+  await session.wait(50);
+  session.mouseUp(col, row);
+}
+
+async function dragSelect(
+  session: TerminalSession,
+  startCol: number,
+  startRow: number,
+  endCol: number,
+  endRow: number,
+): Promise<void> {
+  session.mouseDown(startCol, startRow);
+  await session.wait(50);
+  session.sendMouse({
+    action: MouseAction.Motion,
+    button: MouseButton.Left,
+    col: endCol,
+    row: endRow,
+  });
+  await session.wait(50);
+  session.mouseUp(endCol, endRow);
+}
+
 describe("basic-button example", () => {
   let session: TerminalSession;
 
@@ -36,16 +61,16 @@ describe("basic-button example", () => {
     expect(await session.waitForText("Hovered", 2000)).toBe(true);
 
     session.mouseMove(20, 6);
-    await session.wait(150);
+    expect(
+      await session.waitForTextConvergence("Idle", { timeout: 2000, settleMs: 100 }),
+    ).not.toBeNull();
     expect(session.containsText("Hovered")).toBe(false);
     expect(session.containsText("Idle")).toBe(true);
 
     session.mouseMove(2, 1);
     expect(await session.waitForText("Hovered", 2000)).toBe(true);
 
-    session.mouseDown(2, 1);
-    await session.wait(50);
-    session.mouseUp(2, 1);
+    await click(session, 2, 1);
     expect(await session.waitForText("clicked", 2000)).toBe(true);
   });
 });
@@ -71,11 +96,7 @@ describe("selection example", () => {
     await session.spawn("bun", [selection]);
     expect(await session.waitForText("Selected: none", 2000)).toBe(true);
 
-    session.mouseDown(0, 0);
-    await session.wait(50);
-    session.sendMouse({ action: MouseAction.Motion, button: MouseButton.Left, col: 4, row: 0 });
-    await session.wait(50);
-    session.mouseUp(4, 0);
+    await dragSelect(session, 0, 0, 4, 0);
 
     expect(await session.waitForText("Selected: Hello", 2000)).toBe(true);
     expect(session.containsText("Selected: Hello")).toBe(true);
@@ -120,18 +141,14 @@ describe("modal-menu example", () => {
     expect(launcher).not.toBeNull();
     session.mouseMove(launcher!.col + 2, launcher!.row);
     await session.wait(120);
-    session.mouseDown(launcher!.col + 2, launcher!.row);
-    await session.wait(50);
-    session.mouseUp(launcher!.col + 2, launcher!.row);
+    await click(session, launcher!.col + 2, launcher!.row);
 
     expect(await session.waitForText("Command Palette", 2000)).toBe(true);
     expect(session.containsText("Run Test Suite")).toBe(true);
 
     session.mouseMove(1, 1);
     await session.wait(80);
-    session.mouseDown(1, 1);
-    await session.wait(50);
-    session.mouseUp(1, 1);
+    await click(session, 1, 1);
 
     expect(await session.waitForText("Palette closed", 2000)).toBe(true);
     expect(session.containsText("Command Palette")).toBe(false);

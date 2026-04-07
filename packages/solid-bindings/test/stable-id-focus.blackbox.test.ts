@@ -7,6 +7,15 @@ function screenContainsRaw(session: TerminalSession, text: string): boolean {
   return session.getScreen().raw.includes(text);
 }
 
+async function clickAndFocus(session: TerminalSession, col: number, row: number): Promise<void> {
+  session.mouseMove(col, row);
+  await session.wait(100);
+  session.click(col, row, MouseButton.Left);
+  expect(
+    await session.waitForTextConvergence("FOCUSED", { timeout: 2000, settleMs: 100 }),
+  ).not.toBeNull();
+}
+
 describe("stable id focus blackbox", () => {
   let session: TerminalSession;
 
@@ -23,23 +32,24 @@ describe("stable id focus blackbox", () => {
 
     expect(await session.waitForText("Click to focus", 2000)).toBe(true);
 
-    session.mouseMove(5, 5);
-    await session.wait(100);
-    session.click(5, 5, MouseButton.Left);
-    await session.wait(300);
+    await clickAndFocus(session, 5, 5);
 
     expect(screenContainsRaw(session, "FOCUSED")).toBe(true);
     expect(screenContainsRaw(session, "Banner: off")).toBe(true);
 
     session.sendKey("b");
-    await session.wait(300);
+    expect(
+      await session.waitForTextConvergence("Banner: on", { timeout: 2000, settleMs: 100 }),
+    ).not.toBeNull();
 
     expect(screenContainsRaw(session, "FOCUSED")).toBe(true);
     expect(screenContainsRaw(session, "Banner visible")).toBe(true);
     expect(screenContainsRaw(session, "Banner: on")).toBe(true);
 
     session.sendKey("b");
-    await session.wait(300);
+    expect(
+      await session.waitForTextConvergence("Banner: off", { timeout: 2000, settleMs: 100 }),
+    ).not.toBeNull();
 
     expect(screenContainsRaw(session, "FOCUSED")).toBe(true);
     expect(screenContainsRaw(session, "Banner: off")).toBe(true);

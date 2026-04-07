@@ -19,6 +19,12 @@ function buttonPoint(session: TerminalSession, label: string) {
   };
 }
 
+async function click(session: TerminalSession, col: number, row: number): Promise<void> {
+  session.mouseDown(col, row);
+  await session.wait(50);
+  session.mouseUp(col, row);
+}
+
 function carouselSuite(name: string, fixture: string, transitionLabel: string) {
   describe(name, () => {
     let session: TerminalSession;
@@ -50,9 +56,7 @@ function carouselSuite(name: string, fixture: string, transitionLabel: string) {
       await session.wait(120);
       expect(session.getStyleChanges(before).length).toBeGreaterThan(0);
 
-      session.mouseDown(next.col, next.row);
-      await session.wait(50);
-      session.mouseUp(next.col, next.row);
+      await click(session, next.col, next.row);
 
       expect(await session.waitForText(transitionLabel, 2000)).toBe(true);
       expect(await session.waitForText("TIDE / 02", 2000)).toBe(true);
@@ -65,9 +69,7 @@ function carouselSuite(name: string, fixture: string, transitionLabel: string) {
 
       const next = buttonPoint(session, "Next");
 
-      session.mouseDown(next.col, next.row);
-      await session.wait(50);
-      session.mouseUp(next.col, next.row);
+      await click(session, next.col, next.row);
       expect(await session.waitForText("TIDE / 02", 2000)).toBe(true);
       await session.wait(350);
 
@@ -75,9 +77,7 @@ function carouselSuite(name: string, fixture: string, transitionLabel: string) {
 
       session.mouseMove(prev.col, prev.row);
       await session.wait(120);
-      session.mouseDown(prev.col, prev.row);
-      await session.wait(50);
-      session.mouseUp(prev.col, prev.row);
+      await click(session, prev.col, prev.row);
 
       expect(await session.waitForText(transitionLabel, 2000)).toBe(true);
       expect(await session.waitForText("DUNES / 01", 2000)).toBe(true);

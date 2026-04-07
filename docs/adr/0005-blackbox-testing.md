@@ -35,6 +35,35 @@ session.sendKey("enter");
 expect(session.containsText("Submitted")).toBe(true);
 ```
 
+For interaction-heavy tests, prefer convergence-style helpers over fixed sleeps:
+
+```typescript
+const session = createSession({ cols: 40, rows: 10 });
+await session.spawn("bun", [fixture]);
+
+session.click(3, 2);
+
+const focused = await session.waitForTextConvergence("Focused: yes", {
+  timeout: 2000,
+  settleMs: 100,
+});
+expect(focused).not.toBeNull();
+
+session.sendKey("h");
+
+const frame = await session.waitForFrameText("Value: h", { timeout: 2000 });
+expect(frame).not.toBeNull();
+```
+
+### Testing preference
+
+When writing or updating blackbox tests:
+
+1. Prefer `waitForText()` for simple initial readiness checks.
+2. Prefer `waitForTextConvergence()` when asserting a user-visible state that should settle after async redraws.
+3. Prefer `waitForFrame()` / `waitForFrameText()` when asserting transient states that may only appear for one or two frames.
+4. Avoid raw `await session.wait(...)` sleeps unless they are modeling intentional elapsed time. If a sleep remains, document why a convergence helper is not appropriate.
+
 ## Status
 
 Accepted.
@@ -52,7 +81,7 @@ Accepted.
 **Negative:**
 
 - Slower than unit tests (process spawn overhead)
-- Harder to test edge cases (timing, race conditions)
+- Timing-sensitive cases still require care, but convergence helpers and frame capture make races easier to debug and assert
 - Requires ghostty-vt native library (macOS only currently)
 - Debugging failures requires understanding terminal emulation
 
