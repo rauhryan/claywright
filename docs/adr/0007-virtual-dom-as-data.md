@@ -1,5 +1,11 @@
 # ADR 0007: Virtual DOM as Data, Renderable as Wrapper
 
+## Status
+
+**Superseded** by ADR 0013 (Persistent OpNode Tree).
+
+The OpNode tree now serves as both data and the source of truth for ops. The separate Renderable tree is no longer needed - OpNodes directly emit ops and handle their own lifecycle.
+
 ## Context
 
 We need to decide how to represent UI elements in our system. Opentui uses a class-based approach where `Renderable` is both the data structure and the behavior. We currently have a virtual DOM approach with `ElementNode` and `TextNode` as data structures.

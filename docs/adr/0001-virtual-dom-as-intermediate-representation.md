@@ -1,5 +1,11 @@
 # ADR 0001: Virtual DOM as Intermediate Representation
 
+## Status
+
+**Superseded** by ADR 0013 (Persistent OpNode Tree).
+
+This approach of rebuilding the virtual DOM each frame caused ID instability and focus loss. ADR 0013 adopts a persistent tree architecture that Solid's reconciler is designed for.
+
 ## Context
 
 We are building Solid.js bindings for clayterm, a terminal UI renderer. Several forces are at play:

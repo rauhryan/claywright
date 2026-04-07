@@ -6,18 +6,19 @@ Context for AI assistants working on this package.
 
 Key decisions for this package are documented in the monorepo's ADR directory:
 
-- [ADR 0001: Virtual DOM as Intermediate Representation](../../docs/adr/0001-virtual-dom-as-intermediate-representation.md)
+- [ADR 0001: Virtual DOM as Intermediate Representation](../../docs/adr/0001-virtual-dom-as-intermediate-representation.md) (Superseded)
 - [ADR 0002: WASM as UI Thread](../../docs/adr/0002-wasm-as-ui-thread.md)
-- [ADR 0003: Stateless Ops](../../docs/adr/0003-stateless-ops.md)
+- [ADR 0003: Stateless Ops](../../docs/adr/0003-stateless-ops.md) (Superseded)
 - [ADR 0004: Dual JSX Transform Support](../../docs/adr/0004-dual-jsx-transform-support.md)
 - [ADR 0005: Blackbox Testing](../../docs/adr/0005-blackbox-testing.md)
 - [ADR 0006: Core Package Architecture](../../docs/adr/0006-core-package-architecture.md)
-- [ADR 0007: Virtual DOM as Data, Renderable as Wrapper](../../docs/adr/0007-virtual-dom-as-data.md)
-- [ADR 0008: Renderable Tree Mirrors Virtual DOM](../../docs/adr/0008-renderable-tree-mirrors-virtual-dom.md)
+- [ADR 0007: Virtual DOM as Data, Renderable as Wrapper](../../docs/adr/0007-virtual-dom-as-data.md) (Superseded)
+- [ADR 0008: Renderable Tree Mirrors Virtual DOM](../../docs/adr/0008-renderable-tree-mirrors-virtual-dom.md) (Superseded)
 - [ADR 0009: Direct Clayterm Dependency](../../docs/adr/0009-direct-clayterm-dependency.md)
 - [ADR 0010: Two-Tier Keyboard Event Routing](../../docs/adr/0010-two-tier-keyboard-routing.md)
 - [ADR 0011: Event Bubbling Through Renderable Tree](../../docs/adr/0011-event-bubbling.md)
 - [ADR 0012: Click-to-Focus with preventDefault](../../docs/adr/0012-click-to-focus.md)
+- **[ADR 0013: Persistent OpNode Tree](../../docs/adr/0013-persistent-opnode-tree.md)** (Current)
 
 ## What This Package Does
 
@@ -36,49 +37,75 @@ Signals ──► Ops ─────────► Layout/Render/Diff ──�
 
 **You send ops (desired state), trust the result, stream to stdout.**
 
-### State Layers (IMPORTANT)
+### Persistent OpNode Tree (ADR 0013)
+
+```
+JSX → Solid Reconciler → OpNode Tree (persistent) → Ops → Clayterm
+                           ↑ created once, updated in-place
+```
+
+The OpNode tree is the source of truth:
+- Created once when the app starts
+- Updated in-place by Solid's reconciler
+- Each OpNode has a stable ID
+- Dirty tracking for efficient op emission
+
+### State Layers
 
 | Layer                  | What                 | Where              | Mutable?            |
 | ---------------------- | -------------------- | ------------------ | ------------------- |
 | **Signals**            | App state            | Your JS            | Yes (via setters)   |
+| **OpNode Tree**        | UI structure         | Solid reconciler   | Yes (in-place)      |
 | **Ops**                | Desired screen state | Passed to clayterm | No (just a message) |
 | **Front/Back buffers** | Screen cache         | Clayterm WASM      | Internal only       |
 | **ANSI**               | Changed cells        | stdout             | N/A                 |
 
-**Ops are stateless from your perspective.** You pass "what I want now" and clayterm figures out "what changed."
+### Why Persistent Tree?
 
-### Why Virtual DOM?
+1. **Stable IDs**: OpNodes created once, IDs never change
+2. **Focus Preservation**: Same OpNode instance persists across frames
+3. **Event Handlers**: Attached once, cleaned up on destroy
+4. **Fine-Grained Updates**: Only dirty nodes re-emit ops
+5. **Solid Compatibility**: Works with Solid's control flow (Show, For, Switch)
 
-NOT for diffing (clayterm handles that in WASM). For:
+## Key Components
 
-1. Solid.js compatibility (babel-preset-solid expects tree-building functions)
-2. Component composition
-3. Debugging/inspection
+### OpNode Classes
 
-## JSX Transformation
+| Class | Purpose |
+|-------|---------|
+| `OpNode` | Base class, tree structure, dirty tracking |
+| `ElementOpNode` | Box, text, input elements |
+| `TextOpNode` | Text content nodes |
+| `SlotOpNode` | Placeholder for Show/Switch/For |
 
-Two paths, both work:
+### Reconciler
 
-1. **Bun's built-in**: Uses `jsx`, `jsxs`, `jsxDEV` exports
-2. **Babel preset**: Uses `createElement`, `insertNode`, `createTextNode` etc.
-
-Both produce the same virtual DOM structure.
+Follows opentui's `universal.js` patterns:
+- `createElement()` - Create OpNode with stable ID
+- `setProperty()` - Update props in-place
+- `insertNode()` / `removeNode()` - Tree mutations
+- Array reconciliation with LIS algorithm
 
 ## When Making Changes
 
 ### Adding New Elements
 
 1. Add to `JSX.IntrinsicElements` in `jsx-runtime.ts`
-2. Handle in `nodeToOps()` in `render.ts`
+2. Handle in `ElementOpNode.toOps()`
 3. Add tests
 
-### Performance Optimizations
+### Clayterm ID Stability
 
-For IDE-scale (500+ ops, 12,000+ cells):
+**Critical**: Clayterm must use stable IDs. The fix in `clayterm.c`:
 
-- Current: Rebuild virtual DOM each frame (simple, works)
-- Future: Use Solid.js fine-grained reactivity to update ops in-place
-- Don't add JS-level diffing (clayterm handles this in WASM)
+```c
+// Correct - ID depends only on string
+Clay_ElementId eid = Clay__HashString(str, 0);
+
+// Wrong - ID depends on position
+Clay_ElementId eid = Clay__HashString(str, idx++);
+```
 
 ### The Contract with Clayterm
 
@@ -92,9 +119,10 @@ const { output, events } = term.render(ops, { pointer, deltaTime });
 
 ## Common Pitfalls
 
-1. **Don't diff in JS** - Clayterm's WASM diffing is faster
-2. **Don't make ops mutable** - They're just messages, rebuild or cache as needed
-3. **Don't forget to export** - Both `index.ts` AND `jsx-runtime.ts` need exports for both transform paths
+1. **Don't reset ID counter** - IDs must be unique across the app lifetime
+2. **Don't recreate OpNodes** - Update in-place, don't rebuild
+3. **Handle destroy race conditions** - Check `isDestroyed` after user callbacks
+4. **Validate text node parents** - Text nodes must have text parent
 
 ## Testing
 
@@ -108,10 +136,14 @@ expect(await session.waitForText("text", 2000)).toBe(true);
 
 ## File Purposes
 
-| File                 | Purpose                                         |
-| -------------------- | ----------------------------------------------- |
-| `jsx-runtime.ts`     | Node types + Solid.js runtime + Bun JSX exports |
-| `render.ts`          | `render()` function, virtual DOM → clayterm ops |
-| `index.ts`           | Public API, re-exports for babel preset         |
-| `scripts/solid-*.ts` | Babel transform pipeline                        |
-| `bunfig.toml`        | Preload config for tests                        |
+| File | Purpose |
+|------|---------|
+| `opnode/*.ts` | OpNode classes (persistent tree nodes) |
+| `reconciler/*.ts` | Solid reconciler implementation |
+| `runtime.ts` | App runtime, input handling, frame loop |
+| `jsx-runtime.ts` | JSX exports for Bun's built-in transform |
+| `index.ts` | Public API |
+
+## Implementation Plan
+
+See [Implementation Plan: Persistent OpNode Tree](../../docs/implementation-plan-persistent-opnode-tree.md) for detailed steps.

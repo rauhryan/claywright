@@ -11,7 +11,8 @@
       "clayterm/term": ["packages/clayterm/build/npm/esm/term.d.ts"],
       "clayterm/wasm": ["packages/clayterm/build/npm/esm/wasm.d.ts"],
       "@tui/solid-bindings": ["packages/solid-bindings/src/index.ts"],
-      "@tui/solid-bindings/jsx-runtime": ["packages/solid-bindings/src/jsx-runtime.ts"]
+      "@tui/solid-bindings/jsx-runtime": ["packages/solid-bindings/src/jsx-runtime.ts"],
+      "@tui/solid-bindings/jsx-dev-runtime": ["packages/solid-bindings/src/jsx-dev-runtime.ts"]
     }
   }
 }

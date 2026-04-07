@@ -1,10 +1,10 @@
 import { InputRenderable } from "@tui/core";
-import { ElementNode } from "./jsx-runtime";
+import { ElementOpNode } from "./opnode";
 
 export class InputElementRenderable extends InputRenderable {
-  node: ElementNode;
+  node: ElementOpNode;
 
-  constructor(node: ElementNode) {
+  constructor(node: ElementOpNode) {
     super({
       cursorOffset: node.props.cursorOffset as number | undefined,
       focusable: (node.props.focusable as boolean | undefined) ?? true,

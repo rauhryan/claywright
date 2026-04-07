@@ -19,3 +19,4 @@ export {
   jsxs,
   jsxDEV,
 } from "./jsx-runtime";
+export { OpNode, ElementOpNode, TextOpNode, SlotOpNode, resetIdCounter } from "./opnode";

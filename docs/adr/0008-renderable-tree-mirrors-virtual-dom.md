@@ -1,5 +1,11 @@
 # ADR 0008: Renderable Tree Mirrors Virtual DOM
 
+## Status
+
+**Superseded** by ADR 0013 (Persistent OpNode Tree).
+
+The OpNode tree is now the single source of truth, manipulated directly by Solid's reconciler. There is no separate Renderable tree - OpNodes handle their own lifecycle, dirty tracking, and op emission.
+
 ## Context
 
 We have two tree structures:

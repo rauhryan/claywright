@@ -1,6 +1,14 @@
-import { createInput, type InputEvent, type PointerEvent, type Op } from "clayterm";
+import {
+  createInput,
+  close,
+  grow,
+  open,
+  type InputEvent,
+  type Op,
+  type PointerEvent,
+} from "clayterm";
 import { Renderer } from "@tui/core";
-import { RootNode, ElementNode, TextNode, resetNodeIds, type TerminalNode } from "./jsx-runtime";
+import { ElementOpNode, TextOpNode, resetIdCounter, type OpNode } from "./opnode";
 import { createRenderableTree } from "./reconciler";
 import { renderableToOps } from "./renderable-to-ops";
 
@@ -16,12 +24,19 @@ export interface AppContext {
   sendOps: (ops: Op[]) => void;
 }
 
-export type AppView = (ctx: AppContext) => TerminalNode;
+export type AppView = (ctx: AppContext) => OpNode;
 export type AppReduce = (
   ctx: AppContext,
   inputEvents: InputEvent[],
   pointerEvents: PointerEvent[],
 ) => void;
+
+function clearDirty(node: OpNode): void {
+  node.markClean();
+  for (const child of node.children) {
+    clearDirty(child);
+  }
+}
 
 export async function runApp(view: AppView, options: AppOptions = {}): Promise<void> {
   const width = options.width ?? process.stdout.columns ?? 80;
@@ -50,27 +65,36 @@ export async function runApp(view: AppView, options: AppOptions = {}): Promise<v
     renderer.destroy();
   }
 
+  function collectOps(node: OpNode): Op[] {
+    const ops: Op[] = [open("root", { layout: { width: grow(), height: grow() } })];
+    for (const child of node.children) {
+      ops.push(...child.toOps());
+    }
+    ops.push(close());
+    return ops;
+  }
+
   function frame(allowRerender = true) {
     if (cleanedUp) return;
     frameScheduled = false;
 
-    resetNodeIds();
-    const root = new RootNode();
+    resetIdCounter();
+    const rootOpNode = new ElementOpNode("root", "root");
     const node = view({ width, height, pointer, sendOps });
 
-    if (node instanceof TextNode || node instanceof ElementNode) {
-      root.children.push(node);
-      node.parent = root;
+    if (node instanceof ElementOpNode || node instanceof TextOpNode) {
+      rootOpNode.add(node);
     }
 
-    const rootRenderable = createRenderableTree(root);
+    const rootRenderable = createRenderableTree(rootOpNode);
     if (rootRenderable) {
       renderer.setRoot(rootRenderable);
     }
 
-    const ops = rootRenderable ? renderableToOps(rootRenderable) : [];
-    const output = renderer.render(ops, pointer);
+    const ops = rootRenderable ? renderableToOps(rootRenderable) : collectOps(rootOpNode);
+    clearDirty(rootOpNode);
 
+    const output = renderer.render(ops, pointer);
     process.stdout.write(output);
 
     if (allowRerender && renderer.lastPointerEvents.length > 0) {
@@ -136,7 +160,6 @@ export async function runApp(view: AppView, options: AppOptions = {}): Promise<v
     }
 
     renderer.handleInput(bytes);
-
     scheduleFrame();
   });
 

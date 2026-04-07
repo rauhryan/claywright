@@ -1,5 +1,11 @@
 # ADR 0003: Stateless Ops
 
+## Status
+
+**Superseded** by ADR 0013 (Persistent OpNode Tree).
+
+While ops remain stateless from clayterm's perspective, the OpNode tree that produces them is now persistent and updated in-place by Solid's reconciler.
+
 ## Context
 
 Clayterm's `render(ops)` API accepts a flat array of operations:
