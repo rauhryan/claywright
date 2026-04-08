@@ -1,5 +1,26 @@
 import { fixed, fit, grow, percent, type Op, type SizingAxis } from "clayterm";
 
+export function toSizingAxis(sizing?: {
+  type: string;
+  value?: number;
+  min?: number;
+  max?: number;
+}): SizingAxis | undefined {
+  if (!sizing) return undefined;
+  switch (sizing.type) {
+    case "fixed":
+      return fixed(sizing.value ?? 0);
+    case "grow":
+      return grow(sizing.min, sizing.max);
+    case "percent":
+      return percent(sizing.value ?? 0);
+    case "fit":
+      return fit(sizing.min, sizing.max);
+    default:
+      return undefined;
+  }
+}
+
 export abstract class OpNode {
   id: string;
   type: string;
@@ -108,18 +129,6 @@ export abstract class OpNode {
     min?: number;
     max?: number;
   }): SizingAxis | undefined {
-    if (!sizing) return undefined;
-    switch (sizing.type) {
-      case "fixed":
-        return fixed(sizing.value ?? 0);
-      case "grow":
-        return grow(sizing.min, sizing.max);
-      case "percent":
-        return percent(sizing.value ?? 0);
-      case "fit":
-        return fit(sizing.min, sizing.max);
-      default:
-        return undefined;
-    }
+    return toSizingAxis(sizing);
   }
 }

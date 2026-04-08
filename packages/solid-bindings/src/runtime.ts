@@ -1,9 +1,9 @@
 import { createInput, close, grow, open, type Op } from "clayterm";
 import { createSignal, flush } from "solid-js";
-import { Renderer } from "@tui/core";
+import { InputRenderable, Renderer } from "@tui/core";
 import { render as mountSolid } from "./jsx-runtime";
 import { ElementOpNode, OpNode } from "./opnode";
-import { createRenderableTree } from "./reconciler";
+import { createRenderableTree } from "./renderable-tree";
 import { renderableToOps } from "./renderable-to-ops";
 
 export interface AppOptions {
@@ -191,7 +191,11 @@ export async function runApp(view: AppView, options: AppOptions = {}): Promise<v
         cleanup();
         process.exit(130);
       }
-      if (event.type === "keydown" && event.key.toLowerCase() === "q") {
+      if (
+        event.type === "keydown" &&
+        event.key.toLowerCase() === "q" &&
+        !(renderer.focusedRenderable instanceof InputRenderable)
+      ) {
         cleanup();
         process.exit(0);
       }

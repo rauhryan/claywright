@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { Renderer, MouseEvent } from "@tui/core";
 import { ElementNode } from "../src/jsx-runtime";
-import { createRenderableTree } from "../src/reconciler";
+import { createRenderableTree } from "../src/renderable-tree";
 
 describe("click-to-focus integration", () => {
   test("clicking focusable element triggers focus", async () => {

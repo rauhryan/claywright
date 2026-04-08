@@ -2,6 +2,7 @@ import { createMemo, createRenderEffect } from "solid-js";
 import { OpNode, ElementOpNode, TextOpNode, SlotOpNode, resetIdCounter } from "./opnode";
 import { createReconciler } from "./reconciler/index";
 import { defaultReconcilerOptions } from "./reconciler/defaults";
+import type { MouseEvent, KeyboardEvent, PasteEvent } from "@tui/core";
 
 export const memo = createMemo;
 
@@ -106,13 +107,13 @@ export namespace JSX {
     focusable?: boolean;
     onFocus?: () => void;
     onBlur?: () => void;
-    onClick?: (event: unknown) => void;
-    onMouseDown?: (event: unknown) => void;
-    onMouseUp?: (event: unknown) => void;
-    onMouseMove?: (event: unknown) => void;
-    onKeyDown?: (event: unknown) => void;
-    onKeyUp?: (event: unknown) => void;
-    onPaste?: (event: unknown) => void;
+    onClick?: (event: MouseEvent) => void;
+    onMouseDown?: (event: MouseEvent) => void;
+    onMouseUp?: (event: MouseEvent) => void;
+    onMouseMove?: (event: MouseEvent) => void;
+    onKeyDown?: (event: KeyboardEvent) => void;
+    onKeyUp?: (event: KeyboardEvent) => void;
+    onPaste?: (event: PasteEvent) => void;
   }
   export interface IntrinsicElements {
     text: { color?: number; children?: unknown };

@@ -1,5 +1,16 @@
 import { InputRenderable } from "@tui/core";
 import { ElementOpNode } from "./opnode";
+import { proxyHandlers } from "./ElementRenderable";
+
+const INPUT_HANDLER_KEYS = [
+  "onClick",
+  "onMouseDown",
+  "onMouseMove",
+  "onMouseUp",
+  "onKeyDown",
+  "onKeyUp",
+  "onPaste",
+] as const;
 
 export class InputElementRenderable extends InputRenderable {
   node: ElementOpNode;
@@ -18,17 +29,7 @@ export class InputElementRenderable extends InputRenderable {
 
     this.node = node;
 
-    const handlers = [
-      "onClick",
-      "onMouseDown",
-      "onMouseMove",
-      "onMouseUp",
-      "onKeyDown",
-      "onKeyUp",
-      "onPaste",
-    ] as const;
-
-    for (const handler of handlers) {
+    for (const handler of INPUT_HANDLER_KEYS) {
       Object.defineProperty(this, handler, {
         configurable: true,
         enumerable: true,

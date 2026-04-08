@@ -1,4 +1,10 @@
-import { createInput, createTerm, type InputEvent, type Op } from "clayterm";
+import {
+  createInput,
+  createTerm,
+  type InputEvent,
+  type Op,
+  type PointerEvent as ClaytermPointerEvent,
+} from "clayterm";
 import { Renderable } from "./Renderable.js";
 import {
   MouseEvent,
@@ -22,7 +28,7 @@ export class Renderer {
 
   focusedRenderable: Renderable | null = null;
   rootRenderable: Renderable | null = null;
-  lastPointerEvents: any[] = [];
+  lastPointerEvents: ClaytermPointerEvent[] = [];
   hoveredRenderables: Renderable[] = [];
   pressedRenderable: Renderable | null = null;
 
@@ -172,7 +178,16 @@ export class Renderer {
     return output;
   }
 
-  private handlePointerEvent(event: any): void {
+  private handlePointerEvent(
+    event: ClaytermPointerEvent & {
+      x?: number;
+      y?: number;
+      button?: number;
+      shift?: boolean;
+      alt?: boolean;
+      ctrl?: boolean;
+    },
+  ): void {
     if (!event.id) return;
 
     const renderable = this.findRenderable(event.id);
@@ -180,15 +195,7 @@ export class Renderer {
 
     // Create MouseEvent
     const mouseEvent = new MouseEvent(
-      event.type === "pointerclick"
-        ? "click"
-        : event.type === "pointerdown"
-          ? "mousedown"
-          : event.type === "pointerup"
-            ? "mouseup"
-            : event.type === "pointermove"
-              ? "mousemove"
-              : event.type,
+      event.type === "pointerclick" ? "click" : event.type,
       renderable,
       {
         x: event.x ?? 0,

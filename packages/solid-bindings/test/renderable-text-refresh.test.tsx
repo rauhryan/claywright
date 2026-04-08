@@ -1,7 +1,7 @@
 /** @jsxImportSource @tui/solid-bindings */
 import { describe, expect, test } from "bun:test";
 import { createSignal, flush } from "solid-js";
-import { createRenderableTree } from "../src/reconciler";
+import { createRenderableTree } from "../src/renderable-tree";
 import { RootNode, render } from "../src/jsx-runtime";
 import { renderableToOps } from "../src/renderable-to-ops";
 

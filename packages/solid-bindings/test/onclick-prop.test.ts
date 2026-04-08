@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { RootNode, render, createElement } from "../src/jsx-runtime";
-import { createRenderableTree } from "../src/reconciler";
+import { createRenderableTree } from "../src/renderable-tree";
 
 describe("onClick prop", () => {
   test("onClick prop is set on OpNode", () => {

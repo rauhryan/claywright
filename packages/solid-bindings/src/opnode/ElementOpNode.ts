@@ -11,8 +11,8 @@ export class ElementOpNode extends OpNode {
         .filter((c): c is TextOpNode => c instanceof TextOpNode)
         .map((c) => c.value)
         .join("");
-      const textProps: any = {};
-      if (this.props.color !== undefined) textProps.color = this.props.color;
+      const textProps: { color?: number } = {};
+      if (this.props.color !== undefined) textProps.color = this.props.color as number;
       ops.push(text(content, textProps));
     } else if (this.type === "box") {
       const openProps = this.buildBoxProps();
@@ -22,7 +22,7 @@ export class ElementOpNode extends OpNode {
       }
       ops.push(close());
     } else {
-      ops.push(open(this.id, this.props as any));
+      ops.push(open(this.id, this.props as Record<string, unknown>));
       for (const child of this.children) {
         ops.push(...child.toOps());
       }
@@ -33,8 +33,8 @@ export class ElementOpNode extends OpNode {
   }
 
   private buildBoxProps(): Record<string, unknown> {
-    const props = this.props as any;
-    const openProps: any = {};
+    const props = this.props as Record<string, unknown>;
+    const openProps: Record<string, unknown> = {};
 
     if (
       props.width ||
@@ -46,13 +46,22 @@ export class ElementOpNode extends OpNode {
       props.alignY !== undefined
     ) {
       openProps.layout = {};
-      if (props.width) openProps.layout.width = this.toSizingAxis(props.width);
-      if (props.height) openProps.layout.height = this.toSizingAxis(props.height);
-      if (props.direction) openProps.layout.direction = props.direction;
-      if (props.padding) openProps.layout.padding = props.padding;
-      if (props.gap !== undefined) openProps.layout.gap = props.gap;
-      if (props.alignX !== undefined) openProps.layout.alignX = props.alignX;
-      if (props.alignY !== undefined) openProps.layout.alignY = props.alignY;
+      if (props.width)
+        (openProps.layout as Record<string, unknown>).width = this.toSizingAxis(
+          props.width as Parameters<typeof this.toSizingAxis>[0],
+        );
+      if (props.height)
+        (openProps.layout as Record<string, unknown>).height = this.toSizingAxis(
+          props.height as Parameters<typeof this.toSizingAxis>[0],
+        );
+      if (props.direction)
+        (openProps.layout as Record<string, unknown>).direction = props.direction;
+      if (props.padding) (openProps.layout as Record<string, unknown>).padding = props.padding;
+      if (props.gap !== undefined) (openProps.layout as Record<string, unknown>).gap = props.gap;
+      if (props.alignX !== undefined)
+        (openProps.layout as Record<string, unknown>).alignX = props.alignX;
+      if (props.alignY !== undefined)
+        (openProps.layout as Record<string, unknown>).alignY = props.alignY;
     }
 
     if (props.bg !== undefined) openProps.bg = props.bg;

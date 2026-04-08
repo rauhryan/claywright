@@ -164,11 +164,17 @@ export function createReconciler(options: ReconcilerOptions): Reconciler {
         } else if (current == null || current === "") {
           appendNodes(parent, array);
         } else {
-          reconcileArrays(
-            parent,
-            (multi && Array.isArray(current) ? current : [getFirstChild(parent)!]) as OpNode[],
-            array,
-          );
+          const currentArray =
+            multi && Array.isArray(current)
+              ? current
+              : getFirstChild(parent)
+                ? [getFirstChild(parent)!]
+                : [];
+          if (currentArray.length === 0) {
+            appendNodes(parent, array);
+          } else {
+            reconcileArrays(parent, currentArray as OpNode[], array);
+          }
         }
       }
       current = array;
