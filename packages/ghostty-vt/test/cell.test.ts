@@ -59,6 +59,48 @@ describe("GhosttyTerminal cell inspection", () => {
     expect(cell.text).toBe("X");
   });
 
+  it("preserves prior line content after cursor-addressed single-cell redraw", () => {
+    term = createTerminal({ cols: 70, rows: 16 });
+    term.write("\x1b[3;1H│ Count: 0                   │");
+    term.write("\x1b[3;10H1");
+
+    const screen = term.getScreen();
+    expect(screen).toContain("Count: 1");
+
+    const cell = term.getCell(9, 2);
+    expect(cell.hasText).toBe(true);
+    expect(cell.text).toBe("1");
+  });
+
+  it("ignores SGR mouse input bytes when formatting later redraws", () => {
+    term = createTerminal({ cols: 70, rows: 16 });
+    expect(term.isAltScreen()).toBe(false);
+    term.write("\x1b[?1003h\x1b[?1006h");
+    expect(term.isAltScreen()).toBe(false);
+    term.write(
+      "\x1b[0m\x1b[38;2;255;255;255m\x1b[48;2;100;149;237m\x1b[1;1H┌────────────────────────────┐" +
+        "\x1b[0m\x1b[48;2;10;14;22m                                                  " +
+        "\x1b[0m\x1b[38;2;255;255;255m\x1b[48;2;100;149;237m\x1b[2;1H│\x1b[0m\x1b[48;2;100;149;237m                            \x1b[0m\x1b[38;2;255;255;255m\x1b[48;2;100;149;237m│" +
+        "\x1b[0m\x1b[48;2;10;14;22m                                                  " +
+        "\x1b[0m\x1b[38;2;255;255;255m\x1b[48;2;100;149;237m\x1b[3;1H│\x1b[0m\x1b[48;2;100;149;237m \x1b[0m\x1b[38;2;255;255;255m\x1b[48;2;100;149;237mCount: 0\x1b[0m\x1b[48;2;100;149;237m                   \x1b[0m\x1b[38;2;255;255;255m\x1b[48;2;100;149;237m│",
+    );
+    term.write(
+      "\x1b[4;1H│\x1b[0m\x1b[48;2;100;149;237m                            \x1b[0m\x1b[38;2;255;255;255m\x1b[48;2;100;149;237m│\x1b[5;1H└────────────────────────────┘",
+    );
+    term.write(
+      "\x1b[6;1H                                                                                \x1b[7;1H                                                                                \x1b[8;1H                                                                                \x1b[9;1H                                                                                \x1b[10;1H                                                                                \x1b[11;1H                                                                                \x1b[12;1H                                                                                \x1b[13;1H                                                                                \x1b[14;1H                                                                                \x1b[15;1H                                                                                \x1b[16;1H                                                                                \x1b[17;1H                                                                                \x1b[18;1H                                                                                \x1b[19;1H                                                                                \x1b[20;1H                                                                                \x1b[21;1H                                                                                \x1b[22;1H                                                                                \x1b[23;1H                                                                                \x1b[24;1H                                                                                ",
+    );
+    term.write("\x1b[<35;6;4M\x1b[<0;6;4M\x1b[<0;6;4m");
+    term.write("\x1b[3;10H1");
+
+    const cell = term.getCell(9, 2);
+    expect(cell.hasText).toBe(true);
+    expect(cell.text).toBe("1");
+
+    const line = Array.from({ length: 30 }, (_, col) => term.getCell(col, 2).text || " ").join("");
+    expect(line).toContain("Count: 1");
+  });
+
   it("handles wide characters", () => {
     term.write("日");
 

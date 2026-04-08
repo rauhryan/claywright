@@ -11,8 +11,8 @@ export interface RenderOptions {
 const reconciler = createReconciler(defaultReconcilerOptions);
 
 export async function render(code: () => unknown, options: RenderOptions = {}): Promise<void> {
-  const width = options.width ?? process.stdout.columns ?? 80;
-  const height = options.height ?? process.stdout.rows ?? 24;
+  const width = options.width ?? process.stdout.columns ?? Number(process.env.COLUMNS ?? 80);
+  const height = options.height ?? process.stdout.rows ?? Number(process.env.LINES ?? 24);
 
   const term = await createTerm({ width, height });
   const root = new ElementOpNode("root", "root");

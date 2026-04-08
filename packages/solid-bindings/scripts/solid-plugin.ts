@@ -11,6 +11,10 @@ function sourcePath(path: string): string {
 export const solidPlugin = plugin({
   name: "solid-jsx",
   setup(build) {
+    // Keep Solid on the live client runtime in this CLI package.
+    // Bun resolves `solid-js` to the server build under node conditions,
+    // which breaks reactivity for mounted apps. Do not remove this remap
+    // unless the runtime issue itself is resolved and verified end-to-end.
     build.onLoad(
       { filter: /[/\\]node_modules[/\\]solid-js[/\\]dist[/\\]server\.js(?:[?#].*)?$/ },
       async (args) => {

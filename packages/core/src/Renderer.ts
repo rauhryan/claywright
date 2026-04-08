@@ -29,8 +29,8 @@ export class Renderer {
   private renderablesById: Map<string, Renderable> = new Map();
 
   constructor(options: RendererOptions = {}) {
-    this.width = options.width ?? process.stdout.columns ?? 80;
-    this.height = options.height ?? process.stdout.rows ?? 24;
+    this.width = options.width ?? process.stdout.columns ?? Number(process.env.COLUMNS ?? 80);
+    this.height = options.height ?? process.stdout.rows ?? Number(process.env.LINES ?? 24);
   }
 
   async init(): Promise<void> {

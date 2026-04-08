@@ -20,6 +20,7 @@ export {
   For,
   isPending,
   isRefreshing,
+  lazy,
   latest,
   Loading,
   Match,

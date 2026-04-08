@@ -148,6 +148,7 @@ export interface TerminalCell {
   codepoint: number;
   hasText: boolean;
   wide: number;
+  graphemes: string;
 }
 
 export interface TerminalCellStyle {
@@ -271,21 +272,37 @@ export class GhosttyTerminal {
     const codepointBuf = new Uint32Array(1);
     const hasTextBuf = new Uint8Array(1);
     const wideBuf = new Int32Array(1);
+    const graphemeBuf = new Uint32Array(16);
+    const graphemeLenBuf = new BigUint64Array(1);
 
     lib.symbols.ghostty_wrapper_cell_get_codepoint(ptr(refBuf), ptr(codepointBuf));
     lib.symbols.ghostty_wrapper_cell_get_has_text(ptr(refBuf), ptr(hasTextBuf));
     lib.symbols.ghostty_wrapper_cell_get_wide(ptr(refBuf), ptr(wideBuf));
+    lib.symbols.ghostty_wrapper_cell_get_graphemes(
+      ptr(refBuf),
+      ptr(graphemeBuf),
+      graphemeBuf.length,
+      ptr(graphemeLenBuf),
+    );
 
     const hasText = hasTextBuf[0] !== 0;
     const codepoint = codepointBuf[0];
     const wide = wideBuf[0];
+    const graphemeLen = Number(graphemeLenBuf[0]);
+
+    let graphemes = "";
+    if (graphemeLen > 0) {
+      graphemes = String.fromCodePoint(...graphemeBuf.slice(0, graphemeLen));
+    }
 
     let text = "";
     if (hasText && codepoint > 0) {
       text = String.fromCodePoint(codepoint);
+    } else if (hasText && graphemes.length > 0) {
+      text = graphemes;
     }
 
-    return { text, codepoint, hasText, wide };
+    return { text, codepoint, hasText, wide, graphemes };
   }
 
   getCellStyle(col: number, row: number): TerminalCellStyle {

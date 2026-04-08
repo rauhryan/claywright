@@ -69,6 +69,12 @@ interface FrameCaptureState {
   closed: boolean;
 }
 
+interface ShadowScreenState {
+  cells: string[][];
+  cursorRow: number;
+  cursorCol: number;
+}
+
 export class TerminalSession {
   private terminal: GhosttyTerminal;
   private process: Subprocess<"pipe", "pipe", "pipe"> | null = null;
@@ -81,6 +87,7 @@ export class TerminalSession {
   private frameCapture: FrameCaptureState | null = null;
   private mouseEncoder: MouseEncoder;
   private mouseEvent: MouseEvent;
+  private shadowScreen: ShadowScreenState;
 
   constructor(options: TerminalSessionOptions = {}) {
     this.cols = options.cols ?? 80;
@@ -97,11 +104,24 @@ export class TerminalSession {
       tracking: MouseTracking.Any,
     });
     this.mouseEvent = new MouseEvent();
+    this.shadowScreen = this.createShadowScreen();
+  }
+
+  private createShadowScreen(): ShadowScreenState {
+    return {
+      cells: Array.from({ length: this.rows }, () => Array.from({ length: this.cols }, () => " ")),
+      cursorRow: 0,
+      cursorCol: 0,
+    };
   }
 
   async spawn(command: string, args: string[] = []): Promise<void> {
     if (this.process) {
       throw new Error("Process already running");
+    }
+
+    if (!this.frameCapture) {
+      this.startFrameCapture();
     }
 
     this.process = spawn({
@@ -131,6 +151,7 @@ export class TerminalSession {
         }
 
         this.terminal.write(value);
+        this.applyToShadowScreen(value);
         this.recordFrame(value);
       }
 
@@ -244,15 +265,15 @@ export class TerminalSession {
   }
 
   getScreen(): ScreenSnapshot {
-    const raw = this.terminal.getScreen();
-    const lines = raw.split("\n");
+    const lines = this.shadowScreen.cells.map((line) => line.join(""));
+    const raw = lines.join("\n");
 
     return {
       cols: this.cols,
       rows: this.rows,
       lines,
-      cursorX: 0,
-      cursorY: 0,
+      cursorX: this.shadowScreen.cursorCol,
+      cursorY: this.shadowScreen.cursorRow,
       raw,
     };
   }
@@ -611,6 +632,7 @@ export class TerminalSession {
     this.cols = cols;
     this.rows = rows;
     this.terminal.resize(cols, rows);
+    this.shadowScreen = this.createShadowScreen();
   }
 
   cleanup(): void {
@@ -667,6 +689,110 @@ export class TerminalSession {
         b < 32 || b > 126 ? `\\x${b.toString(16).padStart(2, "0")}` : String.fromCharCode(b),
       )
       .join("");
+  }
+
+  private applyToShadowScreen(chunk: Uint8Array): void {
+    const text = new TextDecoder().decode(chunk);
+    let i = 0;
+
+    while (i < text.length) {
+      const ch = text[i]!;
+
+      if (ch === "\x1b") {
+        const next = text[i + 1];
+        if (next === "[") {
+          const sequenceStart = i;
+          i += 2;
+          let params = "";
+          while (i < text.length) {
+            const current = text[i]!;
+            if (current >= "@" && current <= "~") {
+              this.applyCsi(params, current);
+              i += 1;
+              break;
+            }
+            params += current;
+            i += 1;
+          }
+          if (i === sequenceStart + 2) {
+            i += 1;
+          }
+          continue;
+        }
+
+        i += 1;
+        continue;
+      }
+
+      if (ch === "\r") {
+        this.shadowScreen.cursorCol = 0;
+        i += 1;
+        continue;
+      }
+
+      if (ch === "\n") {
+        this.shadowScreen.cursorRow = Math.min(this.rows - 1, this.shadowScreen.cursorRow + 1);
+        i += 1;
+        continue;
+      }
+
+      this.writeShadowChar(ch);
+      i += 1;
+    }
+  }
+
+  private applyCsi(params: string, final: string): void {
+    if (final === "H" || final === "f") {
+      const [rowParam, colParam] = params.split(";");
+      const row = Math.max(1, Number(rowParam || "1")) - 1;
+      const col = Math.max(1, Number(colParam || "1")) - 1;
+      this.shadowScreen.cursorRow = row;
+      this.shadowScreen.cursorCol = col;
+      return;
+    }
+
+    if (final === "J") {
+      const mode = Number(params || "0");
+      if (mode === 2) {
+        this.shadowScreen.cells = Array.from({ length: this.rows }, () =>
+          Array.from({ length: this.cols }, () => " "),
+        );
+      }
+      return;
+    }
+
+    if (final === "K") {
+      const row = this.shadowScreen.cursorRow;
+      if (row < 0 || row >= this.rows) {
+        return;
+      }
+
+      const mode = Number(params || "0");
+      if (mode === 0) {
+        for (let col = Math.max(0, this.shadowScreen.cursorCol); col < this.cols; col++) {
+          this.shadowScreen.cells[row]![col] = " ";
+        }
+      } else if (mode === 1) {
+        for (let col = 0; col <= Math.min(this.cols - 1, this.shadowScreen.cursorCol); col++) {
+          this.shadowScreen.cells[row]![col] = " ";
+        }
+      } else if (mode === 2) {
+        for (let col = 0; col < this.cols; col++) {
+          this.shadowScreen.cells[row]![col] = " ";
+        }
+      }
+      return;
+    }
+  }
+
+  private writeShadowChar(ch: string): void {
+    const { cursorRow, cursorCol } = this.shadowScreen;
+
+    if (cursorRow >= 0 && cursorRow < this.rows && cursorCol >= 0 && cursorCol < this.cols) {
+      this.shadowScreen.cells[cursorRow]![cursorCol] = ch;
+    }
+
+    this.shadowScreen.cursorCol += 1;
   }
 }
 

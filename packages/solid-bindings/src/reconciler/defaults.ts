@@ -70,6 +70,10 @@ export const defaultReconcilerOptions: ReconcilerOptions = {
 
   removeNode(parent: OpNode, node: OpNode): void {
     if (node instanceof SlotOpNode) {
+      const slotChild = node.getSlotChild(parent);
+      if (slotChild.parent === parent) {
+        parent.remove(slotChild);
+      }
       node.parent = null;
       return;
     }

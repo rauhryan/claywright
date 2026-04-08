@@ -18,12 +18,14 @@ export class SlotOpNode extends OpNode {
       if (!this.textSlot) {
         this.textSlot = new TextSlotOpNode(`${this.id}-text`);
       }
+      this.textSlot.parent = parent;
       return this.textSlot;
     }
 
     if (!this.layoutSlot) {
       this.layoutSlot = new LayoutSlotOpNode(`${this.id}-layout`);
     }
+    this.layoutSlot.parent = parent;
     return this.layoutSlot;
   }
 

@@ -1,4 +1,4 @@
-import { createMemo, createRenderEffect, createComponent as solidCreateComponent } from "solid-js";
+import { createMemo, createRenderEffect } from "solid-js";
 import { OpNode, ElementOpNode, TextOpNode, SlotOpNode, resetIdCounter } from "./opnode";
 import { createReconciler } from "./reconciler/index";
 import { defaultReconcilerOptions } from "./reconciler/defaults";
@@ -75,7 +75,7 @@ export function createComponent<T extends Record<string, unknown>>(
   Comp: (props: T) => unknown,
   props: T,
 ): unknown {
-  return solidCreateComponent(Comp as any, props as any);
+  return reconciler.createComponent(Comp, props);
 }
 
 export function Fragment(props: { children?: unknown }): OpNode {
@@ -198,7 +198,9 @@ export function jsx(
         el.props[key] = value;
       }
     }
-    appendChildren(el, props.children);
+    if (props.children !== undefined) {
+      insert(el, props.children);
+    }
   }
   return el;
 }

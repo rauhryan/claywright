@@ -45,8 +45,8 @@ describe("input element", () => {
     await focusInput(session, inputCol, inputRow);
     const linesAfterFocus = screenLines(session);
     expect(linesAfterFocus.some((line) => line.includes("|Type here"))).toBe(true);
-    expect(linesAfterFocus.some((line) => line.trim() === "yes")).toBe(true);
-    expect(linesAfterFocus.some((line) => line.includes("v sible"))).toBe(true);
+    expect(linesAfterFocus.some((line) => line.includes("Focused: yes"))).toBe(true);
+    expect(linesAfterFocus.some((line) => line.includes("Caret: visible"))).toBe(true);
 
     session.sendKey("h");
     session.sendKey("i");
@@ -56,7 +56,7 @@ describe("input element", () => {
     ).not.toBeNull();
     const linesAfterTyping = screenLines(session);
     expect(linesAfterTyping.some((line) => line.includes("│hi"))).toBe(true);
-    expect(linesAfterTyping.some((line) => line.trim() === "hi")).toBe(true);
+    expect(linesAfterTyping.some((line) => line.includes("Value: hi"))).toBe(true);
   });
 
   test("supports backspace", async () => {
@@ -78,7 +78,7 @@ describe("input element", () => {
     const linesAfterBackspace = screenLines(session);
 
     expect(linesAfterBackspace.some((line) => line.includes("│h|"))).toBe(true);
-    expect(linesAfterBackspace.some((line) => line.trim() === "h")).toBe(true);
+    expect(linesAfterBackspace.some((line) => line.includes("Value: h"))).toBe(true);
   });
 
   test("supports arrow navigation and insertion", async () => {
@@ -101,6 +101,6 @@ describe("input element", () => {
     const linesAfterInsert = screenLines(session);
 
     expect(linesAfterInsert.some((line) => line.includes("│hi|o"))).toBe(true);
-    expect(linesAfterInsert.some((line) => line.trim() === "hio")).toBe(true);
+    expect(linesAfterInsert.some((line) => line.includes("Value: hio"))).toBe(true);
   });
 });

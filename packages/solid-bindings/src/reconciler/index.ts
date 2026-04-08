@@ -3,6 +3,8 @@ import { OpNode, TextOpNode, SlotOpNode } from "../opnode";
 
 const memo = <T>(fn: () => T): (() => T) => createMemo(() => fn());
 
+const renderComponent: typeof createComponent = (Comp, props) => Comp(props || {});
+
 type Disposer = () => void;
 
 function mergeProps<T extends Record<string, unknown>>(...sources: (T | undefined)[]): T {
@@ -408,7 +410,7 @@ export function createReconciler(options: ReconcilerOptions): Reconciler {
     },
     effect: createRenderEffect,
     memo,
-    createComponent,
+    createComponent: renderComponent,
     mergeProps,
     use: <A, T>(fn: (element: OpNode, arg: A) => T, element: OpNode, arg: A): T => {
       return untrack(() => fn(element, arg));

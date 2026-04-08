@@ -32,17 +32,17 @@ describe("tab navigation blackbox", () => {
     await tabAndSettle(session);
     let lines = screenLines(session);
     expect(lines.some((line) => line.includes("|First"))).toBe(true);
-    expect(lines.some((line) => line.trim() === "yes")).toBe(true);
+    expect(lines.some((line) => line.includes("First: yes"))).toBe(true);
 
     await tabAndSettle(session);
     lines = screenLines(session);
     expect(lines.some((line) => line.includes("|Second"))).toBe(true);
-    expect(lines.some((line) => line.trim() === "yes")).toBe(true);
+    expect(lines.some((line) => line.includes("Second: yes"))).toBe(true);
 
     await tabAndSettle(session);
     lines = screenLines(session);
     expect(lines.some((line) => line.includes("|Third"))).toBe(true);
-    expect(lines.some((line) => line.trim() === "yes")).toBe(true);
+    expect(lines.some((line) => line.includes("Third: yes"))).toBe(true);
 
     await tabAndSettle(session);
     lines = screenLines(session);
@@ -61,6 +61,6 @@ describe("tab navigation blackbox", () => {
 
     const lines = screenLines(session);
     expect(lines.some((line) => line.includes("|Third"))).toBe(true);
-    expect(lines.some((line) => line.trim() === "yes")).toBe(true);
+    expect(lines.some((line) => line.includes("Third: yes"))).toBe(true);
   });
 });

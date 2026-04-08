@@ -41,8 +41,8 @@ function clearDirty(node: OpNode): void {
 }
 
 export async function runApp(view: AppView, options: AppOptions = {}): Promise<void> {
-  const width = options.width ?? process.stdout.columns ?? 80;
-  const height = options.height ?? process.stdout.rows ?? 24;
+  const width = options.width ?? process.stdout.columns ?? Number(process.env.COLUMNS ?? 80);
+  const height = options.height ?? process.stdout.rows ?? Number(process.env.LINES ?? 24);
 
   const renderer = new Renderer({ width, height });
   await renderer.init();
@@ -69,6 +69,8 @@ export async function runApp(view: AppView, options: AppOptions = {}): Promise<v
   // Create persistent root once — mounted for the app's entire lifetime
   const rootOpNode = new ElementOpNode("root", "root");
 
+  // Mounted signal writes, boundary settlement, and async sources all flow
+  // through OpNode invalidation. Coalesce them into a single scheduled frame.
   function scheduleFrame() {
     if (cleanedUp) return;
     if (frameInProgress) {
@@ -140,7 +142,15 @@ export async function runApp(view: AppView, options: AppOptions = {}): Promise<v
     const output = renderer.render(ops, getPointer());
     process.stdout.write(output);
 
-    return allowRerender && renderer.lastPointerEvents.length > 0;
+    // Pointer and keyboard handlers can synchronously write signals during render.
+    // Flush them here so the mounted OpNode tree reflects event-driven updates
+    // before deciding whether another pass is required.
+    flush();
+
+    return (
+      allowRerender &&
+      (renderer.lastPointerEvents.length > 0 || frameInvalidatedDuringPass || rootOpNode.isDirty)
+    );
   }
 
   function frame() {
