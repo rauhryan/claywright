@@ -1,12 +1,4 @@
-import {
-  createInput,
-  close,
-  grow,
-  open,
-  type InputEvent,
-  type Op,
-  type PointerEvent,
-} from "clayterm";
+import { createInput, close, grow, open, type Op } from "clayterm";
 import { createSignal, flush } from "solid-js";
 import { Renderer } from "@tui/core";
 import { render as mountSolid } from "./jsx-runtime";
@@ -27,11 +19,6 @@ export interface AppContext {
 }
 
 export type AppView = (ctx: AppContext) => unknown;
-export type AppReduce = (
-  ctx: AppContext,
-  inputEvents: InputEvent[],
-  pointerEvents: PointerEvent[],
-) => void;
 
 function clearDirty(node: OpNode): void {
   node.markClean();
