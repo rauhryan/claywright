@@ -16,6 +16,7 @@ export interface AppContext {
   height: number;
   pointer: { x: number; y: number; down: boolean };
   sendOps: (ops: Op[]) => void;
+  requestAnimationFrame: () => void;
 }
 
 export type AppView = (ctx: AppContext) => unknown;
@@ -69,6 +70,11 @@ export async function runApp(view: AppView, options: AppOptions = {}): Promise<v
     setImmediate(frame);
   }
 
+  function requestAnimationFrame() {
+    if (cleanedUp) return;
+    frame();
+  }
+
   rootOpNode.setInvalidationListener(scheduleFrame);
 
   function sendOps(ops: Op[]) {
@@ -82,6 +88,7 @@ export async function runApp(view: AppView, options: AppOptions = {}): Promise<v
     height,
     pointer,
     sendOps,
+    requestAnimationFrame,
   };
   const dispose = mountSolid(() => view(ctx), rootOpNode);
 

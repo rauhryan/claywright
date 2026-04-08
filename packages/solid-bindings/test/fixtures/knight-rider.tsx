@@ -1,5 +1,5 @@
 /** @jsxImportSource @tui/solid-bindings */
-import { createSignal, onCleanup } from "solid-js";
+import { createSignal } from "solid-js";
 import { fixed, grow, rgba, runApp } from "@tui/solid-bindings";
 
 const BAR_WIDTH = 8;
@@ -19,8 +19,9 @@ const BASE: [number, number, number] = [255, 120, 120];
 const BG: [number, number, number] = [10, 14, 22];
 const BG_INT = rgba(...BG);
 
-const BTN_IDLE = rgba(28, 34, 48);
+const BTN_BG = rgba(28, 34, 48);
 const BTN_HOVER = rgba(55, 65, 85);
+const BTN_ACTIVE = rgba(40, 120, 70);
 const BTN_TEXT = rgba(220, 225, 235);
 
 function blend(fg: [number, number, number], bg: [number, number, number], alpha: number): number {
@@ -89,6 +90,7 @@ function squareColor(index: number, frame: number, running: boolean): number {
 }
 
 const [running, setRunning] = createSignal(false);
+const [statusMsg, setStatusMsg] = createSignal("paused");
 const [frame, setFrame] = createSignal(0);
 
 let interval: ReturnType<typeof setInterval> | null = null;
@@ -97,6 +99,7 @@ let raf: () => void = () => {};
 function startAnimation() {
   if (interval) return;
   setRunning(true);
+  setStatusMsg("running");
   setFrame(0);
   interval = setInterval(() => {
     setFrame((f) => (f + 1) % TOTAL_FRAMES);
@@ -110,13 +113,11 @@ function stopAnimation() {
     interval = null;
   }
   setRunning(false);
+  setStatusMsg("stopped");
 }
 
 runApp((ctx) => {
   raf = ctx.requestAnimationFrame;
-  onCleanup(() => {
-    if (interval) clearInterval(interval);
-  });
 
   const barTotalW = BAR_WIDTH * CELL_W + (BAR_WIDTH - 1);
   const cells: number[] = [];
@@ -156,7 +157,7 @@ runApp((ctx) => {
           width={fixed(10)}
           height={fixed(3)}
           padding={{ left: 2, top: 1 }}
-          bg={running() ? rgba(40, 120, 70) : BTN_HOVER}
+          bg={running() ? BTN_ACTIVE : BTN_HOVER}
           border={{
             color: running() ? rgba(80, 180, 120) : rgba(90, 140, 255),
             left: 1,
@@ -176,7 +177,7 @@ runApp((ctx) => {
           width={fixed(10)}
           height={fixed(3)}
           padding={{ left: 2, top: 1 }}
-          bg={running() ? BTN_HOVER : BTN_IDLE}
+          bg={running() ? BTN_HOVER : BTN_BG}
           border={{
             color: running() ? rgba(200, 80, 80) : rgba(90, 90, 110),
             left: 1,
@@ -192,6 +193,12 @@ runApp((ctx) => {
         </box>
 
         <box width={grow()} height={grow()} />
+      </box>
+
+      <box width={grow()} height={fixed(1)} padding={{ left: 2 }}>
+        <text color={rgba(120, 190, 255)}>
+          {statusMsg()} f:{frame()}
+        </text>
       </box>
 
       <box width={grow()} height={grow()} />
