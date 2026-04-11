@@ -17,14 +17,14 @@ describe("virtual viewport event delivery", () => {
   let session: TerminalSession;
 
   beforeEach(() => {
-    session = createSession({ cols: 40, cwd: process.cwd(), rows: 10 });
+    session = createSession({ cols: 80, cwd: process.cwd(), rows: 10 });
   });
 
   afterEach(() => {
     session.cleanup();
   });
 
-  test("mousedown and click over the viewport update visible state", async () => {
+  test("mousemove, mousedown, mouseup, and click over the viewport update visible state", async () => {
     await session.spawn("bun", [fixture]);
 
     expect(await session.waitForText("Viewport Events Demo", 2000)).toBe(true);
@@ -32,15 +32,31 @@ describe("virtual viewport event delivery", () => {
     expect(await session.waitForText("Row 1", 2000)).toBe(true);
 
     session.mouseMove(1, 5);
-    await session.wait(100);
+    expect(
+      await session.waitForTextConvergence("Status: mv@1,5", { timeout: 2000, settleMs: 100 }),
+    ).not.toBeNull();
+
     session.mouseDown(1, 5);
     expect(
-      await session.waitForTextConvergence("Status: mousedown", { timeout: 2000, settleMs: 100 }),
+      await session.waitForTextConvergence("Status: mv@1,5 | down", {
+        timeout: 2000,
+        settleMs: 100,
+      }),
     ).not.toBeNull();
 
     session.mouseUp(1, 5);
     expect(
-      await session.waitForTextConvergence("Status: click", { timeout: 2000, settleMs: 100 }),
+      await session.waitForConvergence(
+        (screen) =>
+          screen.raw.includes("Status: mv@1,5") &&
+          screen.raw.includes("down") &&
+          screen.raw.includes("up") &&
+          screen.raw.includes("click"),
+        {
+          timeout: 2000,
+          settleMs: 100,
+        },
+      ),
     ).not.toBeNull();
   });
 
@@ -51,7 +67,7 @@ describe("virtual viewport event delivery", () => {
 
     sendWheel(session, "down", 1, 5);
     expect(
-      await session.waitForTextConvergence("Status: wheel:down@1,5", {
+      await session.waitForTextConvergence("Status: wh:d@1,5", {
         timeout: 2000,
         settleMs: 100,
       }),
@@ -59,7 +75,7 @@ describe("virtual viewport event delivery", () => {
 
     sendWheel(session, "up", 1, 5);
     expect(
-      await session.waitForTextConvergence("Status: wheel:up@1,5", {
+      await session.waitForTextConvergence("Status: wh:d@1,5 | wh:u@1,5", {
         timeout: 2000,
         settleMs: 100,
       }),

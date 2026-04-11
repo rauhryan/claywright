@@ -172,7 +172,9 @@ export class Renderer {
     const { output, events } = this.term.render(ops, { pointer });
     this.lastPointerEvents = events;
 
-    // Process events from clayterm
+    // Clayterm's render pass reports pointer-over lifecycle derived from the
+    // current layout (enter/leave/click). This path is complementary to raw
+    // terminal input scanning below; both must stay in sync.
     for (const event of events) {
       this.handlePointerEvent(event);
     }
@@ -301,6 +303,9 @@ export class Renderer {
     return renderable;
   }
 
+  // Raw mouse and wheel bytes arrive through input.scan(). They do not carry
+  // clayterm's pointerenter/pointerclick lifecycle, so we resolve their target
+  // from current geometry and hovered state ourselves.
   private getPointerInputTarget(x: number, y: number): Renderable | null {
     return (
       (this.rootRenderable && this.findRenderableAtPosition(this.rootRenderable, x, y)) ||
@@ -369,6 +374,8 @@ export class Renderer {
       event.type === "mouseup" ||
       event.type === "mousemove"
     ) {
+      // These events originate from raw terminal input, not from the render
+      // pass. Keep their routing behavior aligned with clayterm pointer events.
       const mouseTarget = this.getPointerInputTarget(event.x, event.y);
       const mouseEvent = new MouseEvent(event.type, mouseTarget, {
         x: event.x,

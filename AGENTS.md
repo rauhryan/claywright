@@ -89,6 +89,13 @@ bun test packages/core packages/solid-bindings
 Rules:
 
 - Do not leave known TypeScript errors in files you touched.
+- If you touch `packages/core` or `packages/solid-bindings` runtime/reconciler/event-routing code, also run focused smoke suites that cover both stateful virtual-scroll behavior and boundary semantics:
+  - `bun test packages/solid-bindings/test/virtual-viewport.blackbox.test.ts`
+  - `bun test packages/solid-bindings/test/virtual-viewport-events.blackbox.test.ts`
+  - `bun test packages/solid-bindings/test/mounted-errored-boundary.test.tsx`
+  - `bun test packages/solid-bindings/test/slot-boundary-semantics.test.tsx`
+  - `bun test packages/solid-bindings/test/boundary-focus.blackbox.test.ts`
+  - `bun test packages/solid-bindings/test/action-generator.blackbox.test.ts`
 - If a broader workspace `tsc` failure is unrelated, mention it explicitly and keep your touched files clean.
 - Prefer adding a blackbox or integration test for interaction changes.
 - For blackbox terminal tests, prefer convergence-style assertions (`waitForTextConvergence`, `waitForFrameText`, `waitForFrame`) over fixed sleeps. Use raw `wait()` only when modeling real elapsed time or when no convergence signal exists.

@@ -19,6 +19,7 @@ Key decisions for this package are documented in the monorepo's ADR directory:
 - [ADR 0011: Event Bubbling Through Renderable Tree](../../docs/adr/0011-event-bubbling.md)
 - [ADR 0012: Click-to-Focus with preventDefault](../../docs/adr/0012-click-to-focus.md)
 - **[ADR 0013: Persistent OpNode Tree](../../docs/adr/0013-persistent-opnode-tree.md)** (Current)
+- [Reconciler Component Categories](./docs/reconciler-component-categories.md)
 
 ## What This Package Does
 
@@ -125,6 +126,24 @@ const { output, events } = term.render(ops, { pointer, deltaTime });
 4. **Validate text node parents** - Text nodes must have text parent
 
 ## Testing
+
+### Required smoke suites after reconciler/runtime/event-routing changes
+
+If you touch any of these areas:
+- reconciler component invocation
+- runtime frame scheduling
+- renderable tree creation
+- pointer or wheel routing
+- boundary/control-flow semantics
+
+Run at least these suites before considering the change safe:
+- `packages/solid-bindings/test/mounted-errored-boundary.test.tsx`
+- `packages/solid-bindings/test/slot-boundary-semantics.test.tsx`
+- `packages/solid-bindings/test/virtual-viewport.blackbox.test.ts`
+- `packages/solid-bindings/test/virtual-viewport-events.blackbox.test.ts`
+- `packages/solid-bindings/test/boundary-focus.blackbox.test.ts`
+- `packages/solid-bindings/test/action-generator.blackbox.test.ts`
+
 
 Blackbox only. Spawn script in virtual terminal, assert on screen output:
 

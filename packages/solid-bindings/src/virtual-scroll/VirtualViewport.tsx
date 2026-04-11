@@ -11,6 +11,7 @@ import type { KeyboardEvent, WheelEvent } from "@tui/core";
 import { getNextId } from "../opnode";
 import { useAppContext } from "../runtime";
 import { markStatefulComponent } from "../component-flags";
+import { createElementBoundsObserver, sameBounds } from "../observe-element-bounds";
 import { getFirstVisibleAnchor, resolveAnchorScrollTop } from "./anchor";
 import { MeasurementCache } from "./measurement-cache";
 import type {
@@ -39,6 +40,18 @@ export function VirtualViewport(rawProps: VirtualViewportProps) {
   const [bounds, setBounds] = createSignal<ElementBounds | undefined>(undefined);
   const [scrollTop, setScrollTop] = createSignal(0);
   const [autoFollow, setAutoFollow] = createSignal(rawProps.initialAutoFollow ?? true);
+  // Bounds are discovered after clayterm finishes a render pass. Coalesce those
+  // async reads so repeated effect churn cannot silently spin forever.
+  const boundsObserver = createElementBoundsObserver({
+    elementId: viewportId,
+    readCurrent: bounds,
+    readNext: context.getElementBounds,
+    writeNext(nextBounds) {
+      if (!sameBounds(bounds(), nextBounds)) {
+        setBounds(nextBounds);
+      }
+    },
+  });
 
   let previousMeasured: MeasuredItem[] = [];
   let previousScrollTop = 0;
@@ -199,12 +212,7 @@ export function VirtualViewport(rawProps: VirtualViewportProps) {
       autoFollow: autoFollow(),
     }),
     () => {
-      queueMicrotask(() => {
-        const nextBounds = context.getElementBounds(viewportId);
-        if (!sameBounds(bounds(), nextBounds)) {
-          setBounds(nextBounds);
-        }
-      });
+      boundsObserver.request();
     },
   );
 
@@ -305,10 +313,8 @@ export function VirtualViewport(rawProps: VirtualViewportProps) {
   );
 }
 
+// VirtualViewport owns persistent local signals plus post-render bounds
+// observation. Mark it explicitly so the reconciler can preserve its local
+// runtime state without changing global component invocation semantics and
+// breaking Solid boundaries like Errored/Loading.
 markStatefulComponent(VirtualViewport);
-
-function sameBounds(a: ElementBounds | undefined, b: ElementBounds | undefined): boolean {
-  if (a === b) return true;
-  if (!a || !b) return false;
-  return a.x === b.x && a.y === b.y && a.width === b.width && a.height === b.height;
-}

@@ -68,6 +68,7 @@ export {
   jsxDEV,
 } from "./jsx-runtime";
 export { OpNode, ElementOpNode, TextOpNode, SlotOpNode, resetIdCounter } from "./opnode";
+export { markStatefulComponent } from "./component-flags";
 export { VirtualViewport } from "./virtual-scroll/VirtualViewport";
 export type {
   VirtualItem,
