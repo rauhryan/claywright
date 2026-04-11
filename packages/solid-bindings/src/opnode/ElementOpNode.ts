@@ -67,6 +67,7 @@ export class ElementOpNode extends OpNode {
     if (props.bg !== undefined) openProps.bg = props.bg;
     if (props.border) openProps.border = props.border;
     if (props.cornerRadius) openProps.cornerRadius = props.cornerRadius;
+    if (props.clip) openProps.clip = props.clip;
     if (props.floating) openProps.floating = props.floating;
 
     return openProps;

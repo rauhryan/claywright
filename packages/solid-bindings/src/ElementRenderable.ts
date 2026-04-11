@@ -6,6 +6,7 @@ const EVENT_HANDLER_KEYS = [
   "onMouseDown",
   "onMouseUp",
   "onMouseMove",
+  "onWheel",
   "onKeyDown",
   "onKeyUp",
   "onPaste",

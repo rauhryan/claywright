@@ -59,6 +59,29 @@ export class MouseEvent extends TerminalEvent {
   }
 }
 
+export class WheelEvent extends TerminalEvent {
+  readonly x: number;
+  readonly y: number;
+  readonly direction: "up" | "down";
+  readonly modifiers: MouseModifiers;
+
+  constructor(
+    target: Renderable | null,
+    options: {
+      x: number;
+      y: number;
+      direction: "up" | "down";
+      modifiers?: MouseModifiers;
+    },
+  ) {
+    super("wheel", target);
+    this.x = options.x;
+    this.y = options.y;
+    this.direction = options.direction;
+    this.modifiers = options.modifiers ?? { shift: false, alt: false, ctrl: false };
+  }
+}
+
 export interface KeyboardModifiers {
   shift: boolean;
   alt: boolean;

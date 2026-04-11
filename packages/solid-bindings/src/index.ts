@@ -1,5 +1,12 @@
 export { render, grow, fixed, percent, fit, rgba } from "./render";
-export { runApp, type AppOptions, type AppContext, type AppView } from "./runtime";
+export {
+  AppContextProvider,
+  runApp,
+  useAppContext,
+  type AppOptions,
+  type AppContext,
+  type AppView,
+} from "./runtime";
 export { Portal } from "./Portal";
 export { ATTACH_POINT, ATTACH_TO } from "clayterm";
 export {
@@ -61,3 +68,12 @@ export {
   jsxDEV,
 } from "./jsx-runtime";
 export { OpNode, ElementOpNode, TextOpNode, SlotOpNode, resetIdCounter } from "./opnode";
+export { VirtualViewport } from "./virtual-scroll/VirtualViewport";
+export type {
+  VirtualItem,
+  VirtualItemMeasurement,
+  VirtualViewportBudget,
+  VirtualViewportHandle,
+  VirtualViewportProps,
+  VirtualViewportState,
+} from "./virtual-scroll/types";

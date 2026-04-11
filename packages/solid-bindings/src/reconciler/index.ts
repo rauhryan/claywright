@@ -1,9 +1,17 @@
-import { createRoot, createRenderEffect, createMemo, createComponent, untrack } from "solid-js";
+import {
+  createRoot,
+  createRenderEffect,
+  createMemo,
+  type createComponent,
+  untrack,
+} from "solid-js";
 import { OpNode, TextOpNode, SlotOpNode } from "../opnode";
+import { isStatefulComponent } from "../component-flags";
 
 const memo = <T>(fn: () => T): (() => T) => createMemo(() => fn());
 
-const renderComponent: typeof createComponent = (Comp, props) => Comp(props || {});
+const renderComponent: typeof createComponent = (Comp, props) =>
+  isStatefulComponent(Comp) ? untrack(() => Comp(props || {})) : Comp(props || {});
 
 type Disposer = () => void;
 

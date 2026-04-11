@@ -1,8 +1,9 @@
-import type { TerminalEvent, MouseEvent, KeyboardEvent, PasteEvent } from "./events.js";
+import type { TerminalEvent, MouseEvent, KeyboardEvent, PasteEvent, WheelEvent } from "./events.js";
 import {
   MouseEvent as MouseEventClass,
   KeyboardEvent as KeyboardEventClass,
   PasteEvent as PasteEventClass,
+  WheelEvent as WheelEventClass,
 } from "./events.js";
 
 export enum RenderableEvents {
@@ -28,6 +29,7 @@ export abstract class Renderable {
   onMouseDown?: (event: MouseEvent) => void;
   onMouseUp?: (event: MouseEvent) => void;
   onMouseMove?: (event: MouseEvent) => void;
+  onWheel?: (event: WheelEvent) => void;
   onKeyDown?: (event: KeyboardEvent) => void;
   onKeyUp?: (event: KeyboardEvent) => void;
   onPaste?: (event: PasteEvent) => void;
@@ -103,6 +105,8 @@ export abstract class Renderable {
           this.onMouseMove?.(event);
           break;
       }
+    } else if (event instanceof WheelEventClass) {
+      this.onWheel?.(event);
     } else if (event instanceof KeyboardEventClass) {
       switch (event.type) {
         case "keydown":

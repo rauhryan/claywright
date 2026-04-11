@@ -1,5 +1,5 @@
-import { createInput, close, grow, open, type Op } from "clayterm";
-import { createSignal, flush } from "solid-js";
+import { createInput, close, grow, open, type ElementBounds, type Op } from "clayterm";
+import { createComponent, createContext, createSignal, flush, useContext } from "solid-js";
 import { InputRenderable, Renderer } from "@tui/core";
 import { render as mountSolid } from "./jsx-runtime";
 import { ElementOpNode, OpNode } from "./opnode";
@@ -17,6 +17,17 @@ export interface AppContext {
   pointer: { x: number; y: number; down: boolean };
   sendOps: (ops: Op[]) => void;
   requestAnimationFrame: () => void;
+  getElementBounds: (id: string) => ElementBounds | undefined;
+}
+
+export const AppContextProvider = createContext<AppContext>();
+
+export function useAppContext(): AppContext {
+  const context = useContext(AppContextProvider);
+  if (!context) {
+    throw new Error("useAppContext() must be used within runApp().");
+  }
+  return context;
 }
 
 export type AppView = (ctx: AppContext) => unknown;
@@ -89,8 +100,18 @@ export async function runApp(view: AppView, options: AppOptions = {}): Promise<v
     pointer,
     sendOps,
     requestAnimationFrame,
+    getElementBounds: (id: string) => renderer.getElementBounds(id),
   };
-  const dispose = mountSolid(() => view(ctx), rootOpNode);
+  const dispose = mountSolid(
+    () =>
+      createComponent(AppContextProvider, {
+        value: ctx,
+        get children() {
+          return view(ctx) as never;
+        },
+      }),
+    rootOpNode,
+  );
 
   function cleanup() {
     if (cleanedUp) return;
@@ -109,13 +130,16 @@ export async function runApp(view: AppView, options: AppOptions = {}): Promise<v
     renderer.destroy();
   }
 
+  function wrapRootOps(children: Op[]): Op[] {
+    return [open("root", { layout: { width: grow(), height: grow() } }), ...children, close()];
+  }
+
   function collectOps(node: OpNode): Op[] {
-    const ops: Op[] = [open("root", { layout: { width: grow(), height: grow() } })];
+    const children: Op[] = [];
     for (const child of node.children) {
-      ops.push(...child.toOps());
+      children.push(...child.toOps());
     }
-    ops.push(close());
-    return ops;
+    return wrapRootOps(children);
   }
 
   function renderFramePass(allowRerender: boolean): boolean {
@@ -130,7 +154,9 @@ export async function runApp(view: AppView, options: AppOptions = {}): Promise<v
       renderer.setRoot(rootRenderable);
     }
 
-    const ops = rootRenderable ? renderableToOps(rootRenderable) : collectOps(rootOpNode);
+    const ops = rootRenderable
+      ? wrapRootOps(renderableToOps(rootRenderable))
+      : collectOps(rootOpNode);
     clearDirty(rootOpNode);
 
     const output = renderer.render(ops, getPointer());
@@ -219,6 +245,11 @@ export async function runApp(view: AppView, options: AppOptions = {}): Promise<v
       }
       if (event.type === "mouseup") {
         setPointer({ x: event.x, y: event.y, down: false });
+        frame();
+      }
+      if (event.type === "wheel") {
+        setPointer({ x: event.x, y: event.y, down: getPointer().down });
+        frame();
       }
     }
 

@@ -7,6 +7,7 @@ const INPUT_HANDLER_KEYS = [
   "onMouseDown",
   "onMouseMove",
   "onMouseUp",
+  "onWheel",
   "onKeyDown",
   "onKeyUp",
   "onPaste",

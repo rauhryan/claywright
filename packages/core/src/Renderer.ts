@@ -1,6 +1,7 @@
 import {
   createInput,
   createTerm,
+  type ElementBounds,
   type InputEvent,
   type Op,
   type PointerEvent as ClaytermPointerEvent,
@@ -8,6 +9,7 @@ import {
 import { Renderable } from "./Renderable.js";
 import {
   MouseEvent,
+  WheelEvent,
   KeyboardEvent,
   PasteEvent,
   type MouseModifiers,
@@ -158,6 +160,10 @@ export class Renderer {
     this.focusedRenderable = null;
   }
 
+  getElementBounds(id: string): ElementBounds | undefined {
+    return this.term?.getElementBounds(id);
+  }
+
   render(ops: Op[], pointer?: { x: number; y: number; down: boolean }): Uint8Array {
     if (!this.term) {
       throw new Error("Renderer not initialized. Call init() first.");
@@ -191,6 +197,9 @@ export class Renderer {
     if (!event.id) return;
 
     const renderable = this.findRenderable(event.id);
+    if (process.env.DEBUG_POINTER_ROUTING === "1") {
+      console.error("handlePointerEvent", event, "renderable", renderable?.id);
+    }
     if (!renderable) return;
 
     // Create MouseEvent
@@ -264,6 +273,54 @@ export class Renderer {
     }
   }
 
+  private findRenderableAtPosition(
+    renderable: Renderable,
+    x: number,
+    y: number,
+  ): Renderable | null {
+    const bounds = this.getElementBounds(renderable.id);
+    if (!bounds) {
+      return null;
+    }
+
+    const inside =
+      x >= bounds.x && x < bounds.x + bounds.width && y >= bounds.y && y < bounds.y + bounds.height;
+
+    if (!inside) {
+      return null;
+    }
+
+    for (let index = renderable.children.length - 1; index >= 0; index--) {
+      const child = renderable.children[index]!;
+      const match = this.findRenderableAtPosition(child, x, y);
+      if (match) {
+        return match;
+      }
+    }
+
+    return renderable;
+  }
+
+  private getPointerInputTarget(x: number, y: number): Renderable | null {
+    return (
+      (this.rootRenderable && this.findRenderableAtPosition(this.rootRenderable, x, y)) ||
+      this.getHoveredRenderable()
+    );
+  }
+
+  private toMouseButton(button: "left" | "right" | "middle" | "release"): number {
+    switch (button) {
+      case "left":
+        return 0;
+      case "middle":
+        return 1;
+      case "right":
+        return 2;
+      case "release":
+        return -1;
+    }
+  }
+
   private processInputEvent(event: InputEvent): void {
     if (event.type === "keydown" || event.type === "keyrepeat") {
       const keyEvent = new KeyboardEvent("keydown", this.focusedRenderable, {
@@ -306,6 +363,45 @@ export class Renderer {
 
       if (this.focusedRenderable) {
         this.focusedRenderable.processEvent(keyEvent);
+      }
+    } else if (
+      event.type === "mousedown" ||
+      event.type === "mouseup" ||
+      event.type === "mousemove"
+    ) {
+      const mouseTarget = this.getPointerInputTarget(event.x, event.y);
+      const mouseEvent = new MouseEvent(event.type, mouseTarget, {
+        x: event.x,
+        y: event.y,
+        button: this.toMouseButton(event.button),
+        modifiers: {
+          shift: event.shift ?? false,
+          alt: event.alt ?? false,
+          ctrl: event.ctrl ?? false,
+        },
+      });
+
+      if (mouseTarget) {
+        mouseTarget.processEvent(mouseEvent);
+      }
+    } else if (event.type === "wheel") {
+      const wheelTarget = this.getPointerInputTarget(event.x, event.y);
+      if (process.env.DEBUG_POINTER_ROUTING === "1") {
+        console.error("wheel-input", event, "target", wheelTarget?.id);
+      }
+      const wheelEvent = new WheelEvent(wheelTarget, {
+        x: event.x,
+        y: event.y,
+        direction: event.direction,
+        modifiers: {
+          shift: event.shift ?? false,
+          alt: event.alt ?? false,
+          ctrl: event.ctrl ?? false,
+        },
+      });
+
+      if (wheelTarget) {
+        wheelTarget.processEvent(wheelEvent);
       }
     } else if (typeof (event as { text?: unknown }).text === "string") {
       const pasteEvent = new PasteEvent(

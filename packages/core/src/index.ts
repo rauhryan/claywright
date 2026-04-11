@@ -4,6 +4,7 @@ export { Renderer, type RendererOptions } from "./Renderer.js";
 export {
   TerminalEvent,
   MouseEvent,
+  WheelEvent,
   KeyboardEvent,
   PasteEvent,
   type MouseModifiers,

@@ -1,8 +1,8 @@
-import { createMemo, createRenderEffect } from "solid-js";
+import { createMemo, createRenderEffect, type Component } from "solid-js";
 import { OpNode, ElementOpNode, TextOpNode, SlotOpNode, resetIdCounter } from "./opnode";
 import { createReconciler } from "./reconciler/index";
 import { defaultReconcilerOptions } from "./reconciler/defaults";
-import type { MouseEvent, KeyboardEvent, PasteEvent } from "@tui/core";
+import type { MouseEvent, WheelEvent, KeyboardEvent, PasteEvent } from "@tui/core";
 
 export const memo = createMemo;
 
@@ -73,7 +73,7 @@ export function ref(accessor: () => unknown, node: OpNode): void {
 export const effect = createRenderEffect;
 
 export function createComponent<T extends Record<string, unknown>>(
-  Comp: (props: T) => unknown,
+  Comp: Component<T>,
   props: T,
 ): unknown {
   return reconciler.createComponent(Comp, props);
@@ -111,6 +111,7 @@ export namespace JSX {
     onMouseDown?: (event: MouseEvent) => void;
     onMouseUp?: (event: MouseEvent) => void;
     onMouseMove?: (event: MouseEvent) => void;
+    onWheel?: (event: WheelEvent) => void;
     onKeyDown?: (event: KeyboardEvent) => void;
     onKeyUp?: (event: KeyboardEvent) => void;
     onPaste?: (event: PasteEvent) => void;
@@ -145,6 +146,11 @@ export namespace JSX {
       bg?: number;
       border?: { color: number; left?: number; right?: number; top?: number; bottom?: number };
       cornerRadius?: { tl?: number; tr?: number; bl?: number; br?: number };
+      clip?: {
+        horizontal?: boolean;
+        vertical?: boolean;
+        childOffset?: { x?: number; y?: number };
+      };
     };
   }
 }
@@ -183,7 +189,7 @@ function appendChildren(parent: OpNode, value: unknown): void {
 }
 
 export function jsx(
-  type: string | ((props: Record<string, unknown>) => unknown),
+  type: string | Component<Record<string, unknown>>,
   props: Record<string, unknown> | null,
 ): unknown {
   if (typeof type === "function") {
@@ -209,7 +215,7 @@ export function jsx(
 export const jsxs = jsx;
 
 export function jsxDEV(
-  type: string | ((props: Record<string, unknown>) => unknown),
+  type: string | Component<Record<string, unknown>>,
   props: Record<string, unknown> | null,
   _key?: string,
   _isStaticChildren?: boolean,
