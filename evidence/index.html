@@ -3,7 +3,37 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Unified Virtual Viewport Evidence</title>
+    <title>Claywright — Beautiful, testable terminal interfaces for coding agents</title>
+    <meta
+      name="description"
+      content="Claywright's reviewer-facing evidence gallery: virtual viewport demos, terminal UI behavior captures, blackbox-aligned GIFs, and a mocked coding-agent CLI social preview."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Claywright" />
+    <meta property="og:title" content="Claywright — Beautiful, testable terminal interfaces for coding agents" />
+    <meta
+      property="og:description"
+      content="Virtual viewports, terminal UX, blackbox-tested behavior, and reviewer-friendly demo evidence for coding-agent interfaces."
+    />
+    <meta property="og:url" content="https://rauhryan.github.io/claywright/" />
+    <meta property="og:image" content="https://rauhryan.github.io/claywright/social/og-card.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Claywright social preview card with ASCII-art header, tagline, and a terminal-style mocked coding-agent CLI."
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Claywright — Beautiful, testable terminal interfaces for coding agents" />
+    <meta
+      name="twitter:description"
+      content="Reviewer-facing evidence gallery with virtual viewport demos, terminal UX captures, and mocked coding-agent CLI visuals."
+    />
+    <meta name="twitter:image" content="https://rauhryan.github.io/claywright/social/og-card.png" />
+    <meta
+      name="twitter:image:alt"
+      content="Claywright social preview card with ASCII-art header and a mocked coding-agent CLI terminal panel."
+    />
     <style>
       :root {
         color-scheme: dark;
@@ -329,6 +359,10 @@
               <div class="value"><a href="./gifs/">evidence/gifs/</a></div>
             </li>
             <li>
+              <div class="label">Social preview assets</div>
+              <div class="value"><a href="./social/og-card.png">og-card.png</a> · <a href="./social/og-card.svg">og-card.svg</a> · <a href="./social/agent-demo.gif">agent-demo.gif</a></div>
+            </li>
+            <li>
               <div class="label">Recommended local open command</div>
               <div class="value"><code>open evidence/index.html</code></div>
             </li>
@@ -363,6 +397,44 @@ cd claywright
 bun test packages/solid-bindings/test/virtual-viewport-*.blackbox.test.ts
 bun run evidence:vhs</code></pre>
           </div>
+        </div>
+      </section>
+
+      <section class="panel section">
+        <h2>Social preview pack</h2>
+        <p class="section-copy">
+          GitHub Pages now publishes a dedicated social preview set: a static Open Graph card for link unfurls and a mocked coding-agent terminal demo GIF for richer sharing and landing-page polish.
+        </p>
+        <div class="grid">
+          <article class="panel card">
+            <div>
+              <h3>Open Graph card</h3>
+              <p>Static social card with a terminal palette, ASCII-art Claywright masthead, a sharp tagline, and a mocked agent CLI frame.</p>
+            </div>
+            <figure>
+              <img src="./social/og-card.png" alt="Claywright Open Graph card" loading="lazy" />
+              <figcaption>Focus: strong first impression for GitHub Pages, Slack, and social link previews.</figcaption>
+            </figure>
+            <div class="card-links">
+              <a class="button" href="./social/og-card.png">Open OG PNG</a>
+              <a class="button" href="./social/og-card.svg">Open OG SVG</a>
+            </div>
+          </article>
+
+          <article class="panel card">
+            <div>
+              <h3>Mocked coding-agent CLI demo</h3>
+              <p>Animated terminal vignette showing a stylized Claywright session: planning, test verification, viewport rendering, and shipping the evidence site.</p>
+            </div>
+            <figure>
+              <img src="./social/agent-demo.gif" alt="Claywright mocked coding-agent CLI demo GIF" loading="lazy" />
+              <figcaption>Focus: brand mood, agent workflow, and terminal-native product identity.</figcaption>
+            </figure>
+            <div class="card-links">
+              <a class="button" href="./social/agent-demo.gif">Open social GIF</a>
+              <a class="button" href="./vhs/claywright-agent-demo.tape">Open tape</a>
+            </div>
+          </article>
         </div>
       </section>
 

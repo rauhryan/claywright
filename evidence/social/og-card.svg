@@ -1,0 +1,88 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#08111f"/>
+      <stop offset="0.55" stop-color="#0b1427"/>
+      <stop offset="1" stop-color="#101a2f"/>
+    </linearGradient>
+    <radialGradient id="glowA" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(215 110) rotate(28) scale(360 220)">
+      <stop stop-color="#4EA7FF" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#4EA7FF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowB" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(980 120) rotate(150) scale(300 180)">
+      <stop stop-color="#73F0C5" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#73F0C5" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="18" stdDeviation="28" flood-color="#000814" flood-opacity="0.45"/>
+    </filter>
+    <filter id="terminalShadow" x="-20%" y="-20%" width="140%" height="160%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="24" stdDeviation="28" flood-color="#020611" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#glowA)"/>
+  <rect width="1200" height="630" fill="url(#glowB)"/>
+
+  <g opacity="0.08">
+    <path d="M0 78H1200" stroke="#DCE7FF"/>
+    <path d="M0 156H1200" stroke="#DCE7FF"/>
+    <path d="M0 234H1200" stroke="#DCE7FF"/>
+    <path d="M0 312H1200" stroke="#DCE7FF"/>
+    <path d="M0 390H1200" stroke="#DCE7FF"/>
+    <path d="M0 468H1200" stroke="#DCE7FF"/>
+    <path d="M0 546H1200" stroke="#DCE7FF"/>
+    <path d="M120 0V630" stroke="#DCE7FF"/>
+    <path d="M240 0V630" stroke="#DCE7FF"/>
+    <path d="M360 0V630" stroke="#DCE7FF"/>
+    <path d="M480 0V630" stroke="#DCE7FF"/>
+    <path d="M600 0V630" stroke="#DCE7FF"/>
+    <path d="M720 0V630" stroke="#DCE7FF"/>
+    <path d="M840 0V630" stroke="#DCE7FF"/>
+    <path d="M960 0V630" stroke="#DCE7FF"/>
+    <path d="M1080 0V630" stroke="#DCE7FF"/>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="48" y="44" width="1104" height="542" rx="28" fill="#0E1830" fill-opacity="0.82" stroke="#FFFFFF" stroke-opacity="0.14"/>
+  </g>
+
+  <g>
+    <rect x="78" y="76" width="176" height="34" rx="17" fill="#173056" stroke="#2E5A97"/>
+    <text x="166" y="98" text-anchor="middle" fill="#BED4FF" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="700" letter-spacing="1.2">GITHUB PAGES PREVIEW</text>
+  </g>
+
+  <g>
+    <text x="82" y="164" fill="#A8C6FF" font-family="Menlo, Monaco, 'Courier New', monospace" font-size="18" xml:space="preserve">   ________                _       __     _       __    __</text>
+    <text x="82" y="189" fill="#A8C6FF" font-family="Menlo, Monaco, 'Courier New', monospace" font-size="18" xml:space="preserve">  / ____/ /___ ___  ______(_)___ _/ /_   / |     / /___/ /_</text>
+    <text x="82" y="214" fill="#A8C6FF" font-family="Menlo, Monaco, 'Courier New', monospace" font-size="18" xml:space="preserve"> / /   / / __ `/ / / / __/ / __ `/ __ \ /  | /| / / __  / __/</text>
+    <text x="82" y="239" fill="#A8C6FF" font-family="Menlo, Monaco, 'Courier New', monospace" font-size="18" xml:space="preserve">/ /___/ / /_/ / /_/ / /_/ / /_/ / / / // /| |/ |/ / /_/ / /_</text>
+    <text x="82" y="264" fill="#A8C6FF" font-family="Menlo, Monaco, 'Courier New', monospace" font-size="18" xml:space="preserve">\____/_/\__,_/\__, /\__/_/\__, /_/ /_//_/ |__/|__/\__,_/\__/</text>
+    <text x="82" y="289" fill="#A8C6FF" font-family="Menlo, Monaco, 'Courier New', monospace" font-size="18" xml:space="preserve">             /____/      /____/</text>
+  </g>
+
+  <text x="82" y="340" fill="#E9F1FF" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="800">Beautiful, testable terminal interfaces for coding agents</text>
+  <text x="82" y="374" fill="#95AFD7" font-family="Inter, Arial, sans-serif" font-size="20">Virtual viewports, terminal UX, blackbox tests, evidence GIFs, and reviewer-friendly demos.</text>
+
+  <g filter="url(#terminalShadow)">
+    <rect x="82" y="410" width="1036" height="136" rx="20" fill="#07101D" stroke="#213350"/>
+    <rect x="82" y="410" width="1036" height="38" rx="20" fill="#0D1A2E"/>
+    <circle cx="108" cy="429" r="6" fill="#FF6B6B"/>
+    <circle cx="128" cy="429" r="6" fill="#FFD166"/>
+    <circle cx="148" cy="429" r="6" fill="#72F1B8"/>
+    <text x="600" y="434" text-anchor="middle" fill="#9AB2DB" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="700">mock-agent-cli</text>
+
+    <text x="108" y="476" fill="#6BC1FF" font-family="Menlo, Monaco, 'Courier New', monospace" font-size="19">➜ agent plan</text>
+    <text x="260" y="476" fill="#DCE7FF" font-family="Menlo, Monaco, 'Courier New', monospace" font-size="19">inspect viewport parity • regenerate GIFs • ship Pages</text>
+
+    <text x="108" y="506" fill="#6BC1FF" font-family="Menlo, Monaco, 'Courier New', monospace" font-size="19">✓</text>
+    <text x="134" y="506" fill="#DCE7FF" font-family="Menlo, Monaco, 'Courier New', monospace" font-size="19">track sync verified</text>
+    <text x="382" y="506" fill="#6BC1FF" font-family="Menlo, Monaco, 'Courier New', monospace" font-size="19">✓</text>
+    <text x="408" y="506" fill="#DCE7FF" font-family="Menlo, Monaco, 'Courier New', monospace" font-size="19">evidence deployed</text>
+    <text x="648" y="506" fill="#6BC1FF" font-family="Menlo, Monaco, 'Courier New', monospace" font-size="19">✓</text>
+    <text x="674" y="506" fill="#DCE7FF" font-family="Menlo, Monaco, 'Courier New', monospace" font-size="19">review-ready gallery</text>
+
+    <text x="108" y="535" fill="#7DE5C5" font-family="Menlo, Monaco, 'Courier New', monospace" font-size="18">https://rauhryan.github.io/claywright/</text>
+  </g>
+</svg>
