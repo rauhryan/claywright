@@ -305,7 +305,7 @@
             behavior inspection, and regression comparison faster than replaying each fixture manually.
           </p>
           <div class="pill-row">
-            <span class="pill">8 GIF captures</span>
+            <span class="pill">9 GIF captures</span>
             <span class="pill">Clayterm + Solid fixtures</span>
             <span class="pill">Generated with VHS</span>
             <span class="pill">Reviewer-friendly slower timing</span>
@@ -318,7 +318,7 @@
           <ul class="link-list">
             <li>
               <div class="label">Evaluation guide</div>
-              <div class="value"><a href="../docs/unified-virtual-viewport-evaluation.md">docs/unified-virtual-viewport-evaluation.md</a></div>
+              <div class="value"><a href="https://github.com/rauhryan/claywright/blob/master/docs/unified-virtual-viewport-evaluation.md">docs/unified-virtual-viewport-evaluation.md</a></div>
             </li>
             <li>
               <div class="label">VHS workflow</div>
@@ -509,6 +509,26 @@ bun run evidence:vhs</code></pre>
               <a class="button" href="./gifs/virtual-viewport-prepared-text.gif">Open GIF</a>
               <a class="button" href="./vhs/virtual-viewport-prepared-text.tape">Open tape</a>
               <button class="copy-button" type="button" data-command="cd claywright &amp;&amp; bun ./packages/solid-bindings/test/fixtures/virtual-viewport-prepared-text.tsx">Copy launch command</button>
+            </div>
+          </article>
+
+          <article class="panel card">
+            <div>
+              <h3>VirtualViewport track parity</h3>
+              <p>Side-by-side 50|50 layout: left column has a viewport without a track, right column has a viewport with a track. Verifies that adding a track does not break focus, scrolling, or exit behavior.</p>
+            </div>
+            <figure>
+              <img src="./gifs/virtual-viewport-track-parity.gif" alt="Virtual viewport track parity GIF" loading="lazy" />
+              <figcaption>Focus: both columns scroll independently, track thumb stays in sync, no event starvation.</figcaption>
+            </figure>
+            <div class="command-box">
+              <div class="label">Launch command</div>
+              <code>cd claywright &amp;&amp; bun ./packages/solid-bindings/test/fixtures/virtual-viewport-track-parity.tsx</code>
+            </div>
+            <div class="card-links">
+              <a class="button" href="./gifs/virtual-viewport-track-parity.gif">Open GIF</a>
+              <a class="button" href="./vhs/virtual-viewport-track-parity.tape">Open tape</a>
+              <button class="copy-button" type="button" data-command="cd claywright &amp;&amp; bun ./packages/solid-bindings/test/fixtures/virtual-viewport-track-parity.tsx">Copy launch command</button>
             </div>
           </article>
 

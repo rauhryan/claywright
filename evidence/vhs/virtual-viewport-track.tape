@@ -7,17 +7,26 @@ Set Theme "Builtin Solarized Dark"
 
 Type "bun ./packages/solid-bindings/test/fixtures/virtual-viewport-track.tsx"
 Enter
-Sleep 1800ms
+Sleep 2200ms
+
+# Tab to focus the viewport
 Tab
-Sleep 400ms
+Sleep 600ms
+
+# PageDown — content and thumb should move together
 PageDown
-Sleep 1200ms
+Sleep 1400ms
 PageDown
-Sleep 1200ms
+Sleep 1400ms
+PageDown
+Sleep 1400ms
+
+# PageUp back
 PageUp
-Sleep 1200ms
+Sleep 1400ms
 PageUp
-Sleep 1200ms
+Sleep 1400ms
 PageUp
-Sleep 1200ms
+Sleep 1400ms
+
 Ctrl+C

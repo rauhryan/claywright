@@ -10,6 +10,7 @@ const tapes = [
   { id: "virtual-viewport-prepared-text", tape: "evidence/vhs/virtual-viewport-prepared-text.tape", output: "evidence/gifs/virtual-viewport-prepared-text.gif" },
   { id: "virtual-viewport-track", tape: "evidence/vhs/virtual-viewport-track.tape", output: "evidence/gifs/virtual-viewport-track.gif" },
   { id: "virtual-viewport-transcript-collapse", tape: "evidence/vhs/virtual-viewport-transcript-collapse.tape", output: "evidence/gifs/virtual-viewport-transcript-collapse.gif" },
+  { id: "virtual-viewport-track-parity", tape: "evidence/vhs/virtual-viewport-track-parity.tape", output: "evidence/gifs/virtual-viewport-track-parity.gif" },
 ] as const;
 
 const args = process.argv.slice(2);
