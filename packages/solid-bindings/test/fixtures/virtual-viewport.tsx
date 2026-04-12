@@ -1,4 +1,11 @@
-import { createSignal, fixed, grow, runApp, VirtualViewport } from "@tui/solid-bindings";
+import {
+  createPreparedTextVirtualItem,
+  createSignal,
+  fixed,
+  grow,
+  runApp,
+  VirtualViewport,
+} from "@tui/solid-bindings";
 
 type ItemDef = {
   key: string;
@@ -8,6 +15,13 @@ type ItemDef = {
 const items: ItemDef[] = Array.from({ length: 60 }, (_, index) => ({
   key: `row-${index + 1}`,
   label: `Row ${index + 1}`,
+}));
+
+const viewportItems = items.map((item) => createPreparedTextVirtualItem({
+  key: item.key,
+  text: item.label,
+  estimatedElementsPerRow: 1,
+  estimatedMeasuredWords: 1,
 }));
 
 const [stateText, setStateText] = createSignal("booting");
@@ -30,16 +44,7 @@ runApp(() => (
       initialAutoFollow={false}
       enableArrowKeys
       bg={0xff101010}
-      items={items.map((item) => ({
-        key: item.key,
-        version: 1,
-        measure: () => ({ height: 1, estimatedElements: 1, estimatedMeasuredWords: 1 }),
-        render: () => (
-          <box width={grow()} height={fixed(1)}>
-            <text>{item.label}</text>
-          </box>
-        ),
-      }))}
+      items={viewportItems}
       onStateChange={(state) => {
         setStateText(
           `scroll=${state.scrollTop} window=${state.windowStartIndex}-${state.windowEndIndex} ${state.autoFollow ? "yes" : "no"}`,

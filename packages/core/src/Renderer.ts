@@ -25,8 +25,8 @@ export class Renderer {
   private term: Awaited<ReturnType<typeof createTerm>> | null = null;
   private input: Awaited<ReturnType<typeof createInput>> | null = null;
 
-  readonly width: number;
-  readonly height: number;
+  width: number;
+  height: number;
 
   focusedRenderable: Renderable | null = null;
   rootRenderable: Renderable | null = null;
@@ -420,6 +420,17 @@ export class Renderer {
         this.focusedRenderable.processEvent(pasteEvent);
       }
     }
+  }
+
+  async resize(width: number, height: number): Promise<void> {
+    this.width = width;
+    this.height = height;
+
+    if (!this.term) {
+      return;
+    }
+
+    this.term = await createTerm({ width, height });
   }
 
   destroy(): void {

@@ -4,6 +4,7 @@ import { fixed, grow } from "../src/index";
 import { createComponent, render } from "../src/jsx-runtime";
 import { AppContextProvider, type AppContext } from "../src/runtime";
 import { VirtualViewport } from "../src/virtual-scroll/VirtualViewport";
+import { createPreparedTextVirtualItem } from "../src/virtual-scroll/text-items";
 import { ElementOpNode } from "../src/opnode";
 import { createRenderableTree } from "../src/renderable-tree";
 
@@ -43,11 +44,11 @@ describe("virtual viewport routing tree", () => {
                   height={fixed(3)}
                   initialAutoFollow={false}
                   onClick={() => setViewportStatus("click")}
-                  items={Array.from({ length: 3 }, (_, index) => ({
+                  items={Array.from({ length: 3 }, (_, index) => createPreparedTextVirtualItem({
                     key: `row-${index + 1}`,
-                    version: 1,
-                    measure: () => ({ height: 1, estimatedElements: 1, estimatedMeasuredWords: 1 }),
-                    render: () => `Row ${index + 1}` as never,
+                    text: `Row ${index + 1}`,
+                    estimatedElementsPerRow: 1,
+                    estimatedMeasuredWords: 1,
                   }))}
                 />
               </box>

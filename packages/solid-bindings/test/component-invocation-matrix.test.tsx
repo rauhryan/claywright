@@ -4,6 +4,7 @@ import { createSignal, Errored, flush, fixed, grow } from "@tui/solid-bindings";
 import { createComponent, RootNode, render, renderToString } from "../src/jsx-runtime";
 import { AppContextProvider, type AppContext } from "../src/runtime";
 import { VirtualViewport } from "../src/virtual-scroll/VirtualViewport";
+import { createPreparedTextVirtualItem } from "../src/virtual-scroll/text-items";
 import type { VirtualViewportHandle } from "../src/virtual-scroll/types";
 
 const context: AppContext = {
@@ -51,11 +52,11 @@ describe("component invocation matrix", () => {
                   }}
                   height={fixed(3)}
                   initialAutoFollow={false}
-                  items={Array.from({ length: 8 }, (_, index) => ({
+                  items={Array.from({ length: 8 }, (_, index) => createPreparedTextVirtualItem({
                     key: `row-${index + 1}`,
-                    version: 1,
-                    measure: () => ({ height: 1, estimatedElements: 1, estimatedMeasuredWords: 1 }),
-                    render: () => `Row ${index + 1}` as never,
+                    text: `Row ${index + 1}`,
+                    estimatedElementsPerRow: 1,
+                    estimatedMeasuredWords: 1,
                   }))}
                 />
               </box>

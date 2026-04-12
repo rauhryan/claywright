@@ -20,6 +20,13 @@ describe("Renderer", () => {
     expect(renderer.height).toBe(24);
   });
 
+  test("resize() updates dimensions", async () => {
+    await renderer.resize(100, 30);
+
+    expect(renderer.width).toBe(100);
+    expect(renderer.height).toBe(30);
+  });
+
   test("setRoot() builds ID map", () => {
     const root = new TestRenderable({ id: "root" });
     const child = new TestRenderable({ id: "child" });

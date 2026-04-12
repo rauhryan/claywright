@@ -3,6 +3,7 @@ import { close, createTerm, fixed, grow, open, type Op } from "clayterm";
 import { createComponent, render } from "../src/jsx-runtime";
 import { AppContextProvider, type AppContext } from "../src/runtime";
 import { VirtualViewport } from "../src/virtual-scroll/VirtualViewport";
+import { createPreparedTextVirtualItem } from "../src/virtual-scroll/text-items";
 import { ElementOpNode } from "../src/opnode";
 import { createRenderableTree } from "../src/renderable-tree";
 import { renderableToOps } from "../src/renderable-to-ops";
@@ -35,15 +36,11 @@ describe("virtual viewport pointer integration", () => {
                   id="viewport"
                   initialAutoFollow={false}
                   bg={0xff101010}
-                  items={Array.from({ length: 5 }, (_, index) => ({
+                  items={Array.from({ length: 5 }, (_, index) => createPreparedTextVirtualItem({
                     key: `row-${index + 1}`,
-                    version: 1,
-                    measure: () => ({ height: 1, estimatedElements: 1, estimatedMeasuredWords: 1 }),
-                    render: () => (
-                      <box width={grow()} height={fixed(1)}>
-                        <text>{`Row ${index + 1}`}</text>
-                      </box>
-                    ),
+                    text: `Row ${index + 1}`,
+                    estimatedElementsPerRow: 1,
+                    estimatedMeasuredWords: 1,
                   }))}
                 />
               </box>

@@ -40,13 +40,15 @@ function clearDirty(node: OpNode): void {
 }
 
 export async function runApp(view: AppView, options: AppOptions = {}): Promise<void> {
-  const width = options.width ?? process.stdout.columns ?? Number(process.env.COLUMNS ?? 80);
-  const height = options.height ?? process.stdout.rows ?? Number(process.env.LINES ?? 24);
+  const initialWidth = options.width ?? process.stdout.columns ?? Number(process.env.COLUMNS ?? 80);
+  const initialHeight = options.height ?? process.stdout.rows ?? Number(process.env.LINES ?? 24);
 
-  const renderer = new Renderer({ width, height });
+  const renderer = new Renderer({ width: initialWidth, height: initialHeight });
   await renderer.init();
   const input = await createInput();
 
+  const [getWidth, setWidth] = createSignal(initialWidth);
+  const [getHeight, setHeight] = createSignal(initialHeight);
   const [getPointer, setPointer] = createSignal({ x: -1, y: -1, down: false });
   let cleanedUp = false;
   let frameScheduled = false;
@@ -95,8 +97,12 @@ export async function runApp(view: AppView, options: AppOptions = {}): Promise<v
 
   // Mount Solid tree once; reactive signals drive in-place OpNode mutations
   const ctx: AppContext = {
-    width,
-    height,
+    get width() {
+      return getWidth();
+    },
+    get height() {
+      return getHeight();
+    },
     pointer,
     sendOps,
     requestAnimationFrame,
@@ -214,7 +220,7 @@ export async function runApp(view: AppView, options: AppOptions = {}): Promise<v
 
   frame();
 
-  process.stdin.on("data", (buf: Buffer) => {
+  process.stdin.on("data", async (buf: Buffer) => {
     const bytes = new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength);
     const result = input.scan(bytes);
     const { events } = result;
@@ -235,6 +241,15 @@ export async function runApp(view: AppView, options: AppOptions = {}): Promise<v
     }
 
     for (const event of events) {
+      if (event.type === "resize") {
+        await renderer.resize(event.width, event.height);
+        setWidth(event.width);
+        setHeight(event.height);
+        if (renderFramePass(false)) {
+          scheduleFrame();
+        }
+        continue;
+      }
       if (event.type === "mousemove") {
         setPointer({ x: event.x, y: event.y, down: getPointer().down });
       }

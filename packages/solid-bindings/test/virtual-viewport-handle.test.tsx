@@ -3,6 +3,7 @@ import { flush } from "solid-js";
 import { createComponent, render } from "../src/jsx-runtime";
 import { AppContextProvider, type AppContext } from "../src/runtime";
 import { VirtualViewport } from "../src/virtual-scroll/VirtualViewport";
+import { createPreparedTextVirtualItem } from "../src/virtual-scroll/text-items";
 import type { VirtualViewportHandle } from "../src/virtual-scroll/types";
 import { ElementOpNode } from "../src/opnode";
 
@@ -37,11 +38,11 @@ describe("virtual viewport handle", () => {
                 ref={(value) => {
                   handle = value;
                 }}
-                items={Array.from({ length: 20 }, (_, index) => ({
+                items={Array.from({ length: 20 }, (_, index) => createPreparedTextVirtualItem({
                   key: `row-${index + 1}`,
-                  version: 1,
-                  measure: () => ({ height: 1, estimatedElements: 1, estimatedMeasuredWords: 1 }),
-                  render: () => `Row ${index + 1}` as never,
+                  text: `Row ${index + 1}`,
+                  estimatedElementsPerRow: 1,
+                  estimatedMeasuredWords: 1,
                 }))}
               />
             ) as never;

@@ -1,8 +1,13 @@
 import {
   fixed,
   grow,
+  layoutText,
+  materializeTextRow,
   measureCellWidth,
   measureWrappedHeight,
+  nextTextRow,
+  prepareText,
+  walkTextRows,
   wrapText,
   type ElementBounds,
 } from "clayterm";
@@ -31,6 +36,11 @@ const measureApi = {
   measureCellWidth,
   wrapText,
   measureWrappedHeight,
+  prepareText,
+  layoutText,
+  walkTextRows,
+  nextTextRow,
+  materializeTextRow,
 };
 
 export function VirtualViewport(rawProps: VirtualViewportProps) {
@@ -119,20 +129,21 @@ export function VirtualViewport(rawProps: VirtualViewportProps) {
     return maxScrollTop() - next <= endThresholdRows();
   }
 
-  function commitScroll(next: number): void {
+  function commitScroll(next: number): number {
     const clamped = clampScroll(next);
     previousScrollTop = clamped;
     setScrollTop(clamped);
+    return clamped;
   }
 
   function userScrollBy(delta: number): void {
-    commitScroll(scrollTop() + delta);
-    setAutoFollow(isAtEnd(scrollTop()));
+    const clamped = commitScroll(scrollTop() + delta);
+    setAutoFollow(isAtEnd(clamped));
   }
 
   function scrollTo(offset: number): void {
-    commitScroll(offset);
-    if (isAtEnd(scrollTop())) {
+    const clamped = commitScroll(offset);
+    if (isAtEnd(clamped)) {
       setAutoFollow(true);
     }
   }
@@ -145,8 +156,8 @@ export function VirtualViewport(rawProps: VirtualViewportProps) {
   const handle: VirtualViewportHandle = {
     scrollTo,
     scrollBy(delta: number) {
-      commitScroll(scrollTop() + delta);
-      if (isAtEnd(scrollTop())) {
+      const clamped = commitScroll(scrollTop() + delta);
+      if (isAtEnd(clamped)) {
         setAutoFollow(true);
       }
     },
@@ -210,6 +221,8 @@ export function VirtualViewport(rawProps: VirtualViewportProps) {
       viewportHeight: viewportHeight(),
       scrollTop: scrollTop(),
       autoFollow: autoFollow(),
+      appWidth: context.width,
+      appHeight: context.height,
     }),
     () => {
       boundsObserver.request();

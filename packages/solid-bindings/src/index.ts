@@ -70,6 +70,12 @@ export {
 export { OpNode, ElementOpNode, TextOpNode, SlotOpNode, resetIdCounter } from "./opnode";
 export { markStatefulComponent } from "./component-flags";
 export { VirtualViewport } from "./virtual-scroll/VirtualViewport";
+export { VirtualViewportTrack } from "./virtual-scroll/VirtualViewportTrack";
+export {
+  createPreparedTextVirtualItem,
+  createTranscriptVirtualItem,
+} from "./virtual-scroll/text-items";
+export { computeViewportTrackGeometry } from "./virtual-scroll/track";
 export type {
   VirtualItem,
   VirtualItemMeasurement,
@@ -78,3 +84,11 @@ export type {
   VirtualViewportProps,
   VirtualViewportState,
 } from "./virtual-scroll/types";
+export type {
+  PreparedTextRenderedRow,
+  PreparedTextRowRun,
+  PreparedTextVirtualItemOptions,
+  TranscriptVirtualItemKind,
+  TranscriptVirtualItemOptions,
+} from "./virtual-scroll/text-items";
+export type { VirtualViewportTrackGeometry } from "./virtual-scroll/track";

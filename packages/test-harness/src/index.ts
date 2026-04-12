@@ -633,6 +633,7 @@ export class TerminalSession {
     this.rows = rows;
     this.terminal.resize(cols, rows);
     this.shadowScreen = this.createShadowScreen();
+    this.sendInput(`\x1b[8;${rows};${cols}t`);
   }
 
   cleanup(): void {

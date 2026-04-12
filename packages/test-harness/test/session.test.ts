@@ -77,6 +77,14 @@ describe("TerminalSession", () => {
     expect(screen.rows).toBe(40);
   });
 
+  it("emits a synthetic resize sequence for child apps", () => {
+    session.startVTCapture();
+    session.resize(120, 40);
+
+    expect(session.getVTSequences()).toContain("\\x1b[8;40;120t");
+    session.stopVTCapture();
+  });
+
   it("finds text position", () => {
     const term = session.getTerminal();
     term.write("Hello at start\r\n");
