@@ -1,4 +1,5 @@
 import { createMemo, createRenderEffect, type Component } from "solid-js";
+import type { OpenElement } from "clayterm";
 import { OpNode, ElementOpNode, TextOpNode, SlotOpNode, resetIdCounter } from "./opnode";
 import { createReconciler } from "./reconciler/index";
 import { defaultReconcilerOptions } from "./reconciler/defaults";
@@ -51,7 +52,7 @@ export function mergeProps<T extends Record<string, unknown>>(...sources: (T | u
   return reconciler.mergeProps(...sources);
 }
 
-function applyRef(value: unknown, node: OpNode): void {
+export function applyRef(value: unknown, node: OpNode): void {
   if (Array.isArray(value)) {
     for (const item of value) {
       applyRef(item, node);
@@ -151,6 +152,7 @@ export namespace JSX {
         vertical?: boolean;
         childOffset?: { x?: number; y?: number };
       };
+      floating?: OpenElement["floating"];
     };
   }
 }

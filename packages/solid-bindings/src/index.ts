@@ -8,7 +8,7 @@ export {
   type AppView,
 } from "./runtime";
 export { Portal } from "./Portal";
-export { ATTACH_POINT, ATTACH_TO } from "clayterm";
+export { ATTACH_POINT, ATTACH_TO, POINTER_CAPTURE_MODE, CLIP_TO } from "clayterm";
 export {
   action,
   createContext,
@@ -58,6 +58,7 @@ export {
   spread,
   mergeProps,
   ref,
+  applyRef,
   createComponent,
   setProp,
   renderToString,
@@ -69,6 +70,19 @@ export {
 } from "./jsx-runtime";
 export { OpNode, ElementOpNode, TextOpNode, SlotOpNode, resetIdCounter } from "./opnode";
 export { markStatefulComponent } from "./component-flags";
+export { BufferWindow } from "./buffer-window/BufferWindow";
+export { BufferWorkspace } from "./buffer-window/BufferWorkspace";
+export {
+  createPreparedTextBuffer,
+  createTranscriptBuffer,
+  createVirtualItemsBuffer,
+} from "./buffer-window/buffers";
+export {
+  createBufferMap,
+  partitionBufferWindowSurfaces,
+  resolveActiveWindowId,
+  resolveBufferWindowSurfaces,
+} from "./buffer-window/compositor";
 export { VirtualViewport } from "./virtual-scroll/VirtualViewport";
 export { VirtualViewportTrack } from "./virtual-scroll/VirtualViewportTrack";
 export {
@@ -76,6 +90,30 @@ export {
   createTranscriptVirtualItem,
 } from "./virtual-scroll/text-items";
 export { computeViewportTrackGeometry } from "./virtual-scroll/track";
+export type {
+  BufferId,
+  BufferModel,
+  BufferResolvedContent,
+  BufferWindowChrome,
+  BufferWindowHandle,
+  BufferWindowModel,
+  BufferWindowProps,
+  BufferWindowState,
+  BufferWindowViewState,
+  BufferWorkspaceProps,
+  FloatingWindowConfig,
+  ResolvedBufferWindowSurface,
+  WindowId,
+  WindowMode,
+} from "./buffer-window/types";
+export type {
+  PreparedTextBufferBlock,
+  PreparedTextBufferOptions,
+  TranscriptBufferEntry,
+  TranscriptBufferOptions,
+  TranscriptBufferViewState,
+  VirtualItemsBufferOptions,
+} from "./buffer-window/buffers";
 export type {
   VirtualItem,
   VirtualItemMeasurement,

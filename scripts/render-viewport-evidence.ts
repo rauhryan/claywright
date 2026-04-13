@@ -2,25 +2,68 @@
 import { mkdirSync } from "node:fs";
 
 const tapes = [
-  { id: "text-stream-scroll", tape: "evidence/vhs/text-stream-scroll.tape", output: "evidence/gifs/text-stream-scroll.gif" },
-  { id: "virtual-viewport-auto-follow", tape: "evidence/vhs/virtual-viewport-auto-follow.tape", output: "evidence/gifs/virtual-viewport-auto-follow.gif" },
-  { id: "virtual-viewport-budget", tape: "evidence/vhs/virtual-viewport-budget.tape", output: "evidence/gifs/virtual-viewport-budget.gif" },
-  { id: "virtual-viewport-geometry", tape: "evidence/vhs/virtual-viewport-geometry.tape", output: "evidence/gifs/virtual-viewport-geometry.gif" },
-  { id: "virtual-viewport-large-history", tape: "evidence/vhs/virtual-viewport-large-history.tape", output: "evidence/gifs/virtual-viewport-large-history.gif" },
-  { id: "virtual-viewport-prepared-text", tape: "evidence/vhs/virtual-viewport-prepared-text.tape", output: "evidence/gifs/virtual-viewport-prepared-text.gif" },
-  { id: "virtual-viewport-track", tape: "evidence/vhs/virtual-viewport-track.tape", output: "evidence/gifs/virtual-viewport-track.gif" },
-  { id: "virtual-viewport-transcript-collapse", tape: "evidence/vhs/virtual-viewport-transcript-collapse.tape", output: "evidence/gifs/virtual-viewport-transcript-collapse.gif" },
-  { id: "virtual-viewport-track-parity", tape: "evidence/vhs/virtual-viewport-track-parity.tape", output: "evidence/gifs/virtual-viewport-track-parity.gif" },
-  { id: "claywright-agent-demo", tape: "evidence/vhs/claywright-agent-demo.tape", output: "evidence/social/agent-demo.gif" },
+  {
+    id: "text-stream-scroll",
+    tape: "evidence/vhs/text-stream-scroll.tape",
+    output: "evidence/gifs/text-stream-scroll.gif",
+  },
+  {
+    id: "virtual-viewport-auto-follow",
+    tape: "evidence/vhs/virtual-viewport-auto-follow.tape",
+    output: "evidence/gifs/virtual-viewport-auto-follow.gif",
+  },
+  {
+    id: "virtual-viewport-budget",
+    tape: "evidence/vhs/virtual-viewport-budget.tape",
+    output: "evidence/gifs/virtual-viewport-budget.gif",
+  },
+  {
+    id: "virtual-viewport-geometry",
+    tape: "evidence/vhs/virtual-viewport-geometry.tape",
+    output: "evidence/gifs/virtual-viewport-geometry.gif",
+  },
+  {
+    id: "virtual-viewport-large-history",
+    tape: "evidence/vhs/virtual-viewport-large-history.tape",
+    output: "evidence/gifs/virtual-viewport-large-history.gif",
+  },
+  {
+    id: "virtual-viewport-prepared-text",
+    tape: "evidence/vhs/virtual-viewport-prepared-text.tape",
+    output: "evidence/gifs/virtual-viewport-prepared-text.gif",
+  },
+  {
+    id: "virtual-viewport-track",
+    tape: "evidence/vhs/virtual-viewport-track.tape",
+    output: "evidence/gifs/virtual-viewport-track.gif",
+  },
+  {
+    id: "virtual-viewport-transcript-collapse",
+    tape: "evidence/vhs/virtual-viewport-transcript-collapse.tape",
+    output: "evidence/gifs/virtual-viewport-transcript-collapse.gif",
+  },
+  {
+    id: "virtual-viewport-track-parity",
+    tape: "evidence/vhs/virtual-viewport-track-parity.tape",
+    output: "evidence/gifs/virtual-viewport-track-parity.gif",
+  },
+  {
+    id: "buffer-workspace-focus",
+    tape: "evidence/vhs/buffer-workspace-focus.tape",
+    output: "evidence/gifs/buffer-workspace-focus.gif",
+  },
+  {
+    id: "claywright-agent-demo",
+    tape: "evidence/vhs/claywright-agent-demo.tape",
+    output: "evidence/social/agent-demo.gif",
+  },
 ] as const;
 
 const args = process.argv.slice(2);
 const listOnly = args.includes("--list");
 const checkOnly = args.includes("--check");
 const requested = args.filter((arg) => !arg.startsWith("--"));
-const selected = requested.length > 0
-  ? tapes.filter((tape) => requested.includes(tape.id))
-  : tapes;
+const selected = requested.length > 0 ? tapes.filter((tape) => requested.includes(tape.id)) : tapes;
 
 if (selected.length === 0) {
   console.error("No matching tapes. Use --list to see available ids.");
@@ -36,7 +79,9 @@ if (listOnly) {
 
 const hasVhs = Bun.spawnSync(["bash", "-lc", "command -v vhs >/dev/null 2>&1"]).exitCode === 0;
 if (!hasVhs) {
-  console.error("vhs is not installed. Install https://github.com/charmbracelet/vhs and re-run this script.");
+  console.error(
+    "vhs is not installed. Install https://github.com/charmbracelet/vhs and re-run this script.",
+  );
   process.exit(1);
 }
 

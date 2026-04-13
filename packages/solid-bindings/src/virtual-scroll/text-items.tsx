@@ -16,25 +16,11 @@ import type { JSX } from "../jsx-runtime";
 const graphemeSegmenter = new Intl.Segmenter(undefined, { granularity: "grapheme" });
 
 const ANSI_BASE_COLORS = [
-  0xff000000,
-  0xffcd3131,
-  0xff0dbc79,
-  0xffe5e510,
-  0xff2472c8,
-  0xffbc3fbc,
-  0xff11a8cd,
-  0xffe5e5e5,
+  0xff000000, 0xffcd3131, 0xff0dbc79, 0xffe5e510, 0xff2472c8, 0xffbc3fbc, 0xff11a8cd, 0xffe5e5e5,
 ] as const;
 
 const ANSI_BRIGHT_COLORS = [
-  0xff666666,
-  0xfff14c4c,
-  0xff23d18b,
-  0xfff5f543,
-  0xff3b8eea,
-  0xffd670d6,
-  0xff29b8db,
-  0xffffffff,
+  0xff666666, 0xfff14c4c, 0xff23d18b, 0xfff5f543, 0xff3b8eea, 0xffd670d6, 0xff29b8db, 0xffffffff,
 ] as const;
 
 const TRANSCRIPT_COLORS = {
@@ -119,6 +105,8 @@ export interface TranscriptVirtualItemOptions {
   badgeColor?: number;
   badgeBg?: number;
   prepare?: PrepareTextOptions;
+  prepared?: PreparedText;
+  collapsedPrepared?: PreparedText;
   renderMode?: "plain" | "ansi";
   estimatedElementsPerRow?: number;
   estimatedMeasuredWords?: number;
@@ -158,6 +146,7 @@ export function createTranscriptVirtualItem(options: TranscriptVirtualItemOption
       : options.text,
     version: options.version ?? 1,
     prepare: options.prepare,
+    prepared: options.collapsed ? options.collapsedPrepared : options.prepared,
     estimatedElementsPerRow: options.estimatedElementsPerRow,
     estimatedMeasuredWords: options.estimatedMeasuredWords,
     containerBg: options.containerBg,
@@ -165,7 +154,10 @@ export function createTranscriptVirtualItem(options: TranscriptVirtualItemOption
     rowBg: options.bodyBg,
     renderMode: options.collapsed ? "plain" : (options.renderMode ?? "plain"),
   });
-  const estimatedMeasuredWords = Math.max(options.speaker.trim().split(/\s+/).filter(Boolean).length, 1);
+  const estimatedMeasuredWords = Math.max(
+    options.speaker.trim().split(/\s+/).filter(Boolean).length,
+    1,
+  );
 
   return {
     key: options.key,
@@ -175,7 +167,8 @@ export function createTranscriptVirtualItem(options: TranscriptVirtualItemOption
       return {
         height: bodyMeasurement.height + 1,
         estimatedElements: (bodyMeasurement.estimatedElements ?? 0) + 2,
-        estimatedMeasuredWords: (bodyMeasurement.estimatedMeasuredWords ?? 0) + estimatedMeasuredWords,
+        estimatedMeasuredWords:
+          (bodyMeasurement.estimatedMeasuredWords ?? 0) + estimatedMeasuredWords,
       };
     },
     render() {
@@ -183,13 +176,16 @@ export function createTranscriptVirtualItem(options: TranscriptVirtualItemOption
         <box width={grow()} direction="ttb" bg={options.containerBg}>
           <box width={grow()} height={fixed(1)} bg={options.headerBg} direction="ltr" gap={1}>
             <text color={accentColor}>{options.speaker}</text>
-            {options.badgeText
-              ? (
-                <box width={fit()} height={fixed(1)} bg={options.badgeBg} padding={{ left: 1, right: 1 }}>
-                  <text color={options.badgeColor}>{options.badgeText}</text>
-                </box>
-              )
-              : null}
+            {options.badgeText ? (
+              <box
+                width={fit()}
+                height={fixed(1)}
+                bg={options.badgeBg}
+                padding={{ left: 1, right: 1 }}
+              >
+                <text color={options.badgeColor}>{options.badgeText}</text>
+              </box>
+            ) : null}
             <text color={metaColor}>{headerSuffix(options)}</text>
           </box>
           {bodyPresenter.render()}
@@ -203,11 +199,13 @@ function createPreparedTextPresenter(
   options: PreparedTextVirtualItemOptions,
 ): PreparedTextPresenter {
   const prepared = options.prepared ?? prepareText(options.text, options.prepare);
-  const styledSegments = options.renderMode === "ansi"
-    ? buildStyledSegments(options.text, prepared, options.prepare)
-    : undefined;
+  const styledSegments =
+    options.renderMode === "ansi"
+      ? buildStyledSegments(options.text, prepared, options.prepare)
+      : undefined;
   const estimatedMeasuredWords =
-    options.estimatedMeasuredWords ?? Math.max(options.text.trim().split(/\s+/).filter(Boolean).length, 1);
+    options.estimatedMeasuredWords ??
+    Math.max(options.text.trim().split(/\s+/).filter(Boolean).length, 1);
 
   let renderRows: PreparedTextRenderedRow[] = [];
   let renderWidth = 0;
@@ -258,11 +256,9 @@ function createPreparedTextPresenter(
       const rows = renderRows.length > 0 ? renderRows : [createEmptyRow()];
       return (
         <box width={grow()} direction="ttb" bg={options.containerBg}>
-          {rows.map((row) => (
-            options.renderRow
-              ? options.renderRow(row)
-              : renderPreparedTextRow(row, options)
-          ))}
+          {rows.map((row) =>
+            options.renderRow ? options.renderRow(row) : renderPreparedTextRow(row, options),
+          )}
         </box>
       ) as never;
     },
@@ -275,13 +271,13 @@ function renderPreparedTextRow(
 ): JSX.Element {
   const fallbackColor = resolveRowValue(options.rowColor, row);
   const rowBg = resolveRowValue(options.rowBg, row);
-  const runs = row.runs.length > 0
-    ? row.runs
-    : [{ text: row.text, color: fallbackColor }];
+  const runs = row.runs.length > 0 ? row.runs : [{ text: row.text, color: fallbackColor }];
 
   return (
     <box width={grow()} height={fixed(1)} bg={rowBg}>
-      {runs.map((run) => <text color={run.color}>{run.text}</text>)}
+      {runs.map((run) => (
+        <text color={run.color}>{run.text}</text>
+      ))}
     </box>
   ) as never;
 }
@@ -331,9 +327,10 @@ function materializeRowRuns(
       : [];
   }
 
-  const endClusterIndex = row.range.end.segmentIndex !== row.range.start.segmentIndex
-    ? segment.clusters.length
-    : row.range.end.clusterIndex;
+  const endClusterIndex =
+    row.range.end.segmentIndex !== row.range.start.segmentIndex
+      ? segment.clusters.length
+      : row.range.end.clusterIndex;
   const clusters = segment.clusters.slice(row.range.start.clusterIndex, endClusterIndex);
   if (clusters.length === 0) {
     return row.text.length > 0 || fallbackColor !== undefined
@@ -380,7 +377,9 @@ function buildStyledSegments(
   return parsed;
 }
 
-function normalizePrepareOptions(options: PrepareTextOptions | undefined): Required<PrepareTextOptions> {
+function normalizePrepareOptions(
+  options: PrepareTextOptions | undefined,
+): Required<PrepareTextOptions> {
   return {
     ansi: options?.ansi ?? defaultPrepareOptions.ansi,
     whiteSpace: options?.whiteSpace ?? defaultPrepareOptions.whiteSpace,
@@ -395,7 +394,7 @@ function parseStyledSegments(
   const lines: StyledCodePoint[][] = [[]];
   let color: number | undefined;
 
-  for (let index = 0; index < source.length;) {
+  for (let index = 0; index < source.length; ) {
     const ansi = parseAnsiSequence(source, index);
     if (options.ansi === "skip-csi-osc" && ansi) {
       if (ansi.sgr) {
@@ -504,10 +503,7 @@ function isCollapsibleWhitespace(text: string): boolean {
   return text === " " || text === "\t" || text === "\f" || text === "\v";
 }
 
-function parseAnsiSequence(
-  text: string,
-  index: number,
-): { length: number; sgr?: number[] } | null {
+function parseAnsiSequence(text: string, index: number): { length: number; sgr?: number[] } | null {
   if (text[index] !== "\x1b") {
     return null;
   }
@@ -579,8 +575,12 @@ function applySgrCodes(current: number | undefined, codes: number[]): number | u
         index += 3;
         continue;
       }
-      if (mode === 2 && codes[index + 2] !== undefined && codes[index + 3] !== undefined &&
-        codes[index + 4] !== undefined) {
+      if (
+        mode === 2 &&
+        codes[index + 2] !== undefined &&
+        codes[index + 3] !== undefined &&
+        codes[index + 4] !== undefined
+      ) {
         color = rgb(codes[index + 2]!, codes[index + 3]!, codes[index + 4]!);
         index += 5;
         continue;

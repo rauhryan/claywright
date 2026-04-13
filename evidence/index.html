@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -10,7 +10,10 @@
     />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Claywright" />
-    <meta property="og:title" content="Claywright — Beautiful, testable terminal interfaces for coding agents" />
+    <meta
+      property="og:title"
+      content="Claywright — Beautiful, testable terminal interfaces for coding agents"
+    />
     <meta
       property="og:description"
       content="Virtual viewports, terminal UX, blackbox-tested behavior, and reviewer-friendly demo evidence for coding-agent interfaces."
@@ -24,7 +27,10 @@
       content="Claywright social preview card with ASCII-art header, tagline, and a terminal-style mocked coding-agent CLI."
     />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Claywright — Beautiful, testable terminal interfaces for coding agents" />
+    <meta
+      name="twitter:title"
+      content="Claywright — Beautiful, testable terminal interfaces for coding agents"
+    />
     <meta
       name="twitter:description"
       content="Reviewer-facing evidence gallery with virtual viewport demos, terminal UX captures, and mocked coding-agent CLI visuals."
@@ -54,7 +60,14 @@
 
       body {
         margin: 0;
-        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-family:
+          Inter,
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
         background:
           radial-gradient(circle at top left, rgba(120, 166, 255, 0.16), transparent 28%),
           radial-gradient(circle at top right, rgba(140, 230, 201, 0.12), transparent 24%),
@@ -81,7 +94,9 @@
       }
 
       .panel {
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01)), var(--panel);
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01)),
+          var(--panel);
         border: 1px solid var(--border);
         border-radius: 18px;
         box-shadow: var(--shadow);
@@ -331,11 +346,11 @@
           <h1>Reviewer Evidence Gallery</h1>
           <p class="lead">
             This page presents the generated GIF evidence for the current Clayterm + Claywright
-            unified virtual viewport implementation. It is intended to make design review,
-            behavior inspection, and regression comparison faster than replaying each fixture manually.
+            unified virtual viewport implementation. It is intended to make design review, behavior
+            inspection, and regression comparison faster than replaying each fixture manually.
           </p>
           <div class="pill-row">
-            <span class="pill">9 GIF captures</span>
+            <span class="pill">10 GIF captures</span>
             <span class="pill">Clayterm + Solid fixtures</span>
             <span class="pill">Generated with VHS</span>
             <span class="pill">Reviewer-friendly slower timing</span>
@@ -348,7 +363,12 @@
           <ul class="link-list">
             <li>
               <div class="label">Evaluation guide</div>
-              <div class="value"><a href="https://github.com/rauhryan/claywright/blob/master/docs/unified-virtual-viewport-evaluation.md">docs/unified-virtual-viewport-evaluation.md</a></div>
+              <div class="value">
+                <a
+                  href="https://github.com/rauhryan/claywright/blob/master/docs/unified-virtual-viewport-evaluation.md"
+                  >docs/unified-virtual-viewport-evaluation.md</a
+                >
+              </div>
             </li>
             <li>
               <div class="label">VHS workflow</div>
@@ -360,7 +380,11 @@
             </li>
             <li>
               <div class="label">Social preview assets</div>
-              <div class="value"><a href="./social/og-card.png">og-card.png</a> · <a href="./social/og-card.svg">og-card.svg</a> · <a href="./social/agent-demo.gif">agent-demo.gif</a></div>
+              <div class="value">
+                <a href="./social/og-card.png">og-card.png</a> ·
+                <a href="./social/og-card.svg">og-card.svg</a> ·
+                <a href="./social/agent-demo.gif">agent-demo.gif</a>
+              </div>
             </li>
             <li>
               <div class="label">Recommended local open command</div>
@@ -379,7 +403,9 @@
         <div class="two-col">
           <div>
             <ul class="status-list">
-              <li>Clayterm WASM build path is working via <code>zig cc</code> + <code>wasm-ld</code>.</li>
+              <li>
+                Clayterm WASM build path is working via <code>zig cc</code> + <code>wasm-ld</code>.
+              </li>
               <li>Prepared-text measurement is wired into real viewport item paths.</li>
               <li>Viewport geometry now reboots after terminal resize.</li>
               <li>Transcript collapse, background updates, and re-expansion are covered.</li>
@@ -403,17 +429,24 @@ bun run evidence:vhs</code></pre>
       <section class="panel section">
         <h2>Social preview pack</h2>
         <p class="section-copy">
-          GitHub Pages now publishes a dedicated social preview set: a static Open Graph card for link unfurls and a mocked coding-agent terminal demo GIF for richer sharing and landing-page polish.
+          GitHub Pages now publishes a dedicated social preview set: a static Open Graph card for
+          link unfurls and a mocked coding-agent terminal demo GIF for richer sharing and
+          landing-page polish.
         </p>
         <div class="grid">
           <article class="panel card">
             <div>
               <h3>Open Graph card</h3>
-              <p>Static social card with a terminal palette, ASCII-art Claywright masthead, a sharp tagline, and a mocked agent CLI frame.</p>
+              <p>
+                Static social card with a terminal palette, ASCII-art Claywright masthead, a sharp
+                tagline, and a mocked agent CLI frame.
+              </p>
             </div>
             <figure>
               <img src="./social/og-card.png" alt="Claywright Open Graph card" loading="lazy" />
-              <figcaption>Focus: strong first impression for GitHub Pages, Slack, and social link previews.</figcaption>
+              <figcaption>
+                Focus: strong first impression for GitHub Pages, Slack, and social link previews.
+              </figcaption>
             </figure>
             <div class="card-links">
               <a class="button" href="./social/og-card.png">Open OG PNG</a>
@@ -424,11 +457,20 @@ bun run evidence:vhs</code></pre>
           <article class="panel card">
             <div>
               <h3>Mocked coding-agent CLI demo</h3>
-              <p>Animated terminal vignette showing a stylized Claywright session: planning, test verification, viewport rendering, and shipping the evidence site.</p>
+              <p>
+                Animated terminal vignette showing a stylized Claywright session: planning, test
+                verification, viewport rendering, and shipping the evidence site.
+              </p>
             </div>
             <figure>
-              <img src="./social/agent-demo.gif" alt="Claywright mocked coding-agent CLI demo GIF" loading="lazy" />
-              <figcaption>Focus: brand mood, agent workflow, and terminal-native product identity.</figcaption>
+              <img
+                src="./social/agent-demo.gif"
+                alt="Claywright mocked coding-agent CLI demo GIF"
+                loading="lazy"
+              />
+              <figcaption>
+                Focus: brand mood, agent workflow, and terminal-native product identity.
+              </figcaption>
             </figure>
             <div class="card-links">
               <a class="button" href="./social/agent-demo.gif">Open social GIF</a>
@@ -441,17 +483,28 @@ bun run evidence:vhs</code></pre>
       <section class="section">
         <h2>Evidence gallery</h2>
         <p class="section-copy">
-          Each card links to the generated GIF, the source VHS tape, and includes a button to copy the CLI command used to launch the example locally. The current cuts intentionally linger on state changes a little longer so review is easier.
+          Each card links to the generated GIF, the source VHS tape, and includes a button to copy
+          the CLI command used to launch the example locally. The current cuts intentionally linger
+          on state changes a little longer so review is easier.
         </p>
         <div class="grid">
           <article class="panel card">
             <div>
               <h3>Clayterm text-stream scroll</h3>
-              <p>Shows wrapped text-stream virtualization, thumb movement, and scroll interaction inside the Clayterm demo.</p>
+              <p>
+                Shows wrapped text-stream virtualization, thumb movement, and scroll interaction
+                inside the Clayterm demo.
+              </p>
             </div>
             <figure>
-              <img src="./gifs/text-stream-scroll.gif" alt="Clayterm text-stream scroll demo GIF" loading="lazy" />
-              <figcaption>Focus: wrapped row stability, ANSI-safe visual output, thumb motion.</figcaption>
+              <img
+                src="./gifs/text-stream-scroll.gif"
+                alt="Clayterm text-stream scroll demo GIF"
+                loading="lazy"
+              />
+              <figcaption>
+                Focus: wrapped row stability, ANSI-safe visual output, thumb motion.
+              </figcaption>
             </figure>
             <div class="command-box">
               <div class="label">Launch command</div>
@@ -460,167 +513,356 @@ bun run evidence:vhs</code></pre>
             <div class="card-links">
               <a class="button" href="./gifs/text-stream-scroll.gif">Open GIF</a>
               <a class="button" href="./vhs/text-stream-scroll.tape">Open tape</a>
-              <button class="copy-button" type="button" data-command="cd claywright/packages/clayterm &amp;&amp; deno task demo:scroll">Copy launch command</button>
+              <button
+                class="copy-button"
+                type="button"
+                data-command="cd claywright/packages/clayterm &amp;&amp; deno task demo:scroll"
+              >
+                Copy launch command
+              </button>
             </div>
           </article>
 
           <article class="panel card">
             <div>
               <h3>VirtualViewport auto-follow</h3>
-              <p>Shows streaming transcript behavior, a longer browse-away pause, and a slower return-to-end follow restoration.</p>
+              <p>
+                Shows streaming transcript behavior, a longer browse-away pause, and a slower
+                return-to-end follow restoration.
+              </p>
             </div>
             <figure>
-              <img src="./gifs/virtual-viewport-auto-follow.gif" alt="Virtual viewport auto-follow GIF" loading="lazy" />
-              <figcaption>Focus: follow=yes → user scroll away → follow restoration near the tail.</figcaption>
+              <img
+                src="./gifs/virtual-viewport-auto-follow.gif"
+                alt="Virtual viewport auto-follow GIF"
+                loading="lazy"
+              />
+              <figcaption>
+                Focus: follow=yes → user scroll away → follow restoration near the tail.
+              </figcaption>
             </figure>
             <div class="command-box">
               <div class="label">Launch command</div>
-              <code>cd claywright &amp;&amp; bun ./packages/solid-bindings/test/fixtures/virtual-viewport-auto-follow.tsx</code>
+              <code
+                >cd claywright &amp;&amp; bun
+                ./packages/solid-bindings/test/fixtures/virtual-viewport-auto-follow.tsx</code
+              >
             </div>
             <div class="card-links">
               <a class="button" href="./gifs/virtual-viewport-auto-follow.gif">Open GIF</a>
               <a class="button" href="./vhs/virtual-viewport-auto-follow.tape">Open tape</a>
-              <button class="copy-button" type="button" data-command="cd claywright &amp;&amp; bun ./packages/solid-bindings/test/fixtures/virtual-viewport-auto-follow.tsx">Copy launch command</button>
+              <button
+                class="copy-button"
+                type="button"
+                data-command="cd claywright &amp;&amp; bun ./packages/solid-bindings/test/fixtures/virtual-viewport-auto-follow.tsx"
+              >
+                Copy launch command
+              </button>
             </div>
           </article>
 
           <article class="panel card">
             <div>
               <h3>VirtualViewport scroll track</h3>
-              <p>Shows the reusable track/thumb component derived from viewport state with slower stepped navigation for easier visual comparison.</p>
+              <p>
+                Shows the reusable track/thumb component derived from viewport state with slower
+                stepped navigation for easier visual comparison.
+              </p>
             </div>
             <figure>
-              <img src="./gifs/virtual-viewport-track.gif" alt="Virtual viewport scroll track GIF" loading="lazy" />
+              <img
+                src="./gifs/virtual-viewport-track.gif"
+                alt="Virtual viewport scroll track GIF"
+                loading="lazy"
+              />
               <figcaption>Focus: text window and thumb geometry stay in sync.</figcaption>
             </figure>
             <div class="command-box">
               <div class="label">Launch command</div>
-              <code>cd claywright &amp;&amp; bun ./packages/solid-bindings/test/fixtures/virtual-viewport-track.tsx</code>
+              <code
+                >cd claywright &amp;&amp; bun
+                ./packages/solid-bindings/test/fixtures/virtual-viewport-track.tsx</code
+              >
             </div>
             <div class="card-links">
               <a class="button" href="./gifs/virtual-viewport-track.gif">Open GIF</a>
               <a class="button" href="./vhs/virtual-viewport-track.tape">Open tape</a>
-              <button class="copy-button" type="button" data-command="cd claywright &amp;&amp; bun ./packages/solid-bindings/test/fixtures/virtual-viewport-track.tsx">Copy launch command</button>
+              <button
+                class="copy-button"
+                type="button"
+                data-command="cd claywright &amp;&amp; bun ./packages/solid-bindings/test/fixtures/virtual-viewport-track.tsx"
+              >
+                Copy launch command
+              </button>
             </div>
           </article>
 
           <article class="panel card">
             <div>
               <h3>VirtualViewport budget behavior</h3>
-              <p>Shows that visible rows stay rendered even while the configured materialization budget is exceeded.</p>
+              <p>
+                Shows that visible rows stay rendered even while the configured materialization
+                budget is exceeded.
+              </p>
             </div>
             <figure>
-              <img src="./gifs/virtual-viewport-budget.gif" alt="Virtual viewport budget GIF" loading="lazy" />
+              <img
+                src="./gifs/virtual-viewport-budget.gif"
+                alt="Virtual viewport budget GIF"
+                loading="lazy"
+              />
               <figcaption>Focus: budget reporting without dropping visible content.</figcaption>
             </figure>
             <div class="command-box">
               <div class="label">Launch command</div>
-              <code>cd claywright &amp;&amp; bun ./packages/solid-bindings/test/fixtures/virtual-viewport-budget.tsx</code>
+              <code
+                >cd claywright &amp;&amp; bun
+                ./packages/solid-bindings/test/fixtures/virtual-viewport-budget.tsx</code
+              >
             </div>
             <div class="card-links">
               <a class="button" href="./gifs/virtual-viewport-budget.gif">Open GIF</a>
               <a class="button" href="./vhs/virtual-viewport-budget.tape">Open tape</a>
-              <button class="copy-button" type="button" data-command="cd claywright &amp;&amp; bun ./packages/solid-bindings/test/fixtures/virtual-viewport-budget.tsx">Copy launch command</button>
+              <button
+                class="copy-button"
+                type="button"
+                data-command="cd claywright &amp;&amp; bun ./packages/solid-bindings/test/fixtures/virtual-viewport-budget.tsx"
+              >
+                Copy launch command
+              </button>
             </div>
           </article>
 
           <article class="panel card">
             <div>
               <h3>VirtualViewport geometry bootstrap</h3>
-              <p>Shows parent-constrained <code>grow()</code> sizing and the geometry-aware viewport bootstrap path.</p>
+              <p>
+                Shows parent-constrained <code>grow()</code> sizing and the geometry-aware viewport
+                bootstrap path.
+              </p>
             </div>
             <figure>
-              <img src="./gifs/virtual-viewport-geometry.gif" alt="Virtual viewport geometry GIF" loading="lazy" />
-              <figcaption>Focus: viewport height comes from real geometry instead of only fixed caller inputs.</figcaption>
+              <img
+                src="./gifs/virtual-viewport-geometry.gif"
+                alt="Virtual viewport geometry GIF"
+                loading="lazy"
+              />
+              <figcaption>
+                Focus: viewport height comes from real geometry instead of only fixed caller inputs.
+              </figcaption>
             </figure>
             <div class="command-box">
               <div class="label">Launch command</div>
-              <code>cd claywright &amp;&amp; bun ./packages/solid-bindings/test/fixtures/virtual-viewport-geometry.tsx</code>
+              <code
+                >cd claywright &amp;&amp; bun
+                ./packages/solid-bindings/test/fixtures/virtual-viewport-geometry.tsx</code
+              >
             </div>
             <div class="card-links">
               <a class="button" href="./gifs/virtual-viewport-geometry.gif">Open GIF</a>
               <a class="button" href="./vhs/virtual-viewport-geometry.tape">Open tape</a>
-              <button class="copy-button" type="button" data-command="cd claywright &amp;&amp; bun ./packages/solid-bindings/test/fixtures/virtual-viewport-geometry.tsx">Copy launch command</button>
+              <button
+                class="copy-button"
+                type="button"
+                data-command="cd claywright &amp;&amp; bun ./packages/solid-bindings/test/fixtures/virtual-viewport-geometry.tsx"
+              >
+                Copy launch command
+              </button>
             </div>
           </article>
 
           <article class="panel card">
             <div>
               <h3>VirtualViewport large history</h3>
-              <p>Shows large-history responsiveness without materializing the entire transcript at once.</p>
+              <p>
+                Shows large-history responsiveness without materializing the entire transcript at
+                once.
+              </p>
             </div>
             <figure>
-              <img src="./gifs/virtual-viewport-large-history.gif" alt="Virtual viewport large-history GIF" loading="lazy" />
-              <figcaption>Focus: high content height with lightweight visible-window behavior.</figcaption>
+              <img
+                src="./gifs/virtual-viewport-large-history.gif"
+                alt="Virtual viewport large-history GIF"
+                loading="lazy"
+              />
+              <figcaption>
+                Focus: high content height with lightweight visible-window behavior.
+              </figcaption>
             </figure>
             <div class="command-box">
               <div class="label">Launch command</div>
-              <code>cd claywright &amp;&amp; bun ./packages/solid-bindings/test/fixtures/virtual-viewport-large-history.tsx</code>
+              <code
+                >cd claywright &amp;&amp; bun
+                ./packages/solid-bindings/test/fixtures/virtual-viewport-large-history.tsx</code
+              >
             </div>
             <div class="card-links">
               <a class="button" href="./gifs/virtual-viewport-large-history.gif">Open GIF</a>
               <a class="button" href="./vhs/virtual-viewport-large-history.tape">Open tape</a>
-              <button class="copy-button" type="button" data-command="cd claywright &amp;&amp; bun ./packages/solid-bindings/test/fixtures/virtual-viewport-large-history.tsx">Copy launch command</button>
+              <button
+                class="copy-button"
+                type="button"
+                data-command="cd claywright &amp;&amp; bun ./packages/solid-bindings/test/fixtures/virtual-viewport-large-history.tsx"
+              >
+                Copy launch command
+              </button>
             </div>
           </article>
 
           <article class="panel card">
             <div>
               <h3>VirtualViewport prepared text</h3>
-              <p>Shows transcript-style prepared text, wrapped multi-row items, ANSI-aware spans, and collapsed-thinking presentation.</p>
+              <p>
+                Shows transcript-style prepared text, wrapped multi-row items, ANSI-aware spans, and
+                collapsed-thinking presentation.
+              </p>
             </div>
             <figure>
-              <img src="./gifs/virtual-viewport-prepared-text.gif" alt="Virtual viewport prepared-text GIF" loading="lazy" />
-              <figcaption>Focus: Clayterm prepare/layout as the source of truth for wrapped viewport text.</figcaption>
+              <img
+                src="./gifs/virtual-viewport-prepared-text.gif"
+                alt="Virtual viewport prepared-text GIF"
+                loading="lazy"
+              />
+              <figcaption>
+                Focus: Clayterm prepare/layout as the source of truth for wrapped viewport text.
+              </figcaption>
             </figure>
             <div class="command-box">
               <div class="label">Launch command</div>
-              <code>cd claywright &amp;&amp; bun ./packages/solid-bindings/test/fixtures/virtual-viewport-prepared-text.tsx</code>
+              <code
+                >cd claywright &amp;&amp; bun
+                ./packages/solid-bindings/test/fixtures/virtual-viewport-prepared-text.tsx</code
+              >
             </div>
             <div class="card-links">
               <a class="button" href="./gifs/virtual-viewport-prepared-text.gif">Open GIF</a>
               <a class="button" href="./vhs/virtual-viewport-prepared-text.tape">Open tape</a>
-              <button class="copy-button" type="button" data-command="cd claywright &amp;&amp; bun ./packages/solid-bindings/test/fixtures/virtual-viewport-prepared-text.tsx">Copy launch command</button>
+              <button
+                class="copy-button"
+                type="button"
+                data-command="cd claywright &amp;&amp; bun ./packages/solid-bindings/test/fixtures/virtual-viewport-prepared-text.tsx"
+              >
+                Copy launch command
+              </button>
             </div>
           </article>
 
           <article class="panel card">
             <div>
               <h3>VirtualViewport track parity</h3>
-              <p>Side-by-side 50|50 layout: left column has a viewport without a track, right column has a viewport with a track. Verifies that adding a track does not break focus, scrolling, or exit behavior.</p>
+              <p>
+                Side-by-side 50|50 layout: left column has a viewport without a track, right column
+                has a viewport with a track. Verifies that adding a track does not break focus,
+                scrolling, or exit behavior.
+              </p>
             </div>
             <figure>
-              <img src="./gifs/virtual-viewport-track-parity.gif" alt="Virtual viewport track parity GIF" loading="lazy" />
-              <figcaption>Focus: both columns scroll independently, track thumb stays in sync, no event starvation.</figcaption>
+              <img
+                src="./gifs/virtual-viewport-track-parity.gif"
+                alt="Virtual viewport track parity GIF"
+                loading="lazy"
+              />
+              <figcaption>
+                Focus: both columns scroll independently, track thumb stays in sync, no event
+                starvation.
+              </figcaption>
             </figure>
             <div class="command-box">
               <div class="label">Launch command</div>
-              <code>cd claywright &amp;&amp; bun ./packages/solid-bindings/test/fixtures/virtual-viewport-track-parity.tsx</code>
+              <code
+                >cd claywright &amp;&amp; bun
+                ./packages/solid-bindings/test/fixtures/virtual-viewport-track-parity.tsx</code
+              >
             </div>
             <div class="card-links">
               <a class="button" href="./gifs/virtual-viewport-track-parity.gif">Open GIF</a>
               <a class="button" href="./vhs/virtual-viewport-track-parity.tape">Open tape</a>
-              <button class="copy-button" type="button" data-command="cd claywright &amp;&amp; bun ./packages/solid-bindings/test/fixtures/virtual-viewport-track-parity.tsx">Copy launch command</button>
+              <button
+                class="copy-button"
+                type="button"
+                data-command="cd claywright &amp;&amp; bun ./packages/solid-bindings/test/fixtures/virtual-viewport-track-parity.tsx"
+              >
+                Copy launch command
+              </button>
+            </div>
+          </article>
+
+          <article class="panel card">
+            <div>
+              <h3>BufferWorkspace focus manager</h3>
+              <p>
+                Shows the new buffer/window workspace layer with an explicit active-window manager.
+                Keyboard focus starts on the main docked window, <code>]</code> cycles to the
+                floating preview, and PageDown is routed to the currently active window.
+              </p>
+            </div>
+            <figure>
+              <img
+                src="./gifs/buffer-workspace-focus.gif"
+                alt="Buffer workspace focus manager GIF"
+                loading="lazy"
+              />
+              <figcaption>
+                Focus: active window status, docked vs floating window composition, and
+                keyboard-routed scrolling through the active buffer window.
+              </figcaption>
+            </figure>
+            <div class="command-box">
+              <div class="label">Launch command</div>
+              <code
+                >cd claywright &amp;&amp; bun
+                ./packages/solid-bindings/test/fixtures/buffer-workspace-focus.tsx</code
+              >
+            </div>
+            <div class="card-links">
+              <a class="button" href="./gifs/buffer-workspace-focus.gif">Open GIF</a>
+              <a class="button" href="./vhs/buffer-workspace-focus.tape">Open tape</a>
+              <button
+                class="copy-button"
+                type="button"
+                data-command="cd claywright &amp;&amp; bun ./packages/solid-bindings/test/fixtures/buffer-workspace-focus.tsx"
+              >
+                Copy launch command
+              </button>
             </div>
           </article>
 
           <article class="panel card">
             <div>
               <h3>VirtualViewport transcript collapse</h3>
-              <p>Shows a transcript-style thinking card with stronger framing, colored panels, an explicit collapse control, and enough trailing content to require scrolling.</p>
+              <p>
+                Shows a transcript-style thinking card with stronger framing, colored panels, an
+                explicit collapse control, and enough trailing content to require scrolling.
+              </p>
             </div>
             <figure>
-              <img src="./gifs/virtual-viewport-transcript-collapse.gif" alt="Virtual viewport transcript collapse GIF" loading="lazy" />
-              <figcaption>Focus: clearer colored sections, a bordered viewport frame, a visible collapse control, and longer transcript content with an inline track.</figcaption>
+              <img
+                src="./gifs/virtual-viewport-transcript-collapse.gif"
+                alt="Virtual viewport transcript collapse GIF"
+                loading="lazy"
+              />
+              <figcaption>
+                Focus: clearer colored sections, a bordered viewport frame, a visible collapse
+                control, and longer transcript content with an inline track.
+              </figcaption>
             </figure>
             <div class="command-box">
               <div class="label">Launch command</div>
-              <code>cd claywright &amp;&amp; bun ./packages/solid-bindings/test/fixtures/virtual-viewport-transcript-collapse.tsx</code>
+              <code
+                >cd claywright &amp;&amp; bun
+                ./packages/solid-bindings/test/fixtures/virtual-viewport-transcript-collapse.tsx</code
+              >
             </div>
             <div class="card-links">
               <a class="button" href="./gifs/virtual-viewport-transcript-collapse.gif">Open GIF</a>
               <a class="button" href="./vhs/virtual-viewport-transcript-collapse.tape">Open tape</a>
-              <button class="copy-button" type="button" data-command="cd claywright &amp;&amp; bun ./packages/solid-bindings/test/fixtures/virtual-viewport-transcript-collapse.tsx">Copy launch command</button>
+              <button
+                class="copy-button"
+                type="button"
+                data-command="cd claywright &amp;&amp; bun ./packages/solid-bindings/test/fixtures/virtual-viewport-transcript-collapse.tsx"
+              >
+                Copy launch command
+              </button>
             </div>
           </article>
         </div>
@@ -678,7 +920,8 @@ bun run evidence:vhs</code></pre>
       for (const button of document.querySelectorAll(".copy-button")) {
         button.addEventListener("click", async () => {
           const command = button.dataset.command || "";
-          const originalLabel = button.dataset.originalLabel || button.textContent || "Copy launch command";
+          const originalLabel =
+            button.dataset.originalLabel || button.textContent || "Copy launch command";
           button.dataset.originalLabel = originalLabel;
 
           const copied = await copyCommandText(command);
