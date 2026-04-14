@@ -35,6 +35,9 @@ describe("buffer workspace focus manager", () => {
     expect(await session.waitForText("ActiveWindow: main-window", 2000)).toBe(true);
     expect(await session.waitForText("MainTopRow: 1", 2000)).toBe(true);
     expect(await session.waitForText("FloatTopRow: 1", 2000)).toBe(true);
+    expect(await session.waitForText("BEGIN", 2000)).toBe(true);
+    expect(await session.waitForText("Main Row 1", 2000)).toBe(true);
+    expect(await session.waitForText("Float Row 1", 2000)).toBe(true);
 
     session.sendKey("tab");
     await session.wait(150);
@@ -48,7 +51,10 @@ describe("buffer workspace focus manager", () => {
           screen.raw.includes("ActiveWindow: main-window") &&
           mainTop !== null &&
           mainTop > 1 &&
-          floatTop === 1
+          floatTop === 1 &&
+          screen.raw.includes("Main Row 17") &&
+          screen.raw.includes("BEGIN") &&
+          screen.raw.includes("Float Row 1")
         );
       },
       {
@@ -77,7 +83,9 @@ describe("buffer workspace focus manager", () => {
           screen.raw.includes("ActiveWindow: floating-window") &&
           mainTop === mainTopAfter &&
           floatTop !== null &&
-          floatTop > 1
+          floatTop > 1 &&
+          screen.raw.includes("Main Row 17") &&
+          screen.raw.includes("Float Row 4")
         );
       },
       {
@@ -96,6 +104,9 @@ describe("buffer workspace focus manager", () => {
 
     expect(await session.waitForText("MainTopRow: 1", 2000)).toBe(true);
     expect(await session.waitForText("FloatTopRow: 1", 2000)).toBe(true);
+    expect(await session.waitForText("BEGIN", 2000)).toBe(true);
+    expect(await session.waitForText("Main Row 1", 2000)).toBe(true);
+    expect(await session.waitForText("Float Row 1", 2000)).toBe(true);
 
     sendWheel(session, "down", 30, 9);
     const scrolled = await session.waitForConvergence(
@@ -106,7 +117,9 @@ describe("buffer workspace focus manager", () => {
           screen.raw.includes("ActiveWindow: floating-window") &&
           mainTop === 1 &&
           floatTop !== null &&
-          floatTop > 1
+          floatTop > 1 &&
+          screen.raw.includes("Main Row 1") &&
+          screen.raw.includes("Float Row 3")
         );
       },
       {

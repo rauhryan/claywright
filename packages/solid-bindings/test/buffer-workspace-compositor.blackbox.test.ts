@@ -29,8 +29,9 @@ describe("buffer workspace compositor", () => {
 
     expect(await session.waitForText("MainStatus: idle", 2000)).toBe(true);
     expect(await session.waitForText("FloatStatus: idle", 2000)).toBe(true);
-    expect(await session.waitForText("ain Row 1", 2000)).toBe(true);
-    expect(await session.waitForText("loat Row 1", 2000)).toBe(true);
+    expect(await session.waitForText("BEGIN", 2000)).toBe(true);
+    expect(await session.waitForText("Main Row 1", 2000)).toBe(true);
+    expect(await session.waitForText("Float Row 1", 2000)).toBe(true);
 
     session.mouseMove(22, 9);
     await session.wait(100);
@@ -63,13 +64,18 @@ describe("buffer workspace compositor", () => {
     expect(await session.waitForText("FloatStatus: idle", 2000)).toBe(true);
 
     sendWheel(session, "down", 22, 9);
-    expect(
-      await session.waitForTextConvergence("FloatStatus: wheel:down@22,9", {
+    const floatScrolled = await session.waitForConvergence(
+      (screen) =>
+        screen.raw.includes("FloatStatus: wheel:down@22,9") &&
+        screen.raw.includes("MainStatus: idle") &&
+        screen.raw.includes("Main Row 1") &&
+        screen.raw.includes("Float Row 3"),
+      {
         timeout: 2000,
         settleMs: 100,
-      }),
-    ).not.toBeNull();
-    expect(session.getScreen().raw).toContain("MainStatus: idle");
+      },
+    );
+    expect(floatScrolled).not.toBeNull();
 
     sendWheel(session, "down", 4, 10);
     expect(

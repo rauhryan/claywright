@@ -95,9 +95,11 @@ export function VirtualViewport(rawProps: VirtualViewportProps) {
     return value;
   });
 
-  const viewportWidth = createMemo(() => Math.max(0, Math.floor(bounds()?.width ?? context.width)));
+  const viewportWidth = createMemo(() =>
+    Math.max(0, Math.floor(rawProps.measuredWidth ?? bounds()?.width ?? context.width)),
+  );
   const viewportHeight = createMemo(() =>
-    Math.max(0, Math.floor(bounds()?.height ?? context.height)),
+    Math.max(0, Math.floor(rawProps.measuredHeight ?? bounds()?.height ?? context.height)),
   );
   const measured = createMemo(() =>
     measureItems(rawProps.items, viewportWidth(), measureApi, cache),

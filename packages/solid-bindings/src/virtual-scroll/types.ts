@@ -43,6 +43,8 @@ export interface VirtualViewportHandle {
 export interface VirtualViewportProps {
   id?: string;
   items: readonly VirtualItem[];
+  measuredWidth?: number;
+  measuredHeight?: number;
   overscanRows?: number;
   endThresholdRows?: number;
   wheelStepRows?: number;

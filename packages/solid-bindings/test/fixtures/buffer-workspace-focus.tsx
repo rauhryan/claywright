@@ -11,27 +11,39 @@ import {
   runApp,
 } from "@tui/solid-bindings";
 
+const mainRows = [
+  "BEGIN",
+  ...Array.from({ length: 36 }, (_, index) => `Main Row ${index + 1}`),
+  "END",
+];
+
+const floatRows = [
+  "BEGIN",
+  ...Array.from({ length: 32 }, (_, index) => `Float Row ${index + 1}`),
+  "END",
+];
+
 const mainBuffer = createPreparedTextBuffer({
   id: "main-buffer",
-  blocks: Array.from({ length: 36 }, (_, index) => ({
+  blocks: mainRows.map((text, index) => ({
     key: `main-${index + 1}`,
-    text: `Main Row ${index + 1}`,
+    text,
     estimatedElementsPerRow: 1,
-    estimatedMeasuredWords: 2,
+    estimatedMeasuredWords: 3,
   })),
 });
 
 const floatingBuffer = createPreparedTextBuffer({
   id: "floating-buffer",
-  blocks: Array.from({ length: 32 }, (_, index) => ({
+  blocks: floatRows.map((text, index) => ({
     key: `float-${index + 1}`,
-    text: `Float Row ${index + 1}`,
+    text,
     estimatedElementsPerRow: 1,
-    estimatedMeasuredWords: 2,
+    estimatedMeasuredWords: 3,
   })),
 });
 
-function FocusWorkspaceScreen() {
+function FocusWorkspaceScreen(props: { workspaceHeight: number }) {
   const [activeWindowId, setActiveWindowId] = createSignal<string | undefined>("main-window");
   const [mainTopRow, setMainTopRow] = createSignal(1);
   const [floatTopRow, setFloatTopRow] = createSignal(1);
@@ -117,9 +129,11 @@ function FocusWorkspaceScreen() {
         activeWindowId={activeWindowId()}
         onActiveWindowChange={setActiveWindowId}
         manageKeyboardFocus
+        height={fixed(props.workspaceHeight)}
         bg={rgba(8, 12, 20)}
         windowProps={{
           "main-window": {
+            height: fixed(props.workspaceHeight),
             onStateChange: (state) => {
               setMainTopRow(state.scrollTop + 1);
             },
@@ -139,4 +153,4 @@ function FocusWorkspaceScreen() {
 
 markStatefulComponent(FocusWorkspaceScreen);
 
-runApp(() => <FocusWorkspaceScreen />);
+runApp((ctx) => <FocusWorkspaceScreen workspaceHeight={Math.max(ctx.height - 3, 1)} />);

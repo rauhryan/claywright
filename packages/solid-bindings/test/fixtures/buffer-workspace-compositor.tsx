@@ -11,27 +11,39 @@ import {
   runApp,
 } from "@tui/solid-bindings";
 
+const mainRows = [
+  "BEGIN",
+  ...Array.from({ length: 24 }, (_, index) => `Main Row ${index + 1}`),
+  "END",
+];
+
+const floatRows = [
+  "BEGIN",
+  ...Array.from({ length: 12 }, (_, index) => `Float Row ${index + 1}`),
+  "END",
+];
+
 const mainBuffer = createPreparedTextBuffer({
   id: "main-buffer",
-  blocks: Array.from({ length: 24 }, (_, index) => ({
+  blocks: mainRows.map((text, index) => ({
     key: `main-${index + 1}`,
-    text: `Main Row ${index + 1}`,
+    text,
     estimatedElementsPerRow: 1,
-    estimatedMeasuredWords: 2,
+    estimatedMeasuredWords: 3,
   })),
 });
 
 const floatingBuffer = createPreparedTextBuffer({
   id: "floating-buffer",
-  blocks: Array.from({ length: 12 }, (_, index) => ({
+  blocks: floatRows.map((text, index) => ({
     key: `float-${index + 1}`,
-    text: `Float Row ${index + 1}`,
+    text,
     estimatedElementsPerRow: 1,
-    estimatedMeasuredWords: 2,
+    estimatedMeasuredWords: 3,
   })),
 });
 
-function WorkspaceScreen() {
+function WorkspaceScreen(props: { workspaceHeight: number }) {
   const [mainStatus, setMainStatus] = createSignal("idle");
   const [floatStatus, setFloatStatus] = createSignal("idle");
 
@@ -90,9 +102,11 @@ function WorkspaceScreen() {
             },
           },
         ]}
+        height={fixed(props.workspaceHeight)}
         bg={rgba(8, 12, 20)}
         windowProps={{
           "main-window": {
+            height: fixed(props.workspaceHeight),
             onClick: (event) => {
               setMainStatus(`click@${event.x},${event.y}`);
             },
@@ -118,4 +132,4 @@ function WorkspaceScreen() {
 
 markStatefulComponent(WorkspaceScreen);
 
-runApp(() => <WorkspaceScreen />);
+runApp((ctx) => <WorkspaceScreen workspaceHeight={Math.max(ctx.height - 3, 1)} />);

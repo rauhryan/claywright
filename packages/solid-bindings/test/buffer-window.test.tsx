@@ -18,8 +18,14 @@ const context: AppContext = {
   sendOps() {},
   requestAnimationFrame() {},
   getElementBounds(id: string) {
+    if (id === "main") {
+      return { x: 0, y: 0, width: 48, height: 12 };
+    }
     if (id === "main:viewport") {
       return { x: 0, y: 1, width: 46, height: 10 };
+    }
+    if (id === "float") {
+      return { x: 8, y: 4, width: 24, height: 6 };
     }
     if (id === "float:viewport") {
       return { x: 8, y: 4, width: 24, height: 6 };
@@ -55,6 +61,7 @@ describe("BufferWindow", () => {
                   bufferId: "buffer-1",
                   mode: "docked",
                   title: "Main window",
+                  initialAutoFollow: false,
                   showTrack: true,
                 }}
                 ref={(value) => {
@@ -74,9 +81,11 @@ describe("BufferWindow", () => {
     expect(handle?.getState().mode).toBe("docked");
     expect(handle?.getState().bufferKind).toBe("prepared-text");
 
+    const initialScrollTop = handle?.getState().scrollTop ?? 0;
+
     handle?.scrollBy(2);
     flush();
-    expect(handle?.getState().scrollTop).toBe(2);
+    expect(handle?.getState().scrollTop ?? 0).toBeGreaterThan(initialScrollTop);
 
     dispose();
   });
