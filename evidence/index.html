@@ -350,7 +350,7 @@
             inspection, and regression comparison faster than replaying each fixture manually.
           </p>
           <div class="pill-row">
-            <span class="pill">10 GIF captures</span>
+            <span class="pill">11 GIF captures</span>
             <span class="pill">Clayterm + Solid fixtures</span>
             <span class="pill">Generated with VHS</span>
             <span class="pill">Reviewer-friendly slower timing</span>
@@ -781,6 +781,46 @@ bun run evidence:vhs</code></pre>
                 class="copy-button"
                 type="button"
                 data-command="cd claywright &amp;&amp; bun ./packages/solid-bindings/test/fixtures/virtual-viewport-track-parity.tsx"
+              >
+                Copy launch command
+              </button>
+            </div>
+          </article>
+
+          <article class="panel card">
+            <div>
+              <h3>BufferWorkspace text-stream buffer</h3>
+              <p>
+                Shows a real shared <code>TextStreamBuffer</code>: the docked main window stays
+                pinned near the top while the floating tail preview auto-follows appended stream
+                rows from the same underlying buffer.
+              </p>
+            </div>
+            <figure>
+              <img
+                src="./gifs/buffer-workspace-text-stream.gif"
+                alt="Buffer workspace text-stream buffer GIF"
+                loading="lazy"
+              />
+              <figcaption>
+                Focus: shared append-heavy buffer state, independent per-window follow behavior, and
+                tail updates without flattening the stream into generic item arrays.
+              </figcaption>
+            </figure>
+            <div class="command-box">
+              <div class="label">Launch command</div>
+              <code
+                >cd claywright &amp;&amp; bun
+                ./packages/solid-bindings/test/fixtures/buffer-workspace-text-stream.tsx</code
+              >
+            </div>
+            <div class="card-links">
+              <a class="button" href="./gifs/buffer-workspace-text-stream.gif">Open GIF</a>
+              <a class="button" href="./vhs/buffer-workspace-text-stream.tape">Open tape</a>
+              <button
+                class="copy-button"
+                type="button"
+                data-command="cd claywright &amp;&amp; bun ./packages/solid-bindings/test/fixtures/buffer-workspace-text-stream.tsx"
               >
                 Copy launch command
               </button>

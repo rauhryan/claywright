@@ -53,6 +53,11 @@ const tapes = [
     output: "evidence/gifs/buffer-workspace-focus.gif",
   },
   {
+    id: "buffer-workspace-text-stream",
+    tape: "evidence/vhs/buffer-workspace-text-stream.tape",
+    output: "evidence/gifs/buffer-workspace-text-stream.gif",
+  },
+  {
     id: "claywright-agent-demo",
     tape: "evidence/vhs/claywright-agent-demo.tape",
     output: "evidence/social/agent-demo.gif",

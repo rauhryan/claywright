@@ -43,16 +43,33 @@ export interface BufferWindowChrome {
   trackGap?: number;
 }
 
-export interface BufferResolvedContent {
+export interface BufferResolvedItemsContent {
+  kind: "items";
   items: readonly VirtualItem[];
   initialAutoFollow?: boolean;
 }
+
+export interface TextStreamBufferSnapshot {
+  version: string | number;
+  baseIndex: number;
+  lines: readonly string[];
+  maxLines: number;
+}
+
+export interface BufferResolvedTextStreamContent {
+  kind: "text-stream";
+  stream: TextStreamBufferSnapshot;
+  initialAutoFollow?: boolean;
+}
+
+export type BufferResolvedContent = BufferResolvedItemsContent | BufferResolvedTextStreamContent;
 
 export interface BufferModel {
   id: BufferId;
   kind: string;
   version: string | number;
   resolveContent(window: BufferWindowModel): BufferResolvedContent;
+  subscribe?: (listener: () => void) => () => void;
 }
 
 export interface BufferWindowModel {

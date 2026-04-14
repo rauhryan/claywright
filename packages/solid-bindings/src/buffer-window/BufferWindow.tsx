@@ -5,6 +5,7 @@ import { createElementBoundsObserver, sameBounds } from "../observe-element-boun
 import { useAppContext } from "../runtime";
 import { VirtualViewport } from "../virtual-scroll/VirtualViewport";
 import { VirtualViewportTrack } from "../virtual-scroll/VirtualViewportTrack";
+import { TextStreamWindowRuntime } from "./TextStreamWindowRuntime";
 import type { VirtualViewportHandle, VirtualViewportState } from "../virtual-scroll/types";
 import type {
   BufferWindowHandle,
@@ -28,6 +29,7 @@ const DEFAULT_VIEWPORT_STATE: VirtualViewportState = {
 export function BufferWindow(rawProps: BufferWindowProps) {
   const context = useAppContext();
   const [bounds, setBounds] = createSignal<ElementBounds | undefined>(undefined);
+  const [bufferRevision, setBufferRevision] = createSignal(0);
   const [viewportState, setViewportState] = createSignal<VirtualViewportState>({
     ...DEFAULT_VIEWPORT_STATE,
     autoFollow: rawProps.window.initialAutoFollow ?? true,
@@ -36,11 +38,12 @@ export function BufferWindow(rawProps: BufferWindowProps) {
   let viewportHandle: VirtualViewportHandle | undefined;
 
   const resolvedBuffer = createMemo(() => rawProps.window.bufferId === rawProps.buffer.id);
-  const resolved = createMemo(() =>
-    resolvedBuffer()
+  const resolved = createMemo(() => {
+    bufferRevision();
+    return resolvedBuffer()
       ? rawProps.buffer.resolveContent(rawProps.window)
-      : { items: [], initialAutoFollow: rawProps.window.initialAutoFollow },
-  );
+      : { kind: "items" as const, items: [], initialAutoFollow: rawProps.window.initialAutoFollow };
+  });
   const chrome = createMemo(() => rawProps.window.chrome ?? {});
   const floating = createMemo<FloatingWindowConfig | undefined>(() => {
     if (rawProps.window.mode !== "floating") return undefined;
@@ -109,6 +112,18 @@ export function BufferWindow(rawProps: BufferWindowProps) {
     },
   };
 
+  let unsubscribeBuffer: (() => void) | undefined;
+
+  createRenderEffect(
+    () => rawProps.buffer,
+    (buffer) => {
+      unsubscribeBuffer?.();
+      unsubscribeBuffer = buffer.subscribe?.(() => {
+        setBufferRevision((value) => value + 1);
+      });
+    },
+  );
+
   createRenderEffect(
     () => ({
       resolved: resolvedBuffer(),
@@ -144,6 +159,7 @@ export function BufferWindow(rawProps: BufferWindowProps) {
   );
 
   onCleanup(() => {
+    unsubscribeBuffer?.();
     rawProps.ref?.(undefined);
   });
 
@@ -200,44 +216,75 @@ export function BufferWindow(rawProps: BufferWindowProps) {
             >
               {showTrack() && rawProps.window.trackSide === "left" ? track : null}
 
-              <VirtualViewport
-                id={`${rawProps.window.id}:viewport`}
-                items={currentResolved.items}
-                measuredWidth={contentWidth()}
-                measuredHeight={contentHeight()}
-                width={grow()}
-                height={grow()}
-                overscanRows={rawProps.overscanRows}
-                endThresholdRows={rawProps.endThresholdRows}
-                wheelStepRows={rawProps.wheelStepRows}
-                keyStepRows={rawProps.keyStepRows}
-                enableArrowKeys={rawProps.enableArrowKeys}
-                budget={rawProps.budget}
-                initialAutoFollow={
-                  currentResolved.initialAutoFollow ?? rawProps.window.initialAutoFollow
-                }
-                focusable={rawProps.window.focusable ?? rawProps.focusable}
-                direction={rawProps.direction}
-                padding={rawProps.padding}
-                gap={rawProps.gap}
-                alignX={rawProps.alignX}
-                alignY={rawProps.alignY}
-                bg={currentChrome.contentBg}
-                onClick={rawProps.onClick}
-                onMouseDown={rawProps.onMouseDown}
-                onMouseUp={rawProps.onMouseUp}
-                onMouseMove={rawProps.onMouseMove}
-                onWheel={rawProps.onWheel}
-                onKeyDown={rawProps.onKeyDown}
-                onKeyUp={rawProps.onKeyUp}
-                onPaste={rawProps.onPaste}
-                onFocus={rawProps.onFocus}
-                onBlur={rawProps.onBlur}
-                onStateChange={setViewportState}
-                ref={(value) => {
-                  viewportHandle = value;
-                }}
-              />
+              {currentResolved.kind === "items" ? (
+                <VirtualViewport
+                  id={`${rawProps.window.id}:viewport`}
+                  items={currentResolved.items}
+                  measuredWidth={contentWidth()}
+                  measuredHeight={contentHeight()}
+                  width={grow()}
+                  height={grow()}
+                  overscanRows={rawProps.overscanRows}
+                  endThresholdRows={rawProps.endThresholdRows}
+                  wheelStepRows={rawProps.wheelStepRows}
+                  keyStepRows={rawProps.keyStepRows}
+                  enableArrowKeys={rawProps.enableArrowKeys}
+                  budget={rawProps.budget}
+                  initialAutoFollow={
+                    rawProps.window.initialAutoFollow ?? currentResolved.initialAutoFollow
+                  }
+                  focusable={rawProps.window.focusable ?? rawProps.focusable}
+                  direction={rawProps.direction}
+                  padding={rawProps.padding}
+                  gap={rawProps.gap}
+                  alignX={rawProps.alignX}
+                  alignY={rawProps.alignY}
+                  bg={currentChrome.contentBg}
+                  onClick={rawProps.onClick}
+                  onMouseDown={rawProps.onMouseDown}
+                  onMouseUp={rawProps.onMouseUp}
+                  onMouseMove={rawProps.onMouseMove}
+                  onWheel={rawProps.onWheel}
+                  onKeyDown={rawProps.onKeyDown}
+                  onKeyUp={rawProps.onKeyUp}
+                  onPaste={rawProps.onPaste}
+                  onFocus={rawProps.onFocus}
+                  onBlur={rawProps.onBlur}
+                  onStateChange={setViewportState}
+                  ref={(value) => {
+                    viewportHandle = value;
+                  }}
+                />
+              ) : (
+                <TextStreamWindowRuntime
+                  id={`${rawProps.window.id}:viewport`}
+                  stream={currentResolved.stream}
+                  measuredWidth={contentWidth()}
+                  measuredHeight={contentHeight()}
+                  initialAutoFollow={
+                    rawProps.window.initialAutoFollow ?? currentResolved.initialAutoFollow
+                  }
+                  focusable={rawProps.window.focusable ?? rawProps.focusable}
+                  bg={currentChrome.contentBg}
+                  wheelStepRows={rawProps.wheelStepRows}
+                  keyStepRows={rawProps.keyStepRows}
+                  endThresholdRows={rawProps.endThresholdRows}
+                  enableArrowKeys={rawProps.enableArrowKeys}
+                  onClick={rawProps.onClick}
+                  onMouseDown={rawProps.onMouseDown}
+                  onMouseUp={rawProps.onMouseUp}
+                  onMouseMove={rawProps.onMouseMove}
+                  onWheel={rawProps.onWheel}
+                  onKeyDown={rawProps.onKeyDown}
+                  onKeyUp={rawProps.onKeyUp}
+                  onFocus={rawProps.onFocus}
+                  onBlur={rawProps.onBlur}
+                  onStateChange={setViewportState}
+                  ref={(value) => {
+                    viewportHandle = value;
+                  }}
+                />
+              )}
 
               {showTrack() && rawProps.window.trackSide !== "left" ? track : null}
             </box>

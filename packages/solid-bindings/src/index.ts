@@ -73,7 +73,19 @@ export { markStatefulComponent } from "./component-flags";
 export { BufferWindow } from "./buffer-window/BufferWindow";
 export { BufferWorkspace } from "./buffer-window/BufferWorkspace";
 export {
+  AuthoredBufferWorkspace,
+  AuthoredExternalBuffer,
+  AuthoredPreparedTextBlock,
+  AuthoredPreparedTextBuffer,
+  AuthoredTranscriptBuffer,
+  AuthoredTranscriptEntry,
+  AuthoredWindow,
+  compileAuthoredWorkspace,
+  createAuthoredWorkspaceCompiler,
+} from "./buffer-window/authoring";
+export {
   createPreparedTextBuffer,
+  createTextStreamBuffer,
   createTranscriptBuffer,
   createVirtualItemsBuffer,
 } from "./buffer-window/buffers";
@@ -90,6 +102,24 @@ export {
   createTranscriptVirtualItem,
 } from "./virtual-scroll/text-items";
 export { computeViewportTrackGeometry } from "./virtual-scroll/track";
+export type {
+  AuthoredBufferWorkspaceProps,
+  AuthoredDescriptor,
+  AuthoredExternalBufferNode,
+  AuthoredExternalBufferProps,
+  AuthoredPreparedTextBlockNode,
+  AuthoredPreparedTextBlockProps,
+  AuthoredPreparedTextBufferNode,
+  AuthoredPreparedTextBufferProps,
+  AuthoredTranscriptBufferNode,
+  AuthoredTranscriptBufferProps,
+  AuthoredTranscriptEntryNode,
+  AuthoredTranscriptEntryProps,
+  AuthoredWindowNode,
+  AuthoredWindowProps,
+  AuthoredWorkspaceCompiler,
+  CompiledAuthoredWorkspace,
+} from "./buffer-window/authoring";
 export type {
   BufferId,
   BufferModel,
@@ -109,6 +139,8 @@ export type {
 export type {
   PreparedTextBufferBlock,
   PreparedTextBufferOptions,
+  TextStreamBufferModel,
+  TextStreamBufferOptions,
   TranscriptBufferEntry,
   TranscriptBufferOptions,
   TranscriptBufferViewState,

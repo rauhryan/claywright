@@ -11,6 +11,7 @@ import type {
   BufferResolvedContent,
   BufferWindowModel,
   BufferWindowViewState,
+  TextStreamBufferSnapshot,
 } from "./types";
 
 export interface VirtualItemsBufferOptions {
@@ -53,6 +54,21 @@ export interface TranscriptBufferOptions {
   initialAutoFollow?: boolean;
 }
 
+export interface TextStreamBufferOptions {
+  id: string;
+  kind?: string;
+  maxLines?: number;
+  lines?: readonly string[];
+  initialAutoFollow?: boolean;
+}
+
+export interface TextStreamBufferModel extends BufferModel {
+  appendLine(text: string): number;
+  appendLines(lines: readonly string[]): number[];
+  clear(): void;
+  getSnapshot(): TextStreamBufferSnapshot;
+}
+
 export function createVirtualItemsBuffer(options: VirtualItemsBufferOptions): BufferModel {
   return {
     id: options.id,
@@ -61,6 +77,7 @@ export function createVirtualItemsBuffer(options: VirtualItemsBufferOptions): Bu
     resolveContent(window: BufferWindowModel): BufferResolvedContent {
       const items = typeof options.items === "function" ? options.items(window) : options.items;
       return {
+        kind: "items",
         items,
         initialAutoFollow: options.initialAutoFollow,
       };
@@ -80,6 +97,7 @@ export function createPreparedTextBuffer(options: PreparedTextBufferOptions): Bu
     version: options.version ?? 1,
     resolveContent(): BufferResolvedContent {
       return {
+        kind: "items",
         items: cachedBlocks.map((block) => createPreparedTextVirtualItem(block)),
         initialAutoFollow: options.initialAutoFollow,
       };
@@ -103,6 +121,7 @@ export function createTranscriptBuffer(options: TranscriptBufferOptions): Buffer
     resolveContent(window: BufferWindowModel): BufferResolvedContent {
       const collapsedKeys = window.viewState?.collapsedKeys ?? {};
       return {
+        kind: "items",
         items: cachedEntries.map((entry) => {
           const collapsed = collapsedKeys[entry.key] === true;
           return createTranscriptVirtualItem({
@@ -115,4 +134,95 @@ export function createTranscriptBuffer(options: TranscriptBufferOptions): Buffer
       };
     },
   } satisfies BufferModel;
+}
+
+export function createTextStreamBuffer(options: TextStreamBufferOptions): TextStreamBufferModel {
+  const maxLines = Math.max(1, options.maxLines ?? 10_000);
+  const initialLines = [...(options.lines ?? [])];
+  let snapshot: TextStreamBufferSnapshot = {
+    version: 1,
+    baseIndex: Math.max(initialLines.length - Math.min(initialLines.length, maxLines), 0),
+    lines: initialLines.slice(-maxLines),
+    maxLines,
+  };
+  const listeners = new Set<() => void>();
+
+  function emit(): void {
+    for (const listener of listeners) {
+      listener();
+    }
+  }
+
+  function bumpVersion(previous: string | number): number {
+    return typeof previous === "number" ? previous + 1 : 1;
+  }
+
+  function appendMany(lines: readonly string[]): number[] {
+    if (lines.length === 0) return [];
+
+    const nextLines = [...snapshot.lines];
+    let nextBaseIndex = snapshot.baseIndex;
+    const appendedIndexes: number[] = [];
+
+    for (const line of lines) {
+      nextLines.push(line);
+      if (nextLines.length > snapshot.maxLines) {
+        nextLines.shift();
+        nextBaseIndex += 1;
+      }
+      appendedIndexes.push(nextBaseIndex + nextLines.length - 1);
+    }
+
+    snapshot = {
+      version: bumpVersion(snapshot.version),
+      baseIndex: nextBaseIndex,
+      lines: nextLines,
+      maxLines: snapshot.maxLines,
+    };
+    emit();
+    return appendedIndexes;
+  }
+
+  return {
+    get id() {
+      return options.id;
+    },
+    get kind() {
+      return options.kind ?? "text-stream";
+    },
+    get version() {
+      return snapshot.version;
+    },
+    resolveContent(): BufferResolvedContent {
+      return {
+        kind: "text-stream",
+        stream: snapshot,
+        initialAutoFollow: options.initialAutoFollow,
+      };
+    },
+    subscribe(listener: () => void): () => void {
+      listeners.add(listener);
+      return () => {
+        listeners.delete(listener);
+      };
+    },
+    appendLine(text: string): number {
+      return appendMany([text])[0]!;
+    },
+    appendLines(lines: readonly string[]): number[] {
+      return appendMany(lines);
+    },
+    clear(): void {
+      snapshot = {
+        version: bumpVersion(snapshot.version),
+        baseIndex: 0,
+        lines: [],
+        maxLines: snapshot.maxLines,
+      };
+      emit();
+    },
+    getSnapshot(): TextStreamBufferSnapshot {
+      return snapshot;
+    },
+  } satisfies TextStreamBufferModel;
 }
