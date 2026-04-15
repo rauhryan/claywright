@@ -6,7 +6,7 @@ import {
   createTranscriptVirtualItem,
   fixed,
   grow,
-  markStatefulComponent,
+  stateful,
   onCleanup,
   runApp,
   VirtualViewport,
@@ -64,7 +64,7 @@ function LegendPill(props: { bg: number; color: number; label: string }) {
   ) as never;
 }
 
-function TranscriptCollapseScreen() {
+const TranscriptCollapseScreen = stateful(function TranscriptCollapseScreen() {
   const [collapsed, setCollapsed] = createSignal(false);
   const [revision, setRevision] = createSignal(1);
   const [status, setStatus] = createSignal("booting");
@@ -203,7 +203,11 @@ function TranscriptCollapseScreen() {
       <box width={grow()} height={fixed(1)} bg={TITLE_BG}>
         <text color={TITLE_FG}>Virtual Viewport Transcript Collapse Demo</text>
       </box>
-      <box width={grow()} height={fixed(1)} bg={collapsed() ? STATUS_COLLAPSED_BG : STATUS_EXPANDED_BG}>
+      <box
+        width={grow()}
+        height={fixed(1)}
+        bg={collapsed() ? STATUS_COLLAPSED_BG : STATUS_EXPANDED_BG}
+      >
         <text color={collapsed() ? STATUS_COLLAPSED_FG : STATUS_EXPANDED_FG}>{status()}</text>
       </box>
       <box
@@ -279,12 +283,12 @@ function TranscriptCollapseScreen() {
         <LegendPill bg={THINKING_HEADER_COLLAPSED} color={THINKING_SPEAKER} label="thinking" />
         <LegendPill bg={ANSWER_HEADER_BG} color={ANSWER_SPEAKER} label="answer" />
         <LegendPill bg={SYSTEM_HEADER_BG} color={SYSTEM_SPEAKER} label="system" />
-        <text color={CONTROL_FG}>Click toggles · keyboard c also works · longer content now requires scrolling.</text>
+        <text color={CONTROL_FG}>
+          Click toggles · keyboard c also works · longer content now requires scrolling.
+        </text>
       </box>
     </box>
   ) as never;
-}
-
-markStatefulComponent(TranscriptCollapseScreen);
+});
 
 runApp(() => <TranscriptCollapseScreen />);

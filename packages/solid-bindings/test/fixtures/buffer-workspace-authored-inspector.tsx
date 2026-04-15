@@ -10,7 +10,7 @@ import {
   createTextStreamBuffer,
   fixed,
   grow,
-  markStatefulComponent,
+  stateful,
   onCleanup,
   rgba,
   runApp,
@@ -23,7 +23,9 @@ const stream = createTextStreamBuffer({
   initialAutoFollow: true,
 });
 
-function AuthoredInspectorWorkspace(props: { workspaceHeight: number }) {
+const AuthoredInspectorWorkspace = stateful(function AuthoredInspectorWorkspace(props: {
+  workspaceHeight: number;
+}) {
   const [mainTopRow, setMainTopRow] = createSignal(1);
   const [floatTopRow, setFloatTopRow] = createSignal(1);
   const [appended, setAppended] = createSignal(0);
@@ -151,8 +153,6 @@ function AuthoredInspectorWorkspace(props: { workspaceHeight: number }) {
       </AuthoredBufferWorkspace>
     </box>
   ) as never;
-}
-
-markStatefulComponent(AuthoredInspectorWorkspace);
+});
 
 runApp((ctx) => <AuthoredInspectorWorkspace workspaceHeight={Math.max(ctx.height - 3, 1)} />);

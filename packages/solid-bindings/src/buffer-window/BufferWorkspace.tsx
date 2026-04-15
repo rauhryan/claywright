@@ -1,7 +1,7 @@
 import { grow } from "clayterm";
 import { createMemo, createRenderEffect, createSignal } from "solid-js";
 import type { KeyboardEvent } from "@tui/core";
-import { markStatefulComponent } from "../component-flags";
+import { stateful } from "../component-flags";
 import { BufferWindow } from "./BufferWindow";
 import { createVirtualItemsBuffer } from "./buffers";
 import {
@@ -20,7 +20,7 @@ import type {
 
 const DEFAULT_KEY_STEP_ROWS = 1;
 
-export function BufferWorkspace(rawProps: BufferWorkspaceProps) {
+export const BufferWorkspace = stateful(function BufferWorkspace(rawProps: BufferWorkspaceProps) {
   const [uncontrolledActiveWindowId, setUncontrolledActiveWindowId] = createSignal<
     WindowId | undefined
   >(resolveActiveWindowId(rawProps.windows, undefined, rawProps.initialActiveWindowId));
@@ -271,6 +271,4 @@ export function BufferWorkspace(rawProps: BufferWorkspaceProps) {
       </box>
     ) as never;
   }) as never;
-}
-
-markStatefulComponent(BufferWorkspace);
+});

@@ -5,7 +5,7 @@ import {
   createSignal,
   fixed,
   grow,
-  markStatefulComponent,
+  stateful,
   runApp,
   type VirtualViewportHandle,
   type VirtualViewportState,
@@ -29,15 +29,18 @@ const INITIAL_VIEWPORT_STATE: VirtualViewportState = {
   windowEndIndex: TRACK_ROWS,
 };
 
-const items = Array.from({ length: ROW_COUNT }, (_, index) => createPreparedTextVirtualItem({
-  key: `row-${index + 1}`,
-  text: `Row ${index + 1}`,
-  estimatedElementsPerRow: 1,
-  estimatedMeasuredWords: 1,
-}));
+const items = Array.from({ length: ROW_COUNT }, (_, index) =>
+  createPreparedTextVirtualItem({
+    key: `row-${index + 1}`,
+    text: `Row ${index + 1}`,
+    estimatedElementsPerRow: 1,
+    estimatedMeasuredWords: 1,
+  }),
+);
 
 function sameViewportState(a: VirtualViewportState, b: VirtualViewportState): boolean {
-  return a.scrollTop === b.scrollTop &&
+  return (
+    a.scrollTop === b.scrollTop &&
     a.contentHeight === b.contentHeight &&
     a.viewportHeight === b.viewportHeight &&
     a.atStart === b.atStart &&
@@ -45,16 +48,17 @@ function sameViewportState(a: VirtualViewportState, b: VirtualViewportState): bo
     a.autoFollow === b.autoFollow &&
     a.budgetExceeded === b.budgetExceeded &&
     a.windowStartIndex === b.windowStartIndex &&
-    a.windowEndIndex === b.windowEndIndex;
+    a.windowEndIndex === b.windowEndIndex
+  );
 }
 
-function TrackDemoScreen() {
+const TrackDemoScreen = stateful(function TrackDemoScreen() {
   const [viewportState, setViewportState] = createSignal(INITIAL_VIEWPORT_STATE);
   const [lastEvent, setLastEvent] = createSignal("none");
   let handle: VirtualViewportHandle | undefined;
 
   function syncViewportState(next: VirtualViewportState): void {
-    setViewportState((current) => sameViewportState(current, next) ? current : next);
+    setViewportState((current) => (sameViewportState(current, next) ? current : next));
   }
 
   function syncViewportStateFromHandle(): void {
@@ -98,7 +102,10 @@ function TrackDemoScreen() {
         direction="ltr"
         onWheel={(event) => {
           if (event.defaultPrevented) return;
-          scrollViewport(event.direction === "up" ? -WHEEL_STEP : WHEEL_STEP, `${event.direction === "up" ? "u" : "d"}@${event.x},${event.y}`);
+          scrollViewport(
+            event.direction === "up" ? -WHEEL_STEP : WHEEL_STEP,
+            `${event.direction === "up" ? "u" : "d"}@${event.x},${event.y}`,
+          );
           event.preventDefault();
         }}
       >
@@ -137,8 +144,6 @@ function TrackDemoScreen() {
       </box>
     </box>
   ) as never;
-}
-
-markStatefulComponent(TrackDemoScreen);
+});
 
 runApp(() => <TrackDemoScreen />);

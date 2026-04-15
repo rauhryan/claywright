@@ -1,5 +1,5 @@
 import { createMemo } from "solid-js";
-import { markStatefulComponent } from "../component-flags";
+import { stateful } from "../component-flags";
 import type { JSX } from "../jsx-runtime";
 import { OpNode } from "../opnode";
 import { BufferWorkspace } from "./BufferWorkspace";
@@ -296,7 +296,9 @@ export function compileAuthoredWorkspace(
   return compiler.compile(input);
 }
 
-export function AuthoredBufferWorkspace(rawProps: AuthoredBufferWorkspaceProps) {
+export const AuthoredBufferWorkspace = stateful(function AuthoredBufferWorkspace(
+  rawProps: AuthoredBufferWorkspaceProps,
+) {
   const localCompiler = createAuthoredWorkspaceCompiler();
   const compiler = createMemo(() => rawProps.compiler ?? localCompiler);
   const compiled = createMemo(() => compiler().compile(rawProps.children));
@@ -330,9 +332,7 @@ export function AuthoredBufferWorkspace(rawProps: AuthoredBufferWorkspaceProps) 
       windows={compiled().windows}
     />
   ) as never;
-}
-
-markStatefulComponent(AuthoredBufferWorkspace);
+});
 
 function createAuthoredNode<TKind extends AuthoredNodeKind, TProps extends object>(
   kind: TKind,

@@ -15,7 +15,7 @@ import { createMemo, createRenderEffect, createSignal, onCleanup, untrack } from
 import type { KeyboardEvent, WheelEvent } from "@tui/core";
 import { getNextId } from "../opnode";
 import { useAppContext } from "../runtime";
-import { markStatefulComponent } from "../component-flags";
+import { stateful } from "../component-flags";
 import { createElementBoundsObserver, sameBounds } from "../observe-element-bounds";
 import { getFirstVisibleAnchor, resolveAnchorScrollTop } from "./anchor";
 import { MeasurementCache } from "./measurement-cache";
@@ -43,7 +43,7 @@ const measureApi = {
   materializeTextRow,
 };
 
-export function VirtualViewport(rawProps: VirtualViewportProps) {
+export const VirtualViewport = stateful(function VirtualViewport(rawProps: VirtualViewportProps) {
   const context = useAppContext();
   const viewportId = rawProps.id ?? getNextId("virtual-viewport");
   const cache = new MeasurementCache();
@@ -326,10 +326,4 @@ export function VirtualViewport(rawProps: VirtualViewportProps) {
       </box>
     </box>
   );
-}
-
-// VirtualViewport owns persistent local signals plus post-render bounds
-// observation. Mark it explicitly so the reconciler can preserve its local
-// runtime state without changing global component invocation semantics and
-// breaking Solid boundaries like Errored/Loading.
-markStatefulComponent(VirtualViewport);
+});

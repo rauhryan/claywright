@@ -6,7 +6,7 @@ import {
   createTextStreamBuffer,
   fixed,
   grow,
-  markStatefulComponent,
+  stateful,
   onCleanup,
   rgba,
   runApp,
@@ -19,7 +19,9 @@ const stream = createTextStreamBuffer({
   initialAutoFollow: true,
 });
 
-function SharedStreamWorkspace(props: { workspaceHeight: number }) {
+const SharedStreamWorkspace = stateful(function SharedStreamWorkspace(props: {
+  workspaceHeight: number;
+}) {
   const [mainTopRow, setMainTopRow] = createSignal(1);
   const [floatTopRow, setFloatTopRow] = createSignal(1);
   const [appended, setAppended] = createSignal(0);
@@ -112,8 +114,6 @@ function SharedStreamWorkspace(props: { workspaceHeight: number }) {
       />
     </box>
   ) as never;
-}
-
-markStatefulComponent(SharedStreamWorkspace);
+});
 
 runApp((ctx) => <SharedStreamWorkspace workspaceHeight={Math.max(ctx.height - 3, 1)} />);

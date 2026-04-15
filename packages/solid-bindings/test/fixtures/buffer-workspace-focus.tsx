@@ -6,7 +6,7 @@ import {
   createSignal,
   fixed,
   grow,
-  markStatefulComponent,
+  stateful,
   rgba,
   runApp,
 } from "@tui/solid-bindings";
@@ -43,7 +43,9 @@ const floatingBuffer = createPreparedTextBuffer({
   })),
 });
 
-function FocusWorkspaceScreen(props: { workspaceHeight: number }) {
+const FocusWorkspaceScreen = stateful(function FocusWorkspaceScreen(props: {
+  workspaceHeight: number;
+}) {
   const [activeWindowId, setActiveWindowId] = createSignal<string | undefined>("main-window");
   const [mainTopRow, setMainTopRow] = createSignal(1);
   const [floatTopRow, setFloatTopRow] = createSignal(1);
@@ -149,8 +151,6 @@ function FocusWorkspaceScreen(props: { workspaceHeight: number }) {
       />
     </box>
   ) as never;
-}
-
-markStatefulComponent(FocusWorkspaceScreen);
+});
 
 runApp((ctx) => <FocusWorkspaceScreen workspaceHeight={Math.max(ctx.height - 3, 1)} />);

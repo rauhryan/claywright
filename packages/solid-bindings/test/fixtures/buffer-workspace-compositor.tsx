@@ -6,7 +6,7 @@ import {
   createSignal,
   fixed,
   grow,
-  markStatefulComponent,
+  stateful,
   rgba,
   runApp,
 } from "@tui/solid-bindings";
@@ -43,7 +43,7 @@ const floatingBuffer = createPreparedTextBuffer({
   })),
 });
 
-function WorkspaceScreen(props: { workspaceHeight: number }) {
+const WorkspaceScreen = stateful(function WorkspaceScreen(props: { workspaceHeight: number }) {
   const [mainStatus, setMainStatus] = createSignal("idle");
   const [floatStatus, setFloatStatus] = createSignal("idle");
 
@@ -128,8 +128,6 @@ function WorkspaceScreen(props: { workspaceHeight: number }) {
       />
     </box>
   ) as never;
-}
-
-markStatefulComponent(WorkspaceScreen);
+});
 
 runApp((ctx) => <WorkspaceScreen workspaceHeight={Math.max(ctx.height - 3, 1)} />);

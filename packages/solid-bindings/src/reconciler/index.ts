@@ -6,15 +6,17 @@ import {
   untrack,
 } from "solid-js";
 import { OpNode, TextOpNode, SlotOpNode } from "../opnode";
-import { isStatefulComponent } from "../component-flags";
+import { getStatefulComponentTarget, isStatefulComponent } from "../component-flags";
 
 const memo = <T>(fn: () => T): (() => T) => createMemo(() => fn());
 
 // Most components must keep Solid's normal invocation semantics so boundaries
 // like Errored/Loading continue to work. A small set of stateful terminal
 // primitives opt into an untracked path to preserve internal runtime state.
-const renderComponent: typeof createComponent = (Comp, props) =>
-  isStatefulComponent(Comp) ? untrack(() => Comp(props || {})) : Comp(props || {});
+const renderComponent: typeof createComponent = (Comp, props) => {
+  const target = getStatefulComponentTarget(Comp);
+  return isStatefulComponent(Comp) ? untrack(() => target(props || {})) : target(props || {});
+};
 
 type Disposer = () => void;
 

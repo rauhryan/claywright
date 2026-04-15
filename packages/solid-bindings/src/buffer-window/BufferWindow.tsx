@@ -1,6 +1,6 @@
 import { ATTACH_TO, fixed, grow, POINTER_CAPTURE_MODE, type ElementBounds } from "clayterm";
 import { createMemo, createRenderEffect, createSignal, onCleanup } from "solid-js";
-import { markStatefulComponent } from "../component-flags";
+import { stateful } from "../component-flags";
 import { createElementBoundsObserver, sameBounds } from "../observe-element-bounds";
 import { useAppContext } from "../runtime";
 import { VirtualViewport } from "../virtual-scroll/VirtualViewport";
@@ -26,7 +26,7 @@ const DEFAULT_VIEWPORT_STATE: VirtualViewportState = {
   windowEndIndex: 0,
 };
 
-export function BufferWindow(rawProps: BufferWindowProps) {
+export const BufferWindow = stateful(function BufferWindow(rawProps: BufferWindowProps) {
   const context = useAppContext();
   const [bounds, setBounds] = createSignal<ElementBounds | undefined>(undefined);
   const [bufferRevision, setBufferRevision] = createSignal(0);
@@ -301,6 +301,4 @@ export function BufferWindow(rawProps: BufferWindowProps) {
       </box>
     ) as never;
   }) as never;
-}
-
-markStatefulComponent(BufferWindow);
+});

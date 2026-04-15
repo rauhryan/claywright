@@ -5,7 +5,7 @@ import {
   createSignal,
   fixed,
   grow,
-  markStatefulComponent,
+  stateful,
   runApp,
   VirtualViewport,
   VirtualViewportTrack,
@@ -23,7 +23,7 @@ function makeItems(prefix: string) {
       text: `${prefix} Row ${index + 1}`,
       estimatedElementsPerRow: 1,
       estimatedMeasuredWords: 1,
-    })
+    }),
   );
 }
 
@@ -31,14 +31,15 @@ function applyScroll(current: number, delta: number): number {
   return Math.max(0, Math.min(current + delta, ITEM_COUNT - VIEWPORT_ROWS));
 }
 
-function LeftColumn() {
+const LeftColumn = stateful(function LeftColumn() {
   const [focus, setFocus] = createSignal(false);
   const [clicked, setClicked] = createSignal(false);
   const [wheel, setWheel] = createSignal("-");
   const [scroll, setScroll] = createSignal(0);
   const items = makeItems("Left");
 
-  const summary = () => `L f=${focus() ? "y" : "n"} c=${clicked() ? "y" : "n"} w=${wheel()} s=${scroll()}`;
+  const summary = () =>
+    `L f=${focus() ? "y" : "n"} c=${clicked() ? "y" : "n"} w=${wheel()} s=${scroll()}`;
 
   return (
     <box width={grow()} height={grow()} direction="ttb" bg={0xff101827}>
@@ -60,7 +61,9 @@ function LeftColumn() {
         onWheel={(event) => {
           setWheel(event.direction === "down" ? "d" : "u");
           queueMicrotask(() => {
-            setScroll((current) => applyScroll(current, event.direction === "down" ? WHEEL_STEP : -WHEEL_STEP));
+            setScroll((current) =>
+              applyScroll(current, event.direction === "down" ? WHEEL_STEP : -WHEEL_STEP),
+            );
           });
         }}
         onKeyDown={(event) => {
@@ -75,9 +78,9 @@ function LeftColumn() {
       />
     </box>
   ) as never;
-}
+});
 
-function RightColumn() {
+const RightColumn = stateful(function RightColumn() {
   const [focus, setFocus] = createSignal(false);
   const [clicked, setClicked] = createSignal(false);
   const [wheel, setWheel] = createSignal("-");
@@ -85,11 +88,14 @@ function RightColumn() {
   const items = makeItems("Right");
 
   const summary = () => {
-    const track = computeViewportTrackGeometry({
-      scrollTop: scroll(),
-      contentHeight: ITEM_COUNT,
-      viewportHeight: VIEWPORT_ROWS,
-    }, VIEWPORT_ROWS);
+    const track = computeViewportTrackGeometry(
+      {
+        scrollTop: scroll(),
+        contentHeight: ITEM_COUNT,
+        viewportHeight: VIEWPORT_ROWS,
+      },
+      VIEWPORT_ROWS,
+    );
     return `R f=${focus() ? "y" : "n"} c=${clicked() ? "y" : "n"} w=${wheel()} s=${scroll()} t=${track.thumbPos}/${track.thumbSize}`;
   };
 
@@ -115,7 +121,9 @@ function RightColumn() {
           onWheel={(event) => {
             setWheel(event.direction === "down" ? "d" : "u");
             queueMicrotask(() => {
-              setScroll((current) => applyScroll(current, event.direction === "down" ? WHEEL_STEP : -WHEEL_STEP));
+              setScroll((current) =>
+                applyScroll(current, event.direction === "down" ? WHEEL_STEP : -WHEEL_STEP),
+              );
             });
           }}
           onKeyDown={(event) => {
@@ -143,10 +151,7 @@ function RightColumn() {
       </box>
     </box>
   ) as never;
-}
-
-markStatefulComponent(LeftColumn);
-markStatefulComponent(RightColumn);
+});
 
 runApp(() => (
   <box width={grow()} height={grow()} direction="ltr" bg={0xff0b1020}>

@@ -69,7 +69,7 @@ export {
   jsxDEV,
 } from "./jsx-runtime";
 export { OpNode, ElementOpNode, TextOpNode, SlotOpNode, resetIdCounter } from "./opnode";
-export { markStatefulComponent } from "./component-flags";
+export { markStatefulComponent, stateful } from "./component-flags";
 export { BufferWindow } from "./buffer-window/BufferWindow";
 export { BufferWorkspace } from "./buffer-window/BufferWorkspace";
 export {
