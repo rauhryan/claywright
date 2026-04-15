@@ -2,8 +2,12 @@ const STATEFUL_COMPONENT = Symbol.for("@tui/solid-bindings/stateful-component");
 const STATEFUL_COMPONENT_TARGET = Symbol.for("@tui/solid-bindings/stateful-component-target");
 
 /**
- * Marks a component as owning persistent local runtime state that must survive
- * parent rerenders and post-render geometry observation.
+ * Low-level escape hatch that marks an existing component function as owning
+ * persistent local runtime state that must survive parent rerenders and
+ * post-render geometry observation.
+ *
+ * Prefer `stateful(...)` for exported components and examples. Keep this API
+ * for cases where a caller must mark an already-declared function directly.
  *
  * This is intentionally narrow. Boundary/control-flow components MUST keep the
  * normal Solid component path; only stateful terminal primitives should use it.
