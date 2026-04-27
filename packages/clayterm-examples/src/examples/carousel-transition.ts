@@ -1,17 +1,11 @@
 import {
   close,
-  EXIT_TRANSITION_SIBLING_ORDERING,
   fixed,
   grow,
   open,
   text,
-  TRANSITION_ENTER_TRIGGER,
-  TRANSITION_EXIT_TRIGGER,
-  TRANSITION_HANDLER,
-  TRANSITION_INTERACTION_HANDLING,
-  TRANSITION_PRESET,
-  TRANSITION_PROPERTY,
   type Op,
+  type TransitionPreset,
 } from "clayterm";
 import { getTerminalSize, runExample, type ExampleDefinition } from "../runtime";
 import {
@@ -77,16 +71,16 @@ const example: ExampleDefinition<CarouselState> = {
       direction: 1 | -1,
       entering: boolean,
     ) => {
-      const enterPreset = entering
+      const enterPreset: TransitionPreset = entering
         ? direction === 1
-          ? TRANSITION_PRESET.ENTER_FROM_RIGHT
-          : TRANSITION_PRESET.ENTER_FROM_LEFT
-        : TRANSITION_PRESET.NONE;
-      const exitPreset = !entering
+          ? "enterFromRight"
+          : "enterFromLeft"
+        : "none";
+      const exitPreset: TransitionPreset = !entering
         ? direction === 1
-          ? TRANSITION_PRESET.EXIT_TO_LEFT
-          : TRANSITION_PRESET.EXIT_TO_RIGHT
-        : TRANSITION_PRESET.NONE;
+          ? "exitToLeft"
+          : "exitToRight"
+        : "none";
 
       ops.push(
         open(`slide-${key}`, {
@@ -101,17 +95,16 @@ const example: ExampleDefinition<CarouselState> = {
           cornerRadius: { tl: 1, tr: 1, bl: 1, br: 1 },
           transition: {
             duration: 0.28,
-            handler: TRANSITION_HANDLER.EASE_OUT,
-            properties: TRANSITION_PROPERTY.X,
-            interactionHandling: TRANSITION_INTERACTION_HANDLING.DISABLE_WHILE_POSITIONING,
+            easing: "easeOut",
+            properties: ["x"],
             enter: {
               preset: enterPreset,
-              trigger: TRANSITION_ENTER_TRIGGER.TRIGGER_ON_FIRST_PARENT_FRAME,
+              trigger: "triggerOnFirstParentFrame",
             },
             exit: {
               preset: exitPreset,
-              trigger: TRANSITION_EXIT_TRIGGER.TRIGGER_WHEN_PARENT_EXITS,
-              siblingOrdering: EXIT_TRANSITION_SIBLING_ORDERING.NATURAL_ORDER,
+              trigger: "triggerWhenParentExits",
+              siblingOrder: "naturalOrder",
             },
           },
         }),
