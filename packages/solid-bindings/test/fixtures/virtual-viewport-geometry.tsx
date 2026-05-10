@@ -10,12 +10,14 @@ import {
 
 const [status, setStatus] = createSignal("booting");
 
-const items = Array.from({ length: 40 }, (_, index) => createPreparedTextVirtualItem({
-  key: `row-${index + 1}`,
-  text: `Geometry Row ${index + 1}`,
-  estimatedElementsPerRow: 1,
-  estimatedMeasuredWords: 1,
-}));
+const items = Array.from({ length: 40 }, (_, index) =>
+  createPreparedTextVirtualItem({
+    key: `row-${index + 1}`,
+    text: `Geometry Row ${index + 1}`,
+    estimatedElementsPerRow: 1,
+    estimatedMeasuredWords: 1,
+  }),
+);
 
 runApp(() => (
   <box width={grow()} height={grow()} direction="ttb">

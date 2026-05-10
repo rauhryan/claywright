@@ -1,35 +1,35 @@
 {
-  "name": "tui-monorepo",
-  "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
-  "scripts": {
-    "fmt": "bunx oxfmt --write . --ignore-path .prettierignore",
-    "fmt:check": "bunx oxfmt --check . --ignore-path .prettierignore",
-    "lint": "bunx oxlint --deny-warnings --import-plugin --ignore-path .oxlintignore packages/core packages/solid-bindings",
-    "typecheck": "bunx tsc -p tsconfig.typecheck.json --noEmit",
-    "test": "bun run build:clayterm && bun test packages/core packages/ghostty-vt packages/solid-bindings packages/test-harness packages/clayterm-examples",
-    "test:clayterm-blackbox": "bun test packages/test-harness/test/clayterm-blackbox.test.ts",
-    "build:clayterm": "bun run ./scripts/build-clayterm.ts",
-    "examples": "bun run ./packages/clayterm-examples/src/cli.ts",
-    "examples:list": "bun run ./packages/clayterm-examples/src/cli.ts list",
-    "example:basic-button": "bun run build:clayterm && bun run ./packages/clayterm-examples/src/examples/basic-button.ts",
-    "example:carousel-track": "bun run build:clayterm && bun run ./packages/clayterm-examples/src/examples/carousel-track.ts",
-    "example:carousel-floating": "bun run build:clayterm && bun run ./packages/clayterm-examples/src/examples/carousel-floating.ts",
-    "example:carousel-transition": "bun run build:clayterm && bun run ./packages/clayterm-examples/src/examples/carousel-transition.ts",
-    "example:modal-menu": "bun run build:clayterm && bun run ./packages/clayterm-examples/src/examples/modal-menu.ts",
-    "example:selection": "bun run build:clayterm && bun run ./packages/clayterm-examples/src/examples/selection.ts",
-    "demo:solid-focus": "bun run ./packages/solid-bindings/focus-demo.tsx",
-    "demo:solid-input": "bun run ./packages/solid-bindings/input-demo.tsx",
-    "evidence:vhs": "bun run ./scripts/render-viewport-evidence.ts",
-    "evidence:vhs:list": "bun run ./scripts/render-viewport-evidence.ts --list",
-    "evidence:vhs:check": "bun run ./scripts/render-viewport-evidence.ts --check"
-  },
-  "devDependencies": {
-    "@types/bun": "^1.3.11",
-    "@types/node": "^25.5.2",
-    "oxfmt": "^0.43.0",
-    "oxlint": "^1.58.0"
-  }
+    "name": "tui-monorepo",
+    "private": true,
+    "workspaces": [
+        "packages/*"
+    ],
+    "scripts": {
+        "fmt": "bunx oxfmt --write . --ignore-path .prettierignore",
+        "fmt:check": "bunx oxfmt --check . --ignore-path .prettierignore",
+        "lint": "bunx oxlint --deny-warnings --import-plugin --ignore-path .oxlintignore packages/core packages/solid-bindings",
+        "typecheck": "bunx tsc -p tsconfig.typecheck.json --noEmit",
+        "test": "bun run build:clayterm && bun test packages/text-measure packages/text-virtualizer packages/core packages/ghostty-vt packages/solid-bindings packages/test-harness packages/clayterm-examples",
+        "test:clayterm-blackbox": "bun test packages/test-harness/test/clayterm-blackbox.test.ts",
+        "build:clayterm": "bun run ./scripts/build-clayterm.ts",
+        "examples": "bun run ./packages/clayterm-examples/src/cli.ts",
+        "examples:list": "bun run ./packages/clayterm-examples/src/cli.ts list",
+        "example:basic-button": "bun run build:clayterm && bun run ./packages/clayterm-examples/src/examples/basic-button.ts",
+        "example:carousel-track": "bun run build:clayterm && bun run ./packages/clayterm-examples/src/examples/carousel-track.ts",
+        "example:carousel-floating": "bun run build:clayterm && bun run ./packages/clayterm-examples/src/examples/carousel-floating.ts",
+        "example:carousel-transition": "bun run build:clayterm && bun run ./packages/clayterm-examples/src/examples/carousel-transition.ts",
+        "example:modal-menu": "bun run build:clayterm && bun run ./packages/clayterm-examples/src/examples/modal-menu.ts",
+        "example:selection": "bun run build:clayterm && bun run ./packages/clayterm-examples/src/examples/selection.ts",
+        "demo:solid-focus": "bun run ./packages/solid-bindings/focus-demo.tsx",
+        "demo:solid-input": "bun run ./packages/solid-bindings/input-demo.tsx",
+        "evidence:vhs": "bun run ./scripts/render-viewport-evidence.ts",
+        "evidence:vhs:list": "bun run ./scripts/render-viewport-evidence.ts --list",
+        "evidence:vhs:check": "bun run ./scripts/render-viewport-evidence.ts --check"
+    },
+    "devDependencies": {
+        "@types/bun": "^1.3.11",
+        "@types/node": "^25.5.2",
+        "oxfmt": "^0.43.0",
+        "oxlint": "^1.58.0"
+    }
 }

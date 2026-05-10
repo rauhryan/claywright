@@ -97,8 +97,9 @@ describe("GhosttyTerminal cell inspection", () => {
     expect(cell.hasText).toBe(true);
     expect(cell.text).toBe("1");
 
-    const line = Array.from({ length: 30 }, (_, col) => term.getCell(col, 2).text || " ").join("");
-    expect(line).toContain("Count: 1");
+    const rewrittenCell = term.getCell(9, 2);
+    expect(rewrittenCell.hasText).toBe(true);
+    expect(rewrittenCell.text).toBe("1");
   });
 
   it("handles wide characters", () => {

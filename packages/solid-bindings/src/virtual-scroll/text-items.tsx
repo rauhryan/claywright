@@ -1,7 +1,5 @@
+import { fit, fixed, grow } from "clayterm";
 import {
-  fit,
-  fixed,
-  grow,
   materializeTextRow,
   prepareText,
   walkTextRows,
@@ -9,7 +7,7 @@ import {
   type PrepareTextOptions,
   type TextMeasureApi,
   type TextRowRange,
-} from "clayterm";
+} from "@tui/text-measure";
 import type { VirtualItem, VirtualItemMeasurement } from "./types";
 import type { JSX } from "../jsx-runtime";
 
@@ -304,7 +302,7 @@ function resolveRowValue<T>(
   row: PreparedTextRenderedRow,
 ): T | undefined {
   if (typeof resolver === "function") {
-    return resolver(row);
+    return (resolver as (row: PreparedTextRenderedRow) => T | undefined)(row);
   }
   return resolver;
 }

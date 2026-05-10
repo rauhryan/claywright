@@ -1,5 +1,5 @@
 import type { OpNode } from "./opnode";
 
-export function Portal(props: { children: OpNode }): OpNode {
-  return props.children;
+export function Portal(props: { children: unknown }): OpNode {
+  return props.children as OpNode;
 }

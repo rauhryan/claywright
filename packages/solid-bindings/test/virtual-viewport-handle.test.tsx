@@ -38,12 +38,14 @@ describe("virtual viewport handle", () => {
                 ref={(value) => {
                   handle = value;
                 }}
-                items={Array.from({ length: 20 }, (_, index) => createPreparedTextVirtualItem({
-                  key: `row-${index + 1}`,
-                  text: `Row ${index + 1}`,
-                  estimatedElementsPerRow: 1,
-                  estimatedMeasuredWords: 1,
-                }))}
+                items={Array.from({ length: 20 }, (_, index) =>
+                  createPreparedTextVirtualItem({
+                    key: `row-${index + 1}`,
+                    text: `Row ${index + 1}`,
+                    estimatedElementsPerRow: 1,
+                    estimatedMeasuredWords: 1,
+                  }),
+                )}
               />
             ) as never;
           },

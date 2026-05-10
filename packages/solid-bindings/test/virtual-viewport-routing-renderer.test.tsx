@@ -44,12 +44,14 @@ describe("virtual viewport routing via renderer", () => {
                   id="viewport"
                   height={fixed(3)}
                   initialAutoFollow={false}
-                  items={Array.from({ length: 3 }, (_, index) => createPreparedTextVirtualItem({
-                    key: `row-${index + 1}`,
-                    text: `Row ${index + 1}`,
-                    estimatedElementsPerRow: 1,
-                    estimatedMeasuredWords: 1,
-                  }))}
+                  items={Array.from({ length: 3 }, (_, index) =>
+                    createPreparedTextVirtualItem({
+                      key: `row-${index + 1}`,
+                      text: `Row ${index + 1}`,
+                      estimatedElementsPerRow: 1,
+                      estimatedMeasuredWords: 1,
+                    }),
+                  )}
                 />
               </box>
             ) as never;
@@ -90,12 +92,14 @@ describe("virtual viewport routing via renderer", () => {
                 height={fixed(3)}
                 initialAutoFollow={false}
                 onWheel={() => setStatus("wheel")}
-                items={Array.from({ length: 6 }, (_, index) => createPreparedTextVirtualItem({
-                  key: `row-${index + 1}`,
-                  text: `Row ${index + 1}`,
-                  estimatedElementsPerRow: 1,
-                  estimatedMeasuredWords: 1,
-                }))}
+                items={Array.from({ length: 6 }, (_, index) =>
+                  createPreparedTextVirtualItem({
+                    key: `row-${index + 1}`,
+                    text: `Row ${index + 1}`,
+                    estimatedElementsPerRow: 1,
+                    estimatedMeasuredWords: 1,
+                  }),
+                )}
               />
             ) as never;
           },

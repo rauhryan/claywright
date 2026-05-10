@@ -1,4 +1,11 @@
-import { createInput, createTerm, type InputEvent, type Op, type PointerEvent } from "clayterm";
+import {
+  createInput,
+  createTerm,
+  type InputEvent,
+  type Op,
+  type PointerEvent,
+  type RenderResult,
+} from "clayterm";
 
 export interface PointerState {
   x: number;
@@ -14,8 +21,8 @@ export interface ExampleDefinition<State> {
   reduce(state: State, inputEvents: InputEvent[], pointerEvents: PointerEvent[]): State;
   summary?(state: State): string | null;
   animate?(state: State): State;
-  afterRender?(state: State, renderResult: { hasActiveTransitions?: boolean }): State;
-  hasActiveTransitions?(state: State, renderResult: { hasActiveTransitions?: boolean }): boolean;
+  afterRender?(state: State, renderResult: RenderResult): State;
+  hasActiveTransitions?(state: State, renderResult: RenderResult): boolean;
 }
 
 export function getTerminalSize() {

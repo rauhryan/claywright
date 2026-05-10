@@ -1,4 +1,4 @@
-import { ATTACH_POINT, ATTACH_TO, close, fixed, grow, open, text, type Op } from "clayterm";
+import { close, fixed, grow, open, text, type Op } from "clayterm";
 import { getTerminalSize, runExample, type ExampleDefinition } from "../runtime";
 import {
   beginTransition,
@@ -55,10 +55,10 @@ const example: ExampleDefinition<CarouselState> = {
           floating: {
             x: offsetX,
             y: frameBaseY(metrics),
-            attachTo: ATTACH_TO.ROOT,
+            attachTo: "root",
             attachPoints: {
-              element: ATTACH_POINT.CENTER_CENTER,
-              parent: ATTACH_POINT.CENTER_CENTER,
+              element: "center-center",
+              parent: "center-center",
             },
             zIndex: 1,
           },

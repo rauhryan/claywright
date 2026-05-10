@@ -1,4 +1,4 @@
-import type { TextMeasureApi } from "clayterm";
+import type { TextMeasureApi } from "@tui/text-measure";
 import type { KeyboardEvent, MouseEvent, PasteEvent, WheelEvent } from "@tui/core";
 import type { JSX } from "../jsx-runtime";
 

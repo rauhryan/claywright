@@ -27,17 +27,17 @@ export function createTextNode(value: string): TextOpNode {
   return reconciler.createTextNode(value);
 }
 
-export function insertNode(parent: OpNode, node: OpNode, anchor?: OpNode): void {
-  reconciler.insertNode(parent, node, anchor);
+export function insertNode(parent: OpNode, node: OpNode, anchor?: OpNode | null): void {
+  reconciler.insertNode(parent, node, anchor as OpNode | undefined);
 }
 
 export function insert(
   parent: OpNode,
   accessor: unknown,
-  marker?: OpNode,
+  marker?: OpNode | null,
   initial?: unknown,
 ): OpNode | unknown {
-  return reconciler.insert(parent, accessor, marker, initial);
+  return reconciler.insert(parent, accessor, marker as OpNode | undefined, initial);
 }
 
 export function spread(node: OpNode, accessor: unknown, skipChildren?: boolean): void {
@@ -76,7 +76,7 @@ export const effect = createRenderEffect;
 export function createComponent<T extends Record<string, unknown>>(
   Comp: Component<T>,
   props: T,
-): unknown {
+): any {
   return reconciler.createComponent(Comp, props);
 }
 
@@ -86,7 +86,7 @@ export function Fragment(props: { children?: unknown }): OpNode {
   return root;
 }
 
-export function render(code: () => unknown, root: OpNode): () => void {
+export function render(code: () => any, root: OpNode): () => void {
   return reconciler.render(code, root);
 }
 
@@ -99,7 +99,7 @@ export function renderToString(node: OpNode): string {
 }
 
 export namespace JSX {
-  export type Element = unknown;
+  export type Element = any;
   export interface ElementChildrenAttribute {
     children: {};
   }
@@ -118,7 +118,7 @@ export namespace JSX {
     onPaste?: (event: PasteEvent) => void;
   }
   export interface IntrinsicElements {
-    text: { color?: number; children?: unknown };
+    text: { id?: string; color?: number; children?: unknown };
     input: FocusableProps & {
       value?: string;
       placeholder?: string;
@@ -193,7 +193,7 @@ function appendChildren(parent: OpNode, value: unknown): void {
 export function jsx(
   type: string | Component<Record<string, unknown>>,
   props: Record<string, unknown> | null,
-): unknown {
+): any {
   if (typeof type === "function") {
     return createComponent(type, props ?? {});
   }
@@ -223,6 +223,6 @@ export function jsxDEV(
   _isStaticChildren?: boolean,
   _source?: { fileName: string; lineNumber: number; columnNumber: number },
   _self?: unknown,
-): unknown {
+): any {
   return jsx(type, props);
 }

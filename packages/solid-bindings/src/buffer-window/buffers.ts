@@ -1,4 +1,4 @@
-import { prepareText, type PreparedText } from "clayterm";
+import { prepareText, type PreparedText } from "@tui/text-measure";
 import {
   createPreparedTextVirtualItem,
   createTranscriptVirtualItem,
@@ -13,6 +13,10 @@ import type {
   BufferWindowViewState,
   TextStreamBufferSnapshot,
 } from "./types";
+
+function bumpVersion(previous: string | number): number {
+  return typeof previous === "number" ? previous + 1 : 1;
+}
 
 export interface VirtualItemsBufferOptions {
   id: string;
@@ -151,10 +155,6 @@ export function createTextStreamBuffer(options: TextStreamBufferOptions): TextSt
     for (const listener of listeners) {
       listener();
     }
-  }
-
-  function bumpVersion(previous: string | number): number {
-    return typeof previous === "number" ? previous + 1 : 1;
   }
 
   function appendMany(lines: readonly string[]): number[] {

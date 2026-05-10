@@ -25,7 +25,9 @@ describe("renderable text refresh", () => {
 
     let renderable = createRenderableTree(root);
     expect(renderable).not.toBeNull();
-    expect(collectTextOpsContent(renderableToOps(renderable! as never))).toContain("Count: 0");
+    expect(
+      collectTextOpsContent(renderableToOps(renderable! as never) as Array<{ content?: string }>),
+    ).toContain("Count: 0");
 
     const box = root.children[0] as { props: { onClick?: () => void } };
     box.props.onClick?.();
@@ -33,7 +35,9 @@ describe("renderable text refresh", () => {
 
     renderable = createRenderableTree(root);
     expect(renderable).not.toBeNull();
-    expect(collectTextOpsContent(renderableToOps(renderable! as never))).toContain("Count: 1");
+    expect(
+      collectTextOpsContent(renderableToOps(renderable! as never) as Array<{ content?: string }>),
+    ).toContain("Count: 1");
 
     dispose();
   });

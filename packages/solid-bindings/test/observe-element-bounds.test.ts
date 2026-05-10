@@ -1,5 +1,5 @@
 import { describe, expect, mock, test } from "bun:test";
-import type { ElementBounds } from "clayterm";
+import type { BoundingBox as ElementBounds } from "clayterm";
 import { createElementBoundsObserver } from "../src/observe-element-bounds";
 
 describe("element bounds observer", () => {
@@ -53,7 +53,8 @@ describe("element bounds observer", () => {
       await new Promise((resolve) => queueMicrotask(resolve));
 
       expect(warn).toHaveBeenCalledTimes(1);
-      expect(String(warn.mock.calls[0]?.[0])).toContain("without converging");
+      const [firstCall] = warn.mock.calls as Array<unknown[]>;
+      expect(String(firstCall?.[0])).toContain("without converging");
     } finally {
       console.warn = originalWarn;
     }

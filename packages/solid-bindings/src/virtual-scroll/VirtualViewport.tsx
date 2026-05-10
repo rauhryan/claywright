@@ -1,6 +1,5 @@
+import { fixed, grow, type BoundingBox as ElementBounds } from "clayterm";
 import {
-  fixed,
-  grow,
   layoutText,
   materializeTextRow,
   measureCellWidth,
@@ -9,8 +8,7 @@ import {
   prepareText,
   walkTextRows,
   wrapText,
-  type ElementBounds,
-} from "clayterm";
+} from "@tui/text-measure";
 import { createMemo, createRenderEffect, createSignal, onCleanup, untrack } from "solid-js";
 import type { KeyboardEvent, WheelEvent } from "@tui/core";
 import { getNextId } from "../opnode";

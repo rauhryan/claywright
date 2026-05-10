@@ -53,8 +53,7 @@ export function partitionBufferWindowSurfaces(surfaces: readonly ResolvedBufferW
   const docked = surfaces.filter((surface) => !surface.floating);
   const floating = surfaces
     .filter((surface) => surface.floating)
-    .slice()
-    .sort((left, right) => {
+    .toSorted((left, right) => {
       if (left.zIndex !== right.zIndex) {
         return left.zIndex - right.zIndex;
       }

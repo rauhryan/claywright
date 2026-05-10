@@ -44,12 +44,14 @@ describe("virtual viewport routing tree", () => {
                   height={fixed(3)}
                   initialAutoFollow={false}
                   onClick={() => setViewportStatus("click")}
-                  items={Array.from({ length: 3 }, (_, index) => createPreparedTextVirtualItem({
-                    key: `row-${index + 1}`,
-                    text: `Row ${index + 1}`,
-                    estimatedElementsPerRow: 1,
-                    estimatedMeasuredWords: 1,
-                  }))}
+                  items={Array.from({ length: 3 }, (_, index) =>
+                    createPreparedTextVirtualItem({
+                      key: `row-${index + 1}`,
+                      text: `Row ${index + 1}`,
+                      estimatedElementsPerRow: 1,
+                      estimatedMeasuredWords: 1,
+                    }),
+                  )}
                 />
               </box>
             ) as never;

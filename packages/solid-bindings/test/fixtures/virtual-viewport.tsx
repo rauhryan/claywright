@@ -17,12 +17,14 @@ const items: ItemDef[] = Array.from({ length: 60 }, (_, index) => ({
   label: `Row ${index + 1}`,
 }));
 
-const viewportItems = items.map((item) => createPreparedTextVirtualItem({
-  key: item.key,
-  text: item.label,
-  estimatedElementsPerRow: 1,
-  estimatedMeasuredWords: 1,
-}));
+const viewportItems = items.map((item) =>
+  createPreparedTextVirtualItem({
+    key: item.key,
+    text: item.label,
+    estimatedElementsPerRow: 1,
+    estimatedMeasuredWords: 1,
+  }),
+);
 
 const [stateText, setStateText] = createSignal("booting");
 const [focusText, setFocusText] = createSignal("focus=no");

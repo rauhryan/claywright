@@ -1,7 +1,9 @@
-import { fixed, grow, measureCellWidth, skipAnsiSequence, TextStreamVirtualizer } from "clayterm";
+import { fixed, grow } from "clayterm";
+import { measureCellWidth, skipAnsiSequence } from "@tui/text-measure";
+import { TextStreamVirtualizer } from "@tui/text-virtualizer";
 import { createMemo, createRenderEffect, createSignal, onCleanup } from "solid-js";
 import type { KeyboardEvent, MouseEvent, WheelEvent } from "@tui/core";
-import type { TextViewportEntry } from "clayterm";
+import type { TextViewportEntry } from "@tui/text-virtualizer";
 import type { VirtualViewportHandle, VirtualViewportState } from "../virtual-scroll/types";
 import type { TextStreamBufferSnapshot } from "./types";
 

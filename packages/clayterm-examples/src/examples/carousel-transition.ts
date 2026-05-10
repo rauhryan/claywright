@@ -1,12 +1,4 @@
-import {
-  close,
-  fixed,
-  grow,
-  open,
-  text,
-  type Op,
-  type TransitionPreset,
-} from "clayterm";
+import { close, fixed, grow, open, rgba, text, type Op } from "clayterm";
 import { getTerminalSize, runExample, type ExampleDefinition } from "../runtime";
 import {
   buildSlideRows,
@@ -65,62 +57,32 @@ const example: ExampleDefinition<CarouselState> = {
       close(),
     );
 
-    const pushTransitionSlide = (
-      key: string,
-      slideIndex: number,
-      direction: 1 | -1,
-      entering: boolean,
-    ) => {
-      const enterPreset: TransitionPreset = entering
-        ? direction === 1
-          ? "enterFromRight"
-          : "enterFromLeft"
-        : "none";
-      const exitPreset: TransitionPreset = !entering
-        ? direction === 1
-          ? "exitToLeft"
-          : "exitToRight"
-        : "none";
+    const frameBg = state.currentSlide % 2 === 0 ? palette.frameBg : rgba(24, 36, 52);
 
-      ops.push(
-        open(`slide-${key}`, {
-          layout: {
-            width: fixed(metrics.frameOuterWidth),
-            height: fixed(metrics.frameOuterHeight),
-            direction: "ttb",
-            padding: { left: 1, right: 1, top: 1, bottom: 1 },
-          },
-          bg: palette.frameBg,
-          border: { color: palette.frameBorder, left: 1, right: 1, top: 1, bottom: 1 },
-          cornerRadius: { tl: 1, tr: 1, bl: 1, br: 1 },
-          transition: {
-            duration: 0.28,
-            easing: "easeOut",
-            properties: ["x"],
-            enter: {
-              preset: enterPreset,
-              trigger: "triggerOnFirstParentFrame",
-            },
-            exit: {
-              preset: exitPreset,
-              trigger: "triggerWhenParentExits",
-              siblingOrder: "naturalOrder",
-            },
-          },
-        }),
-      );
-      pushSlideRows(
-        ops,
-        buildSlideRows(slides[slideIndex], metrics.frameInnerWidth, metrics.frameInnerHeight),
-        palette.frameBg,
-      );
-      ops.push(close());
-    };
-
-    if (state.previousSlide !== null && state.animating) {
-      pushTransitionSlide("previous", state.previousSlide, state.direction, false);
-    }
-    pushTransitionSlide("current", state.currentSlide, state.direction, state.animating);
+    ops.push(
+      open("slide-current", {
+        layout: {
+          width: fixed(metrics.frameOuterWidth),
+          height: fixed(metrics.frameOuterHeight),
+          direction: "ttb",
+          padding: { left: 1, right: 1, top: 1, bottom: 1 },
+        },
+        bg: frameBg,
+        border: { color: palette.frameBorder, left: 1, right: 1, top: 1, bottom: 1 },
+        cornerRadius: { tl: 1, tr: 1, bl: 1, br: 1 },
+        transition: {
+          duration: 0.28,
+          easing: "easeOut",
+          properties: ["bg"],
+        },
+      }),
+    );
+    pushSlideRows(
+      ops,
+      buildSlideRows(slides[state.currentSlide], metrics.frameInnerWidth, metrics.frameInnerHeight),
+      frameBg,
+    );
+    ops.push(close());
 
     ops.push(
       open("", { layout: { width: grow(), height: grow() } }),
@@ -194,13 +156,13 @@ const example: ExampleDefinition<CarouselState> = {
         };
       }
       if (event.type === "keydown") {
-        if (event.key === "ArrowRight" && !next.animating) {
+        if (event.key === "ArrowRight") {
           next.previousSlide = next.currentSlide;
           next.currentSlide = wrapSlide(next.currentSlide + 1);
           next.direction = 1;
           next.animating = true;
         }
-        if (event.key === "ArrowLeft" && !next.animating) {
+        if (event.key === "ArrowLeft") {
           next.previousSlide = next.currentSlide;
           next.currentSlide = wrapSlide(next.currentSlide - 1);
           next.direction = -1;
@@ -234,7 +196,7 @@ const example: ExampleDefinition<CarouselState> = {
     return { ...state };
   },
   afterRender(state, renderResult) {
-    if (state.animating && !renderResult.hasActiveTransitions) {
+    if (state.animating && !renderResult.animating) {
       return {
         ...state,
         previousSlide: null,
@@ -244,7 +206,7 @@ const example: ExampleDefinition<CarouselState> = {
     return state;
   },
   hasActiveTransitions(state, renderResult) {
-    return state.animating && !!renderResult.hasActiveTransitions;
+    return state.animating && renderResult.animating;
   },
   summary(state) {
     return `native transition | ${slides[state.currentSlide].title}`;

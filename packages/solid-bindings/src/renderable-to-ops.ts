@@ -60,7 +60,14 @@ export function renderableToOps(renderable: Renderable): Op[] {
     if (props.bg !== undefined) openProps.bg = props.bg;
     if (props.border) openProps.border = props.border;
     if (props.cornerRadius) openProps.cornerRadius = props.cornerRadius;
-    if (props.clip) openProps.clip = props.clip;
+    const clipOffset = (props.clip as { childOffset?: { x?: number; y?: number } } | undefined)
+      ?.childOffset;
+    if (clipOffset) {
+      const clip: { x?: number; y?: number } = {};
+      if (clipOffset.x !== undefined) clip.x = clipOffset.x;
+      if (clipOffset.y !== undefined) clip.y = clipOffset.y;
+      openProps.clip = clip;
+    }
     if (props.floating) openProps.floating = props.floating;
 
     ops.push(open(node.id, openProps));

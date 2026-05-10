@@ -8,7 +8,7 @@ const [result] = createStore(
     await delay(80);
     return { value: "Resolved async store" };
   },
-  {} as { value?: string },
+  { value: "" },
 );
 
 runApp(() => (

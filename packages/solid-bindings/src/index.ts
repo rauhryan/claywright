@@ -8,7 +8,7 @@ export {
   type AppView,
 } from "./runtime";
 export { Portal } from "./Portal";
-export { ATTACH_POINT, ATTACH_TO, POINTER_CAPTURE_MODE, CLIP_TO } from "clayterm";
+export { ATTACH_POINT, ATTACH_TO, POINTER_CAPTURE_MODE, CLIP_TO } from "./constants";
 export {
   action,
   createContext,

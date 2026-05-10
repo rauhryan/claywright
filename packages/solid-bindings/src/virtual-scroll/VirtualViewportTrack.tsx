@@ -29,7 +29,8 @@ export function VirtualViewportTrack(props: VirtualViewportTrackProps) {
         bg={props.bg}
       >
         {Array.from({ length: geometry.trackSize }, (_, index) => {
-          const active = index >= geometry.thumbPos && index < geometry.thumbPos + geometry.thumbSize;
+          const active =
+            index >= geometry.thumbPos && index < geometry.thumbPos + geometry.thumbSize;
           return (
             <box width={fixed(1)} height={fixed(1)}>
               <text color={active ? props.activeColor : props.inactiveColor}>

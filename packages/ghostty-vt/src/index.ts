@@ -137,6 +137,12 @@ const lib = dlopen(libPath, {
   },
 });
 
+function sanitizeTerminalWrite(bytes: Uint8Array): Uint8Array {
+  const text = new TextDecoder().decode(bytes);
+  const sanitized = text.replace(/\x1b\[<[0-9;]*[Mm]/g, "");
+  return sanitized === text ? bytes : new TextEncoder().encode(sanitized);
+}
+
 export interface TerminalOptions {
   cols?: number;
   rows?: number;
@@ -203,7 +209,11 @@ export class GhosttyTerminal {
 
   write(data: string | Uint8Array): void {
     const bytes = typeof data === "string" ? new TextEncoder().encode(data) : data;
-    lib.symbols.ghostty_wrapper_terminal_write(this.handle, ptr(bytes), bytes.length);
+    const sanitized = sanitizeTerminalWrite(bytes);
+    if (sanitized.length === 0) {
+      return;
+    }
+    lib.symbols.ghostty_wrapper_terminal_write(this.handle, ptr(sanitized), sanitized.length);
   }
 
   resize(cols: number, rows: number): void {

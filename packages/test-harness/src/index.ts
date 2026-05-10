@@ -99,6 +99,12 @@ export class TerminalSession {
       rows: this.rows,
       maxScrollback: 10000,
     });
+    const originalWrite = this.terminal.write.bind(this.terminal);
+    this.terminal.write = ((data: string | Uint8Array) => {
+      const bytes = typeof data === "string" ? new TextEncoder().encode(data) : data;
+      originalWrite(bytes);
+      this.applyToShadowScreen(bytes);
+    }) as typeof this.terminal.write;
     this.mouseEncoder = new MouseEncoder({
       format: MouseFormat.SGR,
       tracking: MouseTracking.Any,
@@ -151,7 +157,6 @@ export class TerminalSession {
         }
 
         this.terminal.write(value);
-        this.applyToShadowScreen(value);
         this.recordFrame(value);
       }
 
@@ -632,7 +637,7 @@ export class TerminalSession {
     this.cols = cols;
     this.rows = rows;
     this.terminal.resize(cols, rows);
-    this.shadowScreen = this.createShadowScreen();
+    this.syncShadowScreenFromTerminal();
     this.sendInput(`\x1b[8;${rows};${cols}t`);
   }
 
@@ -646,6 +651,16 @@ export class TerminalSession {
 
   getTerminal(): GhosttyTerminal {
     return this.terminal;
+  }
+
+  private syncShadowScreenFromTerminal(): void {
+    this.shadowScreen = {
+      cells: Array.from({ length: this.rows }, (_, row) =>
+        Array.from({ length: this.cols }, (_, col) => this.terminal.getCell(col, row).text || " "),
+      ),
+      cursorRow: Math.min(this.shadowScreen.cursorRow, this.rows - 1),
+      cursorCol: Math.min(this.shadowScreen.cursorCol, this.cols - 1),
+    };
   }
 
   private recordFrame(chunk: Uint8Array): void {

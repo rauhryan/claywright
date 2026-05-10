@@ -210,7 +210,7 @@ export function createAuthoredWorkspaceCompiler(): AuthoredWorkspaceCompiler {
         if (bufferNode.kind === "external-buffer") {
           const bufferId = bufferNode.buffer.id;
           if (seenBufferIds.has(bufferId)) {
-            throw new Error(`Duplicate authored buffer id \"${bufferId}\".`);
+            throw new Error(`Duplicate authored buffer id "${bufferId}".`);
           }
           seenBufferIds.add(bufferId);
           compiledBuffers.push(bufferNode.buffer);
@@ -218,7 +218,7 @@ export function createAuthoredWorkspaceCompiler(): AuthoredWorkspaceCompiler {
         }
 
         if (seenBufferIds.has(bufferNode.id)) {
-          throw new Error(`Duplicate authored buffer id \"${bufferNode.id}\".`);
+          throw new Error(`Duplicate authored buffer id "${bufferNode.id}".`);
         }
         seenBufferIds.add(bufferNode.id);
 
@@ -256,13 +256,13 @@ export function createAuthoredWorkspaceCompiler(): AuthoredWorkspaceCompiler {
       for (const windowNode of normalized.windows) {
         const windowId = windowNode.window.id;
         if (seenWindowIds.has(windowId)) {
-          throw new Error(`Duplicate authored window id \"${windowId}\".`);
+          throw new Error(`Duplicate authored window id "${windowId}".`);
         }
         seenWindowIds.add(windowId);
 
         if (!seenBufferIds.has(windowNode.window.bufferId)) {
           throw new Error(
-            `Authored window \"${windowId}\" references unresolved buffer \"${windowNode.window.bufferId}\".`,
+            `Authored window "${windowId}" references unresolved buffer "${windowNode.window.bufferId}".`,
           );
         }
 
@@ -414,13 +414,13 @@ function normalizePreparedTextBuffer(
   for (const child of children) {
     if (child.kind !== "prepared-text-block") {
       throw new Error(
-        `Invalid child kind \"${child.kind}\" inside prepared-text buffer \"${node.props.id}\". Only AuthoredPreparedTextBlock is allowed.`,
+        `Invalid child kind "${child.kind}" inside prepared-text buffer "${node.props.id}". Only AuthoredPreparedTextBlock is allowed.`,
       );
     }
     assertNoChildren(child.props.children, "prepared-text-block");
     if (blockKeys.has(child.props.key)) {
       throw new Error(
-        `Duplicate authored prepared-text block key \"${child.props.key}\" in buffer \"${node.props.id}\".`,
+        `Duplicate authored prepared-text block key "${child.props.key}" in buffer "${node.props.id}".`,
       );
     }
     blockKeys.add(child.props.key);
@@ -459,13 +459,13 @@ function normalizeTranscriptBuffer(
   for (const child of children) {
     if (child.kind !== "transcript-entry") {
       throw new Error(
-        `Invalid child kind \"${child.kind}\" inside transcript buffer \"${node.props.id}\". Only AuthoredTranscriptEntry is allowed.`,
+        `Invalid child kind "${child.kind}" inside transcript buffer "${node.props.id}". Only AuthoredTranscriptEntry is allowed.`,
       );
     }
     assertNoChildren(child.props.children, "transcript-entry");
     if (entryKeys.has(child.props.key)) {
       throw new Error(
-        `Duplicate authored transcript entry key \"${child.props.key}\" in buffer \"${node.props.id}\".`,
+        `Duplicate authored transcript entry key "${child.props.key}" in buffer "${node.props.id}".`,
       );
     }
     entryKeys.add(child.props.key);
@@ -550,7 +550,7 @@ function isAuthoredDescriptor(value: unknown): value is AuthoredDescriptor {
 function assertNoChildren(children: unknown, kind: AuthoredNodeKind | string): void {
   const normalized = flattenAuthoredValue(children, kind);
   if (normalized.length > 0) {
-    throw new Error(`Authored node \"${kind}\" does not accept children.`);
+    throw new Error(`Authored node "${kind}" does not accept children.`);
   }
 }
 
@@ -607,7 +607,7 @@ function createSignatureSerializer(): SignatureSerializer {
         if (!isPlainObject(value)) {
           return `obj:${getObjectId(value as object)}`;
         }
-        const keys = Object.keys(value).sort();
+        const keys = Object.keys(value).toSorted();
         return `{${keys.map((key) => `${JSON.stringify(key)}:${serialize((value as Record<string, unknown>)[key])}`).join(",")}}`;
       }
       default:
