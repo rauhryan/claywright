@@ -1,12 +1,15 @@
 import { describe, expect, test } from "bun:test";
 import {
   layoutText,
+  materializeTextRow,
   measureCellWidth,
   measureWrappedHeight,
+  nextTextRow,
   prepareText,
+  walkTextRows,
   wrapText,
   type TextMeasureApi,
-} from "clayterm";
+} from "@tui/text-measure";
 
 describe("cross-layer conformance", () => {
   test("measureWrappedHeight matches prepareText/layoutText row counts", () => {
@@ -32,6 +35,11 @@ describe("cross-layer conformance", () => {
       measureCellWidth,
       wrapText,
       measureWrappedHeight,
+      prepareText,
+      layoutText,
+      walkTextRows,
+      nextTextRow,
+      materializeTextRow,
     };
 
     const item = {

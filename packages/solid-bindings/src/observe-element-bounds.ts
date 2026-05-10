@@ -1,4 +1,4 @@
-import type { ElementBounds } from "clayterm";
+import type { BoundingBox as ElementBounds } from "clayterm";
 
 export interface ElementBoundsObserverOptions {
   elementId: string;

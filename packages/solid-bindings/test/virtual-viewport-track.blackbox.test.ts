@@ -14,13 +14,14 @@ function sendWheel(
 }
 
 function trackPattern(screen: ScreenSnapshot): string {
-  return screen.lines.slice(2, 10).map((line) => line.at(-1) ?? " ").join("");
+  return screen.lines
+    .slice(2, 10)
+    .map((line) => line.at(-1) ?? " ")
+    .join("");
 }
 
 function visibleRows(screen: ScreenSnapshot): string[] {
-  return screen.lines
-    .slice(2, 10)
-    .map((line) => line.match(/Row \d+/)?.[0] ?? "");
+  return screen.lines.slice(2, 10).map((line) => line.match(/Row \d+/)?.[0] ?? "");
 }
 
 describe("virtual viewport scroll track fixture", () => {
@@ -38,8 +39,9 @@ describe("virtual viewport scroll track fixture", () => {
     await session.spawn("bun", [fixture]);
 
     expect(await session.waitForText("Virtual Viewport Scroll Track Demo", 2000)).toBe(true);
-    expect(await session.waitForTextConvergence("scroll=0", { timeout: 2000, settleMs: 100 }))
-      .not.toBeNull();
+    expect(
+      await session.waitForTextConvergence("scroll=0", { timeout: 2000, settleMs: 100 }),
+    ).not.toBeNull();
     expect(await session.waitForText("Row 1", 2000)).toBe(true);
 
     const before = session.getScreen();

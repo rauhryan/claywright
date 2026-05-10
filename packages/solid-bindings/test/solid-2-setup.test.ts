@@ -29,7 +29,9 @@ describe("solid 2 renderer setup", () => {
 
     expect(node).toBeDefined();
     expect((node as ElementNode).children[0]).toBeDefined();
-    expect((node as ElementNode).children[0]?.value).toBe("Hello 2.0");
+    expect(((node as ElementNode).children[0] as { value?: string } | undefined)?.value).toBe(
+      "Hello 2.0",
+    );
   });
 
   test("spread updates node props through universal helper", () => {
@@ -44,6 +46,6 @@ describe("solid 2 renderer setup", () => {
     expect(node.props.bg).toBe(123);
     expect(child.parent).toBeNull();
     expect(node.children).toHaveLength(1);
-    expect(node.children[0]?.value).toBe("ok");
+    expect((node.children[0] as { value?: string } | undefined)?.value).toBe("ok");
   });
 });

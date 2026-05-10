@@ -1,18 +1,22 @@
 {
-  "compilerOptions": {
-    "ignoreDeprecations": "6.0",
-    "baseUrl": ".",
-    "jsx": "react-jsx",
-    "jsxImportSource": "@tui/solid-bindings",
-    "paths": {
-      "clayterm": ["packages/clayterm/build/npm/esm/mod.d.ts"],
-      "clayterm/input": ["packages/clayterm/build/npm/esm/input.d.ts"],
-      "clayterm/ops": ["packages/clayterm/build/npm/esm/ops.d.ts"],
-      "clayterm/term": ["packages/clayterm/build/npm/esm/term.d.ts"],
-      "clayterm/wasm": ["packages/clayterm/build/npm/esm/wasm.d.ts"],
-      "@tui/solid-bindings": ["packages/solid-bindings/src/index.ts"],
-      "@tui/solid-bindings/jsx-runtime": ["packages/solid-bindings/src/jsx-runtime.ts"],
-      "@tui/solid-bindings/jsx-dev-runtime": ["packages/solid-bindings/src/jsx-dev-runtime.ts"]
+    "compilerOptions": {
+        "ignoreDeprecations": "6.0",
+        "baseUrl": ".",
+        "jsx": "react-jsx",
+        "jsxImportSource": "@tui/solid-bindings",
+        "paths": {
+            "clayterm": ["packages/clayterm/build/npm/esm/mod.d.ts"],
+            "clayterm/input": ["packages/clayterm/build/npm/esm/input.d.ts"],
+            "clayterm/ops": ["packages/clayterm/build/npm/esm/ops.d.ts"],
+            "clayterm/term": ["packages/clayterm/build/npm/esm/term.d.ts"],
+            "clayterm/wasm": ["packages/clayterm/build/npm/esm/wasm.d.ts"],
+            "@tui/text-measure": ["packages/text-measure/src/index.ts"],
+            "@tui/text-virtualizer": ["packages/text-virtualizer/src/index.ts"],
+            "@tui/solid-bindings": ["packages/solid-bindings/src/index.ts"],
+            "@tui/solid-bindings/jsx-runtime": ["packages/solid-bindings/src/jsx-runtime.ts"],
+            "@tui/solid-bindings/jsx-dev-runtime": [
+                "packages/solid-bindings/src/jsx-dev-runtime.ts"
+            ]
+        }
     }
-  }
 }

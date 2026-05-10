@@ -133,7 +133,7 @@ describe("BufferWindow", () => {
         element: ATTACH_POINT.CENTER_CENTER,
         parent: ATTACH_POINT.CENTER_CENTER,
       },
-      pointerCaptureMode: 0,
+      pointerCaptureMode: "capture",
       zIndex: 40,
     });
 

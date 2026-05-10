@@ -147,12 +147,12 @@ describe("buffer-window compositor", () => {
     expect(right.id).toBe("right");
     expect(floating.id).toBe("float");
     expect(floating.props.floating).toEqual({
-      attachTo: 3,
+      attachTo: "root",
       attachPoints: {
         element: ATTACH_POINT.LEFT_TOP,
         parent: ATTACH_POINT.LEFT_TOP,
       },
-      pointerCaptureMode: 0,
+      pointerCaptureMode: "capture",
       x: 18,
       y: 4,
       zIndex: 25,

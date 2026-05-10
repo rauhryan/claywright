@@ -1,0 +1,14 @@
+{
+    "name": "@tui/text-virtualizer",
+    "version": "0.1.0",
+    "type": "module",
+    "exports": {
+        ".": "./src/index.ts"
+    },
+    "scripts": {
+        "test": "bun test"
+    },
+    "dependencies": {
+        "@tui/text-measure": "workspace:*"
+    }
+}

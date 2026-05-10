@@ -1,4 +1,11 @@
-import { createInput, close, grow, open, type ElementBounds, type Op } from "clayterm";
+import {
+  createInput,
+  close,
+  grow,
+  open,
+  type BoundingBox as ElementBounds,
+  type Op,
+} from "clayterm";
 import { createComponent, createContext, createSignal, flush, useContext } from "solid-js";
 import { InputRenderable, Renderer } from "@tui/core";
 import { render as mountSolid } from "./jsx-runtime";
@@ -31,6 +38,27 @@ export function useAppContext(): AppContext {
 }
 
 export type AppView = (ctx: AppContext) => unknown;
+
+function parseSyntheticResize(bytes: Uint8Array): { width: number; height: number } | null {
+  const text = new TextDecoder().decode(bytes);
+  const prefix = "\u001b[8;";
+  if (!text.startsWith(prefix) || !text.endsWith("t")) {
+    return null;
+  }
+
+  const parts = text.slice(prefix.length, -1).split(";");
+  if (parts.length !== 2) {
+    return null;
+  }
+
+  const height = Number(parts[0]);
+  const width = Number(parts[1]);
+  if (!Number.isInteger(width) || !Number.isInteger(height)) {
+    return null;
+  }
+
+  return { height, width };
+}
 
 function clearDirty(node: OpNode): void {
   node.markClean();
@@ -222,6 +250,17 @@ export async function runApp(view: AppView, options: AppOptions = {}): Promise<v
 
   process.stdin.on("data", async (buf: Buffer) => {
     const bytes = new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength);
+    const syntheticResize = parseSyntheticResize(bytes);
+    if (syntheticResize) {
+      await renderer.resize(syntheticResize.width, syntheticResize.height);
+      setWidth(syntheticResize.width);
+      setHeight(syntheticResize.height);
+      if (renderFramePass(false)) {
+        scheduleFrame();
+      }
+      return;
+    }
+
     const result = input.scan(bytes);
     const { events } = result;
 

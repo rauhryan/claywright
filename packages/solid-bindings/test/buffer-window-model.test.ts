@@ -8,7 +8,7 @@ import {
   prepareText,
   walkTextRows,
   wrapText,
-} from "clayterm";
+} from "@tui/text-measure";
 import { createPreparedTextBuffer, createTranscriptBuffer, type BufferWindowModel } from "../src";
 
 const measureApi = {
@@ -45,8 +45,16 @@ describe("buffer-window models", () => {
       mode: "docked",
     };
 
-    const leftItem = buffer.resolveContent(leftWindow).items[0];
-    const rightItem = buffer.resolveContent(rightWindow).items[0];
+    const leftContent = buffer.resolveContent(leftWindow);
+    const rightContent = buffer.resolveContent(rightWindow);
+    expect(leftContent.kind).toBe("items");
+    expect(rightContent.kind).toBe("items");
+    if (leftContent.kind !== "items" || rightContent.kind !== "items") {
+      throw new Error("Expected prepared-text buffer to resolve item content.");
+    }
+
+    const leftItem = leftContent.items[0]!;
+    const rightItem = rightContent.items[0]!;
 
     expect(leftItem).not.toBe(rightItem);
     expect(leftItem.key).toBe("intro");
@@ -84,8 +92,16 @@ describe("buffer-window models", () => {
       },
     };
 
-    const expandedItem = buffer.resolveContent(expandedWindow).items[0];
-    const collapsedItem = buffer.resolveContent(collapsedWindow).items[0];
+    const expandedContent = buffer.resolveContent(expandedWindow);
+    const collapsedContent = buffer.resolveContent(collapsedWindow);
+    expect(expandedContent.kind).toBe("items");
+    expect(collapsedContent.kind).toBe("items");
+    if (expandedContent.kind !== "items" || collapsedContent.kind !== "items") {
+      throw new Error("Expected transcript buffer to resolve item content.");
+    }
+
+    const expandedItem = expandedContent.items[0]!;
+    const collapsedItem = collapsedContent.items[0]!;
     const expandedHeight = expandedItem.measure(22, measureApi).height;
     const collapsedHeight = collapsedItem.measure(22, measureApi).height;
 

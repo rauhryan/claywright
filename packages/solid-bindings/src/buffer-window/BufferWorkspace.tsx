@@ -129,7 +129,7 @@ export const BufferWorkspace = stateful(function BufferWorkspace(rawProps: Buffe
 
     const code = event.code ?? event.key;
     if (code === "Tab") {
-      cycleActiveWindow(event.shift ? -1 : 1);
+      cycleActiveWindow(event.modifiers.shift ? -1 : 1);
       event.preventDefault();
       return;
     }

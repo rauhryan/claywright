@@ -1,4 +1,4 @@
-import { ATTACH_TO, fixed, grow, POINTER_CAPTURE_MODE, type ElementBounds } from "clayterm";
+import { fixed, grow, type BoundingBox as ElementBounds } from "clayterm";
 import { createMemo, createRenderEffect, createSignal, onCleanup } from "solid-js";
 import { stateful } from "../component-flags";
 import { createElementBoundsObserver, sameBounds } from "../observe-element-bounds";
@@ -48,8 +48,8 @@ export const BufferWindow = stateful(function BufferWindow(rawProps: BufferWindo
   const floating = createMemo<FloatingWindowConfig | undefined>(() => {
     if (rawProps.window.mode !== "floating") return undefined;
     return {
-      attachTo: ATTACH_TO.ROOT,
-      pointerCaptureMode: POINTER_CAPTURE_MODE.CAPTURE,
+      attachTo: "root",
+      pointerCaptureMode: "capture",
       ...rawProps.window.floating,
     };
   });
@@ -129,8 +129,8 @@ export const BufferWindow = stateful(function BufferWindow(rawProps: BufferWindo
       resolved: resolvedBuffer(),
       current: state(),
     }),
-    ({ resolved, current }) => {
-      if (!resolved) {
+    ({ resolved: isResolved, current }) => {
+      if (!isResolved) {
         rawProps.ref?.(undefined);
         return;
       }

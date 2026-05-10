@@ -36,12 +36,14 @@ describe("virtual viewport pointer integration", () => {
                   id="viewport"
                   initialAutoFollow={false}
                   bg={0xff101010}
-                  items={Array.from({ length: 5 }, (_, index) => createPreparedTextVirtualItem({
-                    key: `row-${index + 1}`,
-                    text: `Row ${index + 1}`,
-                    estimatedElementsPerRow: 1,
-                    estimatedMeasuredWords: 1,
-                  }))}
+                  items={Array.from({ length: 5 }, (_, index) =>
+                    createPreparedTextVirtualItem({
+                      key: `row-${index + 1}`,
+                      text: `Row ${index + 1}`,
+                      estimatedElementsPerRow: 1,
+                      estimatedMeasuredWords: 1,
+                    }),
+                  )}
                 />
               </box>
             ) as never;

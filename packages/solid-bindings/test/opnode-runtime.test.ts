@@ -33,9 +33,12 @@ describe("opnode jsx runtime", () => {
 
     const ops = [open("root", {}), ...root.children.flatMap((child) => child.toOps()), close()];
 
-    expect(ops[0]).toHaveProperty("name", "root");
-    expect(ops[1]).toHaveProperty("name", node.id);
+    expect(ops[0]).toHaveProperty("id", "root");
+    expect(ops[0]).toHaveProperty("directive", 0x02);
+    expect(ops[1]).toHaveProperty("id", node.id);
+    expect(ops[1]).toHaveProperty("directive", 0x02);
     expect(ops[2]).toHaveProperty("content", "Hello");
-    expect(ops[3]).toHaveProperty("id");
+    expect(ops[2]).toHaveProperty("directive", 0x03);
+    expect(ops[3]).toHaveProperty("directive", 0x04);
   });
 });

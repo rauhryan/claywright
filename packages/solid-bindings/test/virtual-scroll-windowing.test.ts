@@ -1,5 +1,14 @@
 import { describe, expect, test } from "bun:test";
-import { measureCellWidth, measureWrappedHeight, wrapText } from "clayterm";
+import {
+  layoutText,
+  materializeTextRow,
+  measureCellWidth,
+  measureWrappedHeight,
+  nextTextRow,
+  prepareText,
+  walkTextRows,
+  wrapText,
+} from "@tui/text-measure";
 import { MeasurementCache } from "../src/virtual-scroll/measurement-cache";
 import { computeWindowLayout, measureItems } from "../src/virtual-scroll/windowing";
 import type { VirtualItem } from "../src/virtual-scroll/types";
@@ -37,18 +46,26 @@ describe("virtual scroll measurement helpers", () => {
   });
 });
 
+const measure = {
+  measureCellWidth,
+  wrapText,
+  measureWrappedHeight,
+  prepareText,
+  layoutText,
+  walkTextRows,
+  nextTextRow,
+  materializeTextRow,
+};
+
 describe("virtual scroll windowing", () => {
   test("duplicate keys are rejected", () => {
     const cache = new MeasurementCache();
     const items = [createItem("dup", 1), createItem("dup", 2)];
-    expect(() =>
-      measureItems(items, 10, { measureCellWidth, wrapText, measureWrappedHeight }, cache),
-    ).toThrow(/Duplicate virtual item key/);
+    expect(() => measureItems(items, 10, measure, cache)).toThrow(/Duplicate virtual item key/);
   });
 
   test("budgetExceeded becomes true when visible items exceed budget", () => {
     const cache = new MeasurementCache();
-    const measure = { measureCellWidth, wrapText, measureWrappedHeight };
     const measured = measureItems(
       [createItem("a", 2, 3), createItem("b", 2, 3), createItem("c", 2, 3)],
       10,
@@ -65,7 +82,6 @@ describe("virtual scroll windowing", () => {
 
   test("overscan is reduced before visible coverage is reduced", () => {
     const cache = new MeasurementCache();
-    const measure = { measureCellWidth, wrapText, measureWrappedHeight };
     const measured = measureItems(
       [createItem("a", 1, 1), createItem("b", 1, 1), createItem("c", 1, 1), createItem("d", 1, 1)],
       10,

@@ -1,4 +1,4 @@
-import type { TextMeasureApi } from "clayterm";
+import type { TextMeasureApi } from "@tui/text-measure";
 import type { VirtualItem, VirtualItemMeasurement } from "./types";
 
 interface CachedMeasurement {

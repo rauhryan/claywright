@@ -83,7 +83,7 @@ export function isStatefulComponent(value: unknown): boolean {
   return Boolean(
     value &&
     typeof value === "function" &&
-    (value as Record<PropertyKey, unknown>)[STATEFUL_COMPONENT],
+    (value as unknown as Record<PropertyKey, unknown>)[STATEFUL_COMPONENT],
   );
 }
 
@@ -92,5 +92,8 @@ export function getStatefulComponentTarget<T extends Function>(component: T): T 
   if (typeof component !== "function") {
     return component;
   }
-  return ((component as Record<PropertyKey, unknown>)[STATEFUL_COMPONENT_TARGET] as T) ?? component;
+  return (
+    ((component as unknown as Record<PropertyKey, unknown>)[STATEFUL_COMPONENT_TARGET] as T) ??
+    component
+  );
 }

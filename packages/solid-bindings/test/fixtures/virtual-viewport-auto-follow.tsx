@@ -64,7 +64,9 @@ function buildItem(sequence: number, version: number = 1): Item {
   };
 }
 
-const [items, setItems] = createSignal<Item[]>(Array.from({ length: 30 }, (_, index) => buildItem(index + 1)));
+const [items, setItems] = createSignal<Item[]>(
+  Array.from({ length: 30 }, (_, index) => buildItem(index + 1)),
+);
 const [status, setStatus] = createSignal("booting");
 const [lastEvent, setLastEvent] = createSignal("none");
 
@@ -85,14 +87,18 @@ setInterval(() => {
   });
 }, 750);
 
-const viewportItems = createMemo(() => items().map((item) => createTranscriptVirtualItem({
-  key: item.key,
-  version: item.version,
-  speaker: item.speaker,
-  kind: item.kind,
-  timestamp: item.timestamp,
-  text: item.text,
-})));
+const viewportItems = createMemo(() =>
+  items().map((item) =>
+    createTranscriptVirtualItem({
+      key: item.key,
+      version: item.version,
+      speaker: item.speaker,
+      kind: item.kind,
+      timestamp: item.timestamp,
+      text: item.text,
+    }),
+  ),
+);
 const tail = createMemo(() => items()[items().length - 1]);
 
 runApp(() => (
@@ -101,7 +107,9 @@ runApp(() => (
       <text>Virtual Viewport Auto-Follow Demo</text>
     </box>
     <box width={grow()} height={fixed(1)}>
-      <text>{status()} event={lastEvent()}</text>
+      <text>
+        {status()} event={lastEvent()}
+      </text>
     </box>
     <VirtualViewport
       id="viewport"

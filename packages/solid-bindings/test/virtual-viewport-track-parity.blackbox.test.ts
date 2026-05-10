@@ -28,17 +28,18 @@ describe("virtual viewport track parity fixture", () => {
     await session.spawn("bun", [fixture]);
 
     expect(await session.waitForText("Left viewport · no track", 2000)).toBe(true);
-    expect(await session.waitForTextConvergence("L f=n c=n w=- s=0", { timeout: 2000, settleMs: 100 }))
-      .not.toBeNull();
+    expect(
+      await session.waitForTextConvergence("L f=n c=n w=- s=0", { timeout: 2000, settleMs: 100 }),
+    ).not.toBeNull();
 
     session.mouseMove(2, 4);
     await session.wait(100);
     session.click(2, 4);
     expect(
-      await session.waitForConvergence(
-        (screen) => screen.raw.includes("L f=y c=y w=- s=0"),
-        { timeout: 2000, settleMs: 100 },
-      ),
+      await session.waitForConvergence((screen) => screen.raw.includes("L f=y c=y w=- s=0"), {
+        timeout: 2000,
+        settleMs: 100,
+      }),
     ).not.toBeNull();
 
     session.sendKey("pagedown");
@@ -66,17 +67,20 @@ describe("virtual viewport track parity fixture", () => {
 
     expect(await session.waitForText("Right viewport · with track", 2000)).toBe(true);
     expect(
-      await session.waitForTextConvergence("R f=n c=n w=- s=0 t=0/3", { timeout: 2000, settleMs: 100 }),
+      await session.waitForTextConvergence("R f=n c=n w=- s=0 t=0/3", {
+        timeout: 2000,
+        settleMs: 100,
+      }),
     ).not.toBeNull();
 
     session.mouseMove(42, 4);
     await session.wait(100);
     session.click(42, 4);
     expect(
-      await session.waitForConvergence(
-        (screen) => screen.raw.includes("R f=y c=y w=- s=0 t=0/3"),
-        { timeout: 2000, settleMs: 100 },
-      ),
+      await session.waitForConvergence((screen) => screen.raw.includes("R f=y c=y w=- s=0 t=0/3"), {
+        timeout: 2000,
+        settleMs: 100,
+      }),
     ).not.toBeNull();
 
     session.sendKey("pagedown");
@@ -94,8 +98,7 @@ describe("virtual viewport track parity fixture", () => {
     expect(
       await session.waitForConvergence(
         (screen) =>
-          screen.raw.includes("R f=y c=y w=d s=12 t=3/3") &&
-          screen.raw.includes("Right Row 13"),
+          screen.raw.includes("R f=y c=y w=d s=12 t=3/3") && screen.raw.includes("Right Row 13"),
         { timeout: 2000, settleMs: 100 },
       ),
     ).not.toBeNull();

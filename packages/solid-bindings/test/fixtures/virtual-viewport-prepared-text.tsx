@@ -40,7 +40,7 @@ const items = [
   createPreparedTextVirtualItem({
     key: "p-4",
     text: "Prepared text item four still uses the lower-level helper directly and styles continuation rows differently to prove the row hooks are live.",
-    rowColor: (row) => row.continued ? 0xff9ecbff : 0xffedf3ff,
+    rowColor: (row) => (row.continued ? 0xff9ecbff : 0xffedf3ff),
   }),
 ];
 
@@ -59,7 +59,9 @@ runApp(() => (
       bg={0xff101010}
       items={items}
       onStateChange={(state) => {
-        setStatus(`content=${state.contentHeight} items=${items.length} window=${state.windowStartIndex}-${state.windowEndIndex}`);
+        setStatus(
+          `content=${state.contentHeight} items=${items.length} window=${state.windowStartIndex}-${state.windowEndIndex}`,
+        );
       }}
     />
   </box>

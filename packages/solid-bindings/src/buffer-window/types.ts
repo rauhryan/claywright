@@ -1,4 +1,5 @@
 import type { KeyboardEvent } from "@tui/core";
+import type { AttachPoint, AttachTo, ClipTo, PointerCaptureMode } from "clayterm";
 import type { JSX } from "../jsx-runtime";
 import type {
   VirtualItem,
@@ -22,10 +23,10 @@ export interface FloatingWindowConfig {
   y?: number;
   expand?: { width?: number; height?: number };
   parent?: number;
-  attachTo?: number;
-  attachPoints?: { element?: number; parent?: number };
-  pointerCaptureMode?: number;
-  clipTo?: number;
+  attachTo?: AttachTo;
+  attachPoints?: { element?: AttachPoint; parent?: AttachPoint };
+  pointerCaptureMode?: PointerCaptureMode;
+  clipTo?: ClipTo;
   zIndex?: number;
 }
 

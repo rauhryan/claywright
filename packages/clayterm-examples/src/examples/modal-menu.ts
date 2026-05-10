@@ -1,4 +1,4 @@
-import { ATTACH_POINT, ATTACH_TO, close, fixed, grow, open, rgba, text, type Op } from "clayterm";
+import { close, fixed, grow, open, rgba, text, type Op } from "clayterm";
 import { getTerminalSize, runExample, type ExampleDefinition } from "../runtime";
 
 interface CommandItem {
@@ -420,10 +420,10 @@ const example: ExampleDefinition<State> = {
           floating: {
             x: 1,
             y: 1,
-            attachTo: ATTACH_TO.ROOT,
+            attachTo: "root",
             attachPoints: {
-              element: ATTACH_POINT.CENTER_CENTER,
-              parent: ATTACH_POINT.CENTER_CENTER,
+              element: "center-center",
+              parent: "center-center",
             },
             zIndex: 20,
           },
@@ -442,10 +442,10 @@ const example: ExampleDefinition<State> = {
             padding: { left: 2, right: 2, top: 1, bottom: 1 },
           },
           floating: {
-            attachTo: ATTACH_TO.ROOT,
+            attachTo: "root",
             attachPoints: {
-              element: ATTACH_POINT.CENTER_CENTER,
-              parent: ATTACH_POINT.CENTER_CENTER,
+              element: "center-center",
+              parent: "center-center",
             },
             zIndex: 30,
           },

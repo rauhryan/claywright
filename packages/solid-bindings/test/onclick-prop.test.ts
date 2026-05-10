@@ -16,12 +16,12 @@ describe("onClick prop", () => {
       return box;
     }, root);
 
-    const child = root.children[0];
+    const child = root.children[0] as { props: { onClick?: () => void } } | undefined;
     expect(child).toBeDefined();
     expect(child?.props.onClick).toBeDefined();
     expect(typeof child?.props.onClick).toBe("function");
 
-    child?.props.onClick();
+    child?.props.onClick?.();
     expect(clicked).toBe(true);
   });
 

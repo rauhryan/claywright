@@ -8,7 +8,7 @@ import {
   prepareText,
   walkTextRows,
   wrapText,
-} from "clayterm";
+} from "@tui/text-measure";
 import { render } from "../src/jsx-runtime";
 import { ElementOpNode, TextOpNode, type OpNode } from "../src/opnode";
 import {
@@ -90,9 +90,15 @@ describe("prepared text virtual item", () => {
     const dispose = render(() => item.render(), root);
     const textElements = collectTextElements(root);
 
-    expect(textElements.some((entry) => entry.text === "red" && entry.color === 0xffcd3131)).toBe(true);
-    expect(textElements.some((entry) => entry.text === " plain " && entry.color === undefined)).toBe(true);
-    expect(textElements.some((entry) => entry.text === "cyan" && entry.color === 0xff00d7ff)).toBe(true);
+    expect(textElements.some((entry) => entry.text === "red" && entry.color === 0xffcd3131)).toBe(
+      true,
+    );
+    expect(
+      textElements.some((entry) => entry.text === " plain " && entry.color === undefined),
+    ).toBe(true);
+    expect(textElements.some((entry) => entry.text === "cyan" && entry.color === 0xff00d7ff)).toBe(
+      true,
+    );
 
     dispose();
   });
@@ -101,8 +107,8 @@ describe("prepared text virtual item", () => {
     const item = createPreparedTextVirtualItem({
       key: "message-rows",
       text: "alpha beta gamma delta",
-      rowColor: (row) => row.continued ? 0xffa6e3a1 : 0xffedf3ff,
-      rowBg: (row) => row.index === 1 ? 0xff202030 : undefined,
+      rowColor: (row) => (row.continued ? 0xffa6e3a1 : 0xffedf3ff),
+      rowBg: (row) => (row.index === 1 ? 0xff202030 : undefined),
     });
 
     item.measure(8, textApi);
@@ -135,7 +141,9 @@ describe("prepared text virtual item", () => {
       text: "A thinking block should occupy multiple wrapped rows when expanded in a narrow viewport.",
     });
 
-    expect(expanded.measure(12, textApi).height).toBeGreaterThan(collapsed.measure(12, textApi).height);
+    expect(expanded.measure(12, textApi).height).toBeGreaterThan(
+      collapsed.measure(12, textApi).height,
+    );
   });
 
   test("transcript virtual items can render a header badge", () => {
@@ -154,7 +162,9 @@ describe("prepared text virtual item", () => {
     const dispose = render(() => item.render(), root);
     const textElements = collectTextElements(root);
 
-    expect(textElements.some((entry) => entry.text === "collapsed" && entry.color === 0xfffff4d6)).toBe(true);
+    expect(
+      textElements.some((entry) => entry.text === "collapsed" && entry.color === 0xfffff4d6),
+    ).toBe(true);
 
     dispose();
   });

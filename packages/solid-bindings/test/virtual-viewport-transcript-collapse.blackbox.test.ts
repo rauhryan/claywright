@@ -1,7 +1,8 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { createSession, type TerminalSession } from "@tui/test-harness";
 
-const fixture = new URL("./fixtures/virtual-viewport-transcript-collapse.tsx", import.meta.url).pathname;
+const fixture = new URL("./fixtures/virtual-viewport-transcript-collapse.tsx", import.meta.url)
+  .pathname;
 
 describe("virtual viewport transcript collapse fixture", () => {
   let session: TerminalSession;

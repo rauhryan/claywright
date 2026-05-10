@@ -48,12 +48,14 @@ describe("virtual viewport routing hit test", () => {
                   id="viewport"
                   height={fixed(3)}
                   initialAutoFollow={false}
-                  items={Array.from({ length: 3 }, (_, index) => createPreparedTextVirtualItem({
-                    key: `row-${index + 1}`,
-                    text: `Row ${index + 1}`,
-                    estimatedElementsPerRow: 1,
-                    estimatedMeasuredWords: 1,
-                  }))}
+                  items={Array.from({ length: 3 }, (_, index) =>
+                    createPreparedTextVirtualItem({
+                      key: `row-${index + 1}`,
+                      text: `Row ${index + 1}`,
+                      estimatedElementsPerRow: 1,
+                      estimatedMeasuredWords: 1,
+                    }),
+                  )}
                 />
               </box>
             ) as never;
@@ -67,9 +69,9 @@ describe("virtual viewport routing hit test", () => {
     const ops = [open("root", { layout: { width: grow(), height: grow() } }), ...innerOps, close()];
     const term = await createTerm({ width: 40, height: 10 });
 
-    term.render(ops, { pointer: { x: 0, y: 0, down: false } });
-    const boxBounds = term.getElementBounds("box-target");
-    const viewportBounds = term.getElementBounds("viewport");
+    const initialResult = term.render(ops, { pointer: { x: 0, y: 0, down: false } });
+    const boxBounds = initialResult.info.get("box-target")?.bounds;
+    const viewportBounds = initialResult.info.get("viewport")?.bounds;
     expect(boxBounds).toEqual({ x: 0, y: 3, width: 20, height: 3 });
     expect(viewportBounds).toEqual({ x: 0, y: 6, width: 40, height: 3 });
 

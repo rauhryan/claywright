@@ -1,10 +1,11 @@
 import {
   createInput,
   createTerm,
-  type ElementBounds,
+  type BoundingBox as ElementBounds,
   type InputEvent,
   type Op,
   type PointerEvent as ClaytermPointerEvent,
+  type RenderInfo,
 } from "clayterm";
 import { Renderable } from "./Renderable.js";
 import {
@@ -35,6 +36,7 @@ export class Renderer {
   pressedRenderable: Renderable | null = null;
 
   private renderablesById: Map<string, Renderable> = new Map();
+  private lastRenderInfo: RenderInfo | null = null;
 
   constructor(options: RendererOptions = {}) {
     this.width = options.width ?? process.stdout.columns ?? Number(process.env.COLUMNS ?? 80);
@@ -161,7 +163,7 @@ export class Renderer {
   }
 
   getElementBounds(id: string): ElementBounds | undefined {
-    return this.term?.getElementBounds(id);
+    return this.lastRenderInfo?.get(id)?.bounds;
   }
 
   render(ops: Op[], pointer?: { x: number; y: number; down: boolean }): Uint8Array {
@@ -169,8 +171,9 @@ export class Renderer {
       throw new Error("Renderer not initialized. Call init() first.");
     }
 
-    const { output, events } = this.term.render(ops, { pointer });
+    const { output, events, info } = this.term.render(ops, { pointer });
     this.lastPointerEvents = events;
+    this.lastRenderInfo = info;
 
     // Clayterm's render pass reports pointer-over lifecycle derived from the
     // current layout (enter/leave/click). This path is complementary to raw
@@ -431,6 +434,7 @@ export class Renderer {
     }
 
     this.term = await createTerm({ width, height });
+    this.lastRenderInfo = null;
   }
 
   destroy(): void {
@@ -444,5 +448,6 @@ export class Renderer {
     this.rootRenderable = null;
     this.term = null;
     this.input = null;
+    this.lastRenderInfo = null;
   }
 }

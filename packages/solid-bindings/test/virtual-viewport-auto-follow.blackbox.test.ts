@@ -28,10 +28,15 @@ describe("virtual viewport auto-follow", () => {
     await session.spawn("bun", [fixture]);
 
     expect(await session.waitForText("Virtual Viewport Auto-Follow Demo", 2000)).toBe(true);
-    expect(await session.waitForTextConvergence("items=30", { timeout: 2000, settleMs: 100 })).not.toBeNull();
+    expect(
+      await session.waitForTextConvergence("items=30", { timeout: 2000, settleMs: 100 }),
+    ).not.toBeNull();
     expect(
       await session.waitForConvergence(
-        (screen) => screen.raw.includes("follow=yes") && /scroll=\d+/.test(screen.raw) && !screen.raw.includes("scroll=0"),
+        (screen) =>
+          screen.raw.includes("follow=yes") &&
+          /scroll=\d+/.test(screen.raw) &&
+          !screen.raw.includes("scroll=0"),
         { timeout: 2000, settleMs: 100 },
       ),
     ).not.toBeNull();
