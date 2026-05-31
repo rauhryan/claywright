@@ -14,6 +14,8 @@ interface State {
   hoveredLauncher: boolean;
   pressedLauncher: boolean;
   selectedIndex: number;
+  hoveredIndex: number | null;
+  pointerInMenu: boolean;
   query: string;
   lastAction: string;
 }
@@ -112,6 +114,8 @@ function openMenu(state: State): State {
     ...state,
     menuOpen: true,
     pressedLauncher: false,
+    hoveredIndex: null,
+    pointerInMenu: false,
     query: "",
     selectedIndex: normalizeSelection("", state.selectedIndex),
   };
@@ -122,6 +126,8 @@ function closeMenu(state: State): State {
     ...state,
     menuOpen: false,
     pressedLauncher: false,
+    hoveredIndex: null,
+    pointerInMenu: false,
   };
 }
 
@@ -131,6 +137,8 @@ function activateSelection(state: State, index: number): State {
     ...state,
     menuOpen: false,
     pressedLauncher: false,
+    hoveredIndex: null,
+    pointerInMenu: false,
     query: "",
     selectedIndex: index,
     lastAction: `Ran ${commands[index].label}`,
@@ -165,6 +173,16 @@ function pointInRect(
   return x >= rect.x && x < rect.x + rect.width && y >= rect.y && y < rect.y + rect.height;
 }
 
+function commandIndexAtPoint(state: State, x: number, y: number): number | null {
+  const rect = modalRect(state.size);
+  if (!pointInRect(x, y, rect)) return null;
+
+  const visible = visibleCommandIndices(state.query);
+  const row = y - (rect.y + 5);
+  if (row < 0 || row >= visible.length) return null;
+  return visible[row] ?? null;
+}
+
 const example: ExampleDefinition<State> = {
   width: size.width,
   height: size.height,
@@ -174,6 +192,8 @@ const example: ExampleDefinition<State> = {
     hoveredLauncher: false,
     pressedLauncher: false,
     selectedIndex: 0,
+    hoveredIndex: null,
+    pointerInMenu: false,
     query: "",
     lastAction: "Waiting for a command",
   },
@@ -190,6 +210,7 @@ const example: ExampleDefinition<State> = {
         : palette.launcherBg;
     const visible = visibleCommandIndices(state.query);
     const selected = normalizeSelection(state.query, state.selectedIndex);
+    const activeIndex = state.menuOpen && state.pointerInMenu ? state.hoveredIndex : selected;
     const modal = modalMetrics(state.size);
     const queryLine =
       state.query.length > 0
@@ -486,7 +507,7 @@ const example: ExampleDefinition<State> = {
       } else {
         for (const index of visible) {
           const command = commands[index];
-          const selectedRow = index === selected;
+          const selectedRow = index === activeIndex;
           pushLine(
             ops,
             `item-${index}`,
@@ -533,9 +554,22 @@ const example: ExampleDefinition<State> = {
         next.pressedLauncher = true;
       }
 
+      if (
+        next.menuOpen &&
+        (event.type === "mousemove" || event.type === "mousedown" || event.type === "mouseup")
+      ) {
+        next.pointerInMenu = pointInRect(event.x, event.y, modalRect(next.size));
+        next.hoveredIndex = next.pointerInMenu ? commandIndexAtPoint(next, event.x, event.y) : null;
+      }
+
       if (event.type === "mouseup") {
         next.pressedLauncher = false;
         if (next.menuOpen && (event.button === "left" || event.button === "release")) {
+          const commandIndex = commandIndexAtPoint(next, event.x, event.y);
+          if (commandIndex !== null) {
+            next = activateSelection(next, commandIndex);
+            continue;
+          }
           if (!pointInRect(event.x, event.y, modalRect(next.size))) {
             next = closeMenu(next);
           }
@@ -562,11 +596,15 @@ const example: ExampleDefinition<State> = {
       }
 
       if (event.key === "ArrowDown") {
+        next.pointerInMenu = false;
+        next.hoveredIndex = null;
         next.selectedIndex = moveSelection(next.query, next.selectedIndex, 1);
         continue;
       }
 
       if (event.key === "ArrowUp") {
+        next.pointerInMenu = false;
+        next.hoveredIndex = null;
         next.selectedIndex = moveSelection(next.query, next.selectedIndex, -1);
         continue;
       }
@@ -577,12 +615,16 @@ const example: ExampleDefinition<State> = {
       }
 
       if (event.key === "Backspace") {
+        next.pointerInMenu = false;
+        next.hoveredIndex = null;
         next.query = next.query.slice(0, -1);
         next.selectedIndex = normalizeSelection(next.query, next.selectedIndex);
         continue;
       }
 
       if (!event.ctrl && !event.alt && event.key.length === 1) {
+        next.pointerInMenu = false;
+        next.hoveredIndex = null;
         next.query += event.key;
         next.selectedIndex = normalizeSelection(next.query, next.selectedIndex);
       }
@@ -604,7 +646,12 @@ const example: ExampleDefinition<State> = {
         const index = Number(event.id.slice(5));
         if (Number.isNaN(index)) continue;
         if (event.type === "pointerenter") {
+          next.pointerInMenu = true;
+          next.hoveredIndex = index;
           next.selectedIndex = index;
+        }
+        if (event.type === "pointerleave" && next.hoveredIndex === index) {
+          next.hoveredIndex = null;
         }
         if (event.type === "pointerclick") {
           next = activateSelection(next, index);

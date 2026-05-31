@@ -139,8 +139,10 @@ describe("modal-menu example", () => {
 
     const launcher = session.findText("Open Menu");
     expect(launcher).not.toBeNull();
+    const summaryStyle = session.getCellStyle(0, 0);
     session.mouseMove(launcher!.col + 2, launcher!.row);
     await session.wait(120);
+    expect(session.getCellStyle(0, 0)).toEqual(summaryStyle);
     await click(session, launcher!.col + 2, launcher!.row);
 
     expect(await session.waitForText("Command Palette", 2000)).toBe(true);
@@ -151,6 +153,37 @@ describe("modal-menu example", () => {
     await click(session, 1, 1);
 
     expect(await session.waitForText("Palette closed", 2000)).toBe(true);
+    expect(session.containsText("Command Palette")).toBe(false);
+  });
+
+  it("updates menu item hover and click on the visual row", async () => {
+    await session.spawn("bun", [modalMenu]);
+    expect(await session.waitForText("Palette closed", 2000)).toBe(true);
+
+    session.sendKey("/");
+    expect(await session.waitForText("Command Palette", 2000)).toBe(true);
+
+    const openProject = session.findText("Open Project");
+    const searchFiles = session.findText("Search Files");
+    expect(openProject).not.toBeNull();
+    expect(searchFiles).not.toBeNull();
+
+    const selectedStyle = session.getCellStyle(openProject!.col, openProject!.row);
+    session.mouseMove(openProject!.col, openProject!.row - 1);
+    await session.wait(120);
+    expect(session.getCellStyle(openProject!.col, openProject!.row)).not.toEqual(selectedStyle);
+
+    session.mouseMove(openProject!.col, openProject!.row);
+    await session.wait(120);
+    expect(session.getCellStyle(openProject!.col, openProject!.row)).toEqual(selectedStyle);
+
+    session.mouseMove(searchFiles!.col, searchFiles!.row);
+    await session.wait(120);
+    expect(session.getCellStyle(searchFiles!.col, searchFiles!.row)).toEqual(selectedStyle);
+    expect(session.getCellStyle(openProject!.col, openProject!.row)).not.toEqual(selectedStyle);
+
+    await click(session, searchFiles!.col, searchFiles!.row);
+    expect(await session.waitForText("Ran Search Files", 2000)).toBe(true);
     expect(session.containsText("Command Palette")).toBe(false);
   });
 

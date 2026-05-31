@@ -103,7 +103,7 @@ export async function runExample<State>(definition: ExampleDefinition<State>) {
     }
 
     const summary = definition.summary?.(state);
-    process.stdout.write(`\x1b[1;1H\x1b[2K${summary ?? ""}`);
+    process.stdout.write(`\x1b[0m\x1b[1;1H\x1b[2K${summary ?? ""}\x1b[0m`);
 
     if (definition.hasActiveTransitions?.(state, renderResult)) {
       scheduleTick();
