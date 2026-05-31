@@ -641,22 +641,6 @@ const example: ExampleDefinition<State> = {
           next = openMenu(next);
         }
       }
-
-      if (event.id.startsWith("item-")) {
-        const index = Number(event.id.slice(5));
-        if (Number.isNaN(index)) continue;
-        if (event.type === "pointerenter") {
-          next.pointerInMenu = true;
-          next.hoveredIndex = index;
-          next.selectedIndex = index;
-        }
-        if (event.type === "pointerleave" && next.hoveredIndex === index) {
-          next.hoveredIndex = null;
-        }
-        if (event.type === "pointerclick") {
-          next = activateSelection(next, index);
-        }
-      }
     }
 
     return next;
