@@ -174,16 +174,16 @@ Expose clip props in Solid bindings so a viewport can be expressed in ops.
 - Map `clip` through both op emission paths:
   - OpNode path
   - renderable fallback path
-- Confirm `childOffset` is emitted correctly.
-- Keep this additive and non-breaking.
+- Confirm boolean `horizontal` / `vertical` clip props are emitted correctly.
+- Keep generic clip support aligned with clayterm's current boolean clip API.
 
 ### Tests to Add
 - clip props reach emitted ops
-- `childOffset` changes propagate to rendered output
+- boolean clip changes propagate to rendered output
 - no regression in existing box rendering
 
 ### Deliverable
-Solid bindings can express a clipped container with manual child offset.
+Solid bindings can express a clipped container using clayterm's boolean clip API.
 
 ---
 

@@ -62,7 +62,7 @@ export abstract class OpNode {
     this._invalidationListener?.();
   }
 
-  abstract toOps(): Op[];
+  abstract toOps(inheritedFloatingZIndex?: number): Op[];
 
   add(child: OpNode, index?: number): number {
     if (child.parent && child.parent !== this) {

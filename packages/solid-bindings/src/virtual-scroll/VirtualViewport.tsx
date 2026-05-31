@@ -313,9 +313,20 @@ export const VirtualViewport = stateful(function VirtualViewport(rawProps: Virtu
       onPaste={rawProps.onPaste}
       onFocus={rawProps.onFocus}
       onBlur={rawProps.onBlur}
-      clip={{ vertical: true, childOffset: { y: -scrollTop() } }}
+      clip={{ vertical: true }}
     >
-      <box width={grow()} direction="ttb">
+      <box
+        id={`${viewportId}:content`}
+        width={grow()}
+        direction="ttb"
+        floating={{
+          y: -scrollTop(),
+          attachTo: "parent",
+          attachPoints: { element: "left-top", parent: "left-top" },
+          pointerCaptureMode: "passthrough",
+          clipTo: "attached-parent",
+        }}
+      >
         <box width={grow()} height={fixed(layout().beforeHeight)} />
         {layout()
           .measured.slice(layout().windowStartIndex, layout().windowEndIndex)

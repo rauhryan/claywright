@@ -3,7 +3,7 @@ import { InputRenderable, Renderable } from "@tui/core";
 import { ElementRenderable } from "./ElementRenderable";
 import { ElementOpNode, TextOpNode, toSizingAxis } from "./opnode";
 
-export function renderableToOps(renderable: Renderable): Op[] {
+export function renderableToOps(renderable: Renderable, inheritedFloatingZIndex?: number): Op[] {
   const ops: Op[] = [];
 
   if (renderable instanceof InputRenderable) {
@@ -60,19 +60,27 @@ export function renderableToOps(renderable: Renderable): Op[] {
     if (props.bg !== undefined) openProps.bg = props.bg;
     if (props.border) openProps.border = props.border;
     if (props.cornerRadius) openProps.cornerRadius = props.cornerRadius;
-    const clipOffset = (props.clip as { childOffset?: { x?: number; y?: number } } | undefined)
-      ?.childOffset;
-    if (clipOffset) {
-      const clip: { x?: number; y?: number } = {};
-      if (clipOffset.x !== undefined) clip.x = clipOffset.x;
-      if (clipOffset.y !== undefined) clip.y = clipOffset.y;
+    const clipProps = props.clip as { horizontal?: boolean; vertical?: boolean } | undefined;
+    if (clipProps) {
+      const clip: { horizontal?: boolean; vertical?: boolean } = {};
+      if (clipProps.horizontal !== undefined) clip.horizontal = clipProps.horizontal;
+      if (clipProps.vertical !== undefined) clip.vertical = clipProps.vertical;
       openProps.clip = clip;
     }
-    if (props.floating) openProps.floating = props.floating;
+
+    let nextFloatingZIndex = inheritedFloatingZIndex;
+    if (props.floating) {
+      const floating = { ...(props.floating as Record<string, unknown>) };
+      if (floating.zIndex === undefined && inheritedFloatingZIndex !== undefined) {
+        floating.zIndex = inheritedFloatingZIndex;
+      }
+      openProps.floating = floating;
+      if (typeof floating.zIndex === "number") nextFloatingZIndex = floating.zIndex;
+    }
 
     ops.push(open(node.id, openProps));
     for (const child of renderable.children) {
-      ops.push(...renderableToOps(child));
+      ops.push(...renderableToOps(child, nextFloatingZIndex));
     }
     ops.push(close());
   }

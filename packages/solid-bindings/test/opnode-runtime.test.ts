@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { close, open } from "clayterm";
+import { close, open, type Op } from "clayterm";
 import { RootNode, ElementNode, TextNode, jsx, renderToString } from "../src/jsx-runtime";
 
 describe("opnode jsx runtime", () => {
@@ -40,5 +40,37 @@ describe("opnode jsx runtime", () => {
     expect(ops[2]).toHaveProperty("content", "Hello");
     expect(ops[2]).toHaveProperty("directive", 0x03);
     expect(ops[3]).toHaveProperty("directive", 0x04);
+  });
+
+  test("element ops serialize boolean clip props", () => {
+    const node = jsx("box", {
+      id: "clipped",
+      clip: { horizontal: true, vertical: true },
+    });
+
+    const [op] = node.toOps();
+
+    expect(op).toHaveProperty("id", "clipped");
+    expect(op).toHaveProperty("clip", { horizontal: true, vertical: true });
+    expect(op).not.toHaveProperty("clip.x");
+    expect(op).not.toHaveProperty("clip.y");
+  });
+
+  test("element ops inherit floating z-index for nested floating layers", () => {
+    const node = jsx("box", {
+      id: "floating-window",
+      floating: { attachTo: "root", zIndex: 45 },
+      children: jsx("box", {
+        id: "floating-content",
+        floating: {
+          attachTo: "parent",
+          attachPoints: { element: "left-top", parent: "left-top" },
+        },
+      }),
+    });
+
+    const content = (node.toOps() as Op[]).find((op) => "id" in op && op.id === "floating-content");
+
+    expect(content).toHaveProperty("floating.zIndex", 45);
   });
 });

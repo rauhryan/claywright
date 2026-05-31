@@ -3,7 +3,7 @@ import { OpNode } from "./OpNode";
 import { TextOpNode } from "./TextOpNode";
 
 export class ElementOpNode extends OpNode {
-  toOps(): Op[] {
+  toOps(inheritedFloatingZIndex?: number): Op[] {
     const ops: Op[] = [];
 
     if (this.type === "text") {
@@ -15,16 +15,17 @@ export class ElementOpNode extends OpNode {
       if (this.props.color !== undefined) textProps.color = this.props.color as number;
       ops.push(text(content, textProps));
     } else if (this.type === "box") {
-      const openProps = this.buildBoxProps();
+      const { openProps, floatingZIndex } = this.buildBoxProps(inheritedFloatingZIndex);
       ops.push(open(this.id, openProps));
       for (const child of this.children) {
-        ops.push(...child.toOps());
+        ops.push(...child.toOps(floatingZIndex));
       }
       ops.push(close());
     } else {
-      ops.push(open(this.id, this.props as Record<string, unknown>));
+      const { openProps, floatingZIndex } = this.buildPassthroughProps(inheritedFloatingZIndex);
+      ops.push(open(this.id, openProps));
       for (const child of this.children) {
-        ops.push(...child.toOps());
+        ops.push(...child.toOps(floatingZIndex));
       }
       ops.push(close());
     }
@@ -32,7 +33,10 @@ export class ElementOpNode extends OpNode {
     return ops;
   }
 
-  private buildBoxProps(): Record<string, unknown> {
+  private buildBoxProps(inheritedFloatingZIndex?: number): {
+    openProps: Record<string, unknown>;
+    floatingZIndex: number | undefined;
+  } {
     const props = this.props as Record<string, unknown>;
     const openProps: Record<string, unknown> = {};
 
@@ -67,16 +71,42 @@ export class ElementOpNode extends OpNode {
     if (props.bg !== undefined) openProps.bg = props.bg;
     if (props.border) openProps.border = props.border;
     if (props.cornerRadius) openProps.cornerRadius = props.cornerRadius;
-    const clipOffset = (props.clip as { childOffset?: { x?: number; y?: number } } | undefined)
-      ?.childOffset;
-    if (clipOffset) {
-      const clip: { x?: number; y?: number } = {};
-      if (clipOffset.x !== undefined) clip.x = clipOffset.x;
-      if (clipOffset.y !== undefined) clip.y = clipOffset.y;
+    const clipProps = props.clip as { horizontal?: boolean; vertical?: boolean } | undefined;
+    if (clipProps) {
+      const clip: { horizontal?: boolean; vertical?: boolean } = {};
+      if (clipProps.horizontal !== undefined) clip.horizontal = clipProps.horizontal;
+      if (clipProps.vertical !== undefined) clip.vertical = clipProps.vertical;
       openProps.clip = clip;
     }
-    if (props.floating) openProps.floating = props.floating;
+    const floatingZIndex = this.applyFloatingProps(openProps, props, inheritedFloatingZIndex);
 
-    return openProps;
+    return { openProps, floatingZIndex };
+  }
+
+  private buildPassthroughProps(inheritedFloatingZIndex?: number): {
+    openProps: Record<string, unknown>;
+    floatingZIndex: number | undefined;
+  } {
+    const props = this.props as Record<string, unknown>;
+    const openProps = { ...props };
+    const floatingZIndex = this.applyFloatingProps(openProps, props, inheritedFloatingZIndex);
+    return { openProps, floatingZIndex };
+  }
+
+  private applyFloatingProps(
+    openProps: Record<string, unknown>,
+    props: Record<string, unknown>,
+    inheritedFloatingZIndex: number | undefined,
+  ): number | undefined {
+    let nextFloatingZIndex = inheritedFloatingZIndex;
+    if (props.floating) {
+      const floating = { ...(props.floating as Record<string, unknown>) };
+      if (floating.zIndex === undefined && inheritedFloatingZIndex !== undefined) {
+        floating.zIndex = inheritedFloatingZIndex;
+      }
+      openProps.floating = floating;
+      if (typeof floating.zIndex === "number") nextFloatingZIndex = floating.zIndex;
+    }
+    return nextFloatingZIndex;
   }
 }

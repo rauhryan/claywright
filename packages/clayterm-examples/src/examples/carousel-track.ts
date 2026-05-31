@@ -89,7 +89,7 @@ const example: ExampleDefinition<CarouselState> = {
       }),
       open("viewport", {
         layout: { width: fixed(metrics.frameInnerWidth), height: fixed(metrics.frameInnerHeight) },
-        clip: { x: trackOffset, y: 0 },
+        clip: { horizontal: true, vertical: true },
         bg: palette.frameBg,
       }),
       open("track", {
@@ -97,6 +97,14 @@ const example: ExampleDefinition<CarouselState> = {
           width: fixed(trackWidth),
           height: fixed(metrics.frameInnerHeight),
           direction: "ltr",
+        },
+        floating: {
+          x: trackOffset,
+          y: 0,
+          attachTo: "parent",
+          attachPoints: { element: "left-top", parent: "left-top" },
+          pointerCaptureMode: "passthrough",
+          clipTo: "attached-parent",
         },
         bg: palette.frameBg,
       }),

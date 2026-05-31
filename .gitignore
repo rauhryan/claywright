@@ -5,3 +5,4 @@ packages/ghostty-vt/lib
 # formatter/linter ignore helpers
 .oxlintignore
 .prettierignore
+.pi/specs

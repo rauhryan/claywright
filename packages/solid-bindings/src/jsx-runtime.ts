@@ -150,7 +150,6 @@ export namespace JSX {
       clip?: {
         horizontal?: boolean;
         vertical?: boolean;
-        childOffset?: { x?: number; y?: number };
       };
       floating?: OpenElement["floating"];
     };
